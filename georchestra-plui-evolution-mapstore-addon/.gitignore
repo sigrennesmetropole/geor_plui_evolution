@@ -1,0 +1,7 @@
+/target/
+/node_modules/
+/.project
+/dist/
+/.settings/
+/MapStore2/
+/mapstore2-georchestra/

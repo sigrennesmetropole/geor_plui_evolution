@@ -1,0 +1,134 @@
+# Pipeline variables
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=.m2/repository --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# Cache policy - Share target folders between jobs - Note that key is related to a commit and is purged automatically after pipeline execution
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - $CI_PROJECT_DIR/.m2/repository/**/*
+    - $CI_PROJECT_DIR/**/target/**/*
+
+default:
+  image: maven:3.6.0-jdk-11
+  before_script:
+    - apt update && apt install -y gettext-base build-essential
+    - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
+
+# Stages definition
+stages:
+  - build
+  - test
+  - deploy
+
+# Build job with maven plugin execution policies define in parent pom
+pluievolutionapi:build:
+  script:
+    - sh ./mvnw $MAVEN_CLI_OPTS -U package
+  stage: build
+  except:
+    refs:
+      - master
+      - open/master  
+  tags: 
+   - cdp-rennes  
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip
+      
+pluievolutionapi:build:master:
+  script:
+    - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests
+  stage: build
+  tags: 
+   - cdp-rennes
+  only:
+    refs:
+      - master
+      - open/master   
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip
+
+# Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
+pluievolutionapi:sonar:
+  stage: test
+  dependencies:
+    - pluievolutionapi:build
+  except:
+    refs:
+      - master
+      - open/master
+  allow_failure: true
+  script:
+    - >
+      sh ./mvnw $MAVEN_CLI_OPTS -U compile sonar:sonar
+      -Dsonar.host.url=$SONAR_URL
+      -Dsonar.login=$SONAR_TOKEN
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+      -Dsonar.branch.name=$CI_COMMIT_REF_NAME
+            
+
+# On master, do not use branch parameter
+pluievolutionapi:sonar:master:
+  stage: test
+  dependencies:
+    - pluievolutionapi:build
+  only:
+    refs:
+      - open/master
+  allow_failure: true
+  script:
+    - >
+      sh ./mvnw $MAVEN_CLI_OPTS -U compile sonar:sonar
+      -Dsonar.host.url=$SONAR_URL
+      -Dsonar.login=$SONAR_TOKEN
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
+pluievolutionapi:deploy:
+  stage: deploy
+  tags: 
+   - cdp-rennes
+  image: ansible/ansible-runner:1.4.4
+  dependencies:
+    - pluievolutionapi:build
+  only:
+    refs:
+      - open/develop
+  script:
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip $CI_PROJECT_DIR/ansible/dockerize/files/plui-evolution.zip
+    - cd $CI_PROJECT_DIR/ansible  
+    - chmod og-rw key/id_rsa
+    - cp plui-evolution_dev_var.yml $HOME/plui-evolution_var.yml
+    - ansible-playbook plui-evolution-docker.yml -v -i "10.50.1.21," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
+
+pluievolutionapi:deploy:master:
+  stage: deploy
+  tags: 
+   - cdp-rennes  
+  image: ansible/ansible-runner:1.4.4
+  dependencies:
+    - pluievolutionapi:build:master
+  only:
+    refs:
+      - open/master
+  script:
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip $CI_PROJECT_DIR/ansible/dockerize/files/plui-evolution.zip
+    - cd $CI_PROJECT_DIR/ansible  
+    - chmod og-rw key/id_rsa
+    - cp plui-evolution_rct_var.yml $HOME/plui-evolution_var.yml
+    - ansible-playbook plui-evolution-docker.yml -v -i "194.2.68.134," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
+    

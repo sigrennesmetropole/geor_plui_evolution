@@ -1,0 +1,17 @@
+FROM jetty:9.3-jre8
+USER root
+MAINTAINER fni18300@open-groupe.com
+ENV TZ=Europe/Paris
+EXPOSE {{plui-evolution_server_port}}
+
+RUN mkdir -p /opt/plui-evolution/data/models
+
+ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
+#ADD jetty-logging.properties /usr/local/jetty/resources/jetty-logging.properties
+
+CMD [ "sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty -Dgeorchestra.datadir=/etc/georchestra \
+      ${ADD_JAVA_OPTS}                                   \
+      -Xmx${XMX:-1G} -Xms${XMX:-1G}                      \
+      -jar /usr/local/jetty/start.jar" ]
+
+

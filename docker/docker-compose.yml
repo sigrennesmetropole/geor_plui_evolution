@@ -1,0 +1,20 @@
+proxy:
+  build: proxy
+  ports:
+    - "8080:8080"
+  links:
+    - mapfishapp
+    - plui-evolution
+    - header
+  environment:
+    - XMX=512M
+
+plui-evolution:
+  build: plui-evolution
+  environment:
+    - ADD_JAVA_OPTS=-Dgeorchestra.datadir=/etc/georchestra
+
+header:
+  environment:
+    - XMX=512M
+  image: georchestra/header

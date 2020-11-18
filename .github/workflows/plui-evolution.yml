@@ -1,0 +1,55 @@
+name: "plui-evolution"
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+jobs:
+  build-docker:
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checking out"
+      uses: actions/checkout@v2
+
+    - name: "Setting up Java"
+      uses: actions/setup-java@v1
+      with:
+        java-version: '8.x'
+
+    - name: "Maven repository caching"
+      uses: actions/cache@v1
+      with:
+        path: ~/.m2/repository
+        key: plui-evolution-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: "Calculating docker image tag"
+      id: version
+      run: echo ::set-output name=VERSION::$(echo $GITHUB_REF | cut -d / -f 3)
+
+    - name: "Build a docker image"
+      run: mvn -B clean package -Pdocker -DskipTests -DskipDockerPush -DdockerImageName=sigrennesmetropole/geor_plui_evolution:${{ steps.version.outputs.VERSION }}
+
+    - name: "Logging in docker.io"
+      uses: azure/docker-login@v1
+      with:
+        username: '${{ secrets.DOCKER_HUB_USERNAME }}'
+        password: '${{ secrets.DOCKER_HUB_PASSWORD }}'
+
+    - name: "Pushing latest to docker.io"
+      if: github.ref == 'refs/heads/master'
+      run: |
+        docker tag sigrennesmetropole/geor_plui_evolution:${{ steps.version.outputs.VERSION }} georchestra/cadastrapp:latest
+        docker push sigrennesmetropole/geor_plui_evolution:latest
+
+    - name: "Pushing release tag to docker.io"
+      if: contains(github.ref, 'refs/tags/')
+      run: |
+        docker push sigrennesmetropole/geor_plui_evolution:${{ steps.version.outputs.VERSION }}
+
+    - name: "Remove SNAPSHOT jars from repository"
+      run: |
+        find .m2/repository -name "*SNAPSHOT*" -type d | xargs rm -rf {}

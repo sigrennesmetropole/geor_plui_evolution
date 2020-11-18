@@ -1,0 +1,695 @@
+{
+	"swagger": "2.0",
+	"info": {
+		"version": "1.0.0",
+		"title": "Georchestra - Plugin Plui'Evolution' API",
+		"contact": {
+			"email": "thomas.brule@open-groupe.com"
+		},
+		"license": {
+			"name": "Apache 2.0",
+			"url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+		}
+	},
+	"host": "",
+	"basePath": "/",
+	"tags": [
+		{
+			"name": "administration",
+			"description": "Administration de la plateforme"
+		},
+		{
+			"name": "user",
+			"description": "Services de gestion des utilisateurs"
+		},
+		{
+			"name": "request",
+			"description": "Services de gestion des demandes"
+		}
+	],
+	"schemes": [
+		"https",
+		"http"
+	],
+	"paths": {
+		"/administration/configuration": {
+			"get": {
+				"tags": [
+					"administration"
+				],
+				"summary": "Récupération des propriétés de configuration",
+				"description": "Ensemble des propriétés de configuration",
+				"operationId": "getConfiguration",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/ConfigurationData"
+						}
+					}
+				}
+			}
+		},
+		"/administration/initialize": {
+			"get": {
+				"tags": [
+					"administration"
+				],
+				"summary": "Initialisation applicatives",
+				"description": "Initialisation applicatives",
+				"operationId": "initialize",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				}
+			}
+		},
+		"/user/me":{
+			"get": {
+				"tags": [
+					"user"
+				],
+				"summary": "Récupération des données de l'utilisateur connecté",
+				"description": "",
+				"operationId": "getMe",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/User"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/attachment/configuration": {
+			"get": {
+				"tags": [
+					"administration"
+				],
+				"summary": "Lister la configuration liées aux pièces jointes",
+				"description": "Lister la configuration liées aux pièces jointes",
+				"operationId": "getAttachmentConfiguration",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/AttachmentConfiguration"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/{uuid}/upload": {
+			"post": {
+				"tags": [
+					"request"
+				],
+				"summary": "Téléversement d'une pièce jointe sur une demande",
+				"description": "",
+				"operationId": "uploadDocument",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "uuid",
+						"description": "Identifiant de la demande",
+						"required": true,
+						"type": "string",
+						"format": "uuid"
+					},
+					{
+						"in": "formData",
+						"name": "file",
+						"description": "Pièce jointe sous la forme d'un blob",
+						"required": true,
+						"type": "file"
+					}
+				],
+				"consumes": [
+					"multipart/form-data",
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/Attachment"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/{uuid}/delete/{attachmentId}": {
+			"delete": {
+				"tags": [
+					"request"
+				],
+				"summary": "Suppression d'un pièce jointe sur une demande",
+				"description": "",
+				"operationId": "deleteDocument",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "uuid",
+						"description": "Identifiant de la demande",
+						"required": true,
+						"type": "string",
+						"format": "uuid"
+					},
+					{
+						"in": "path",
+						"name": "attachmentId",
+						"description": "Identifiant de l'attachement",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/{uuid}/download/{attachmentId}": {
+			"get": {
+				"tags": [
+					"request"
+				],
+				"summary": "Téléchargement d'un pièce attachée à une demande",
+				"description": "",
+				"operationId": "downloadDocument",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "uuid",
+						"description": "Identifiant de la demande",
+						"required": true,
+						"type": "string",
+						"format": "uuid"
+					},
+					{
+						"in": "path",
+						"name": "attachmentId",
+						"description": "Identifiant de l'attachement",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		}
+	},
+	"definitions": {
+		"ApiError": {
+			"type": "object",
+			"properties": {
+				"code": {
+					"type": "string"
+				},
+				"label": {
+					"type": "string"
+				}
+			}
+		},
+		"ConfigurationData": {
+			"type": "object",
+			"properties": {
+				"version": {
+					"type": "string"
+				}
+			}
+		},
+		"Attachment": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer",
+					"format": "int64"
+				},
+				"name": {
+					"type": "string"
+				},
+				"mimeType": {
+					"type": "string"
+				}
+			}
+		},
+		"AttachmentConfiguration": {
+			"type": "object",
+			"properties": {
+				"maxSize": {
+					"type": "integer",
+					"format": "int64"
+				},
+				"maxCount": {
+					"type": "integer",
+					"format": "int32"
+				},
+				"mimeTypes": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"User": {
+			"type": "object",
+			"properties": {
+				"login": {
+					"type": "string"
+				},
+				"firstName": {
+					"type": "string"
+				},
+				"lastName": {
+					"type": "string"
+				},
+				"email": {
+					"type": "string"
+				},
+				"organization": {
+					"type": "string"
+				},
+				"roles":{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		},
+		"GeometryType": {
+			"type": "string",
+			"description": "the geometry type",
+			"enum": [
+				"Point",
+				"LineString",
+				"Polygon",
+				"MultiPoint",
+				"MultiLineString",
+				"MultiPolygon"
+			]
+		},
+		"Geometry": {
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"discriminator": "type",
+			"properties": {
+				"type": {
+					"type": "object",
+					"$ref": "#/definitions/GeometryType"
+				}
+			}
+		},
+		"Point2D":{
+			"type": "array",
+			"maxItems": 2,
+    		"minItems": 2,
+    		"items":{
+    			"type": "number"
+    		}
+		},
+		"Point": {
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type": "object",
+					"properties": {
+						"coordinates": {
+							"$ref": "#/definitions/Point2D"
+						}
+					}
+				}
+			]
+		},
+		"LineString":{
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type":"object",
+					"properties": {
+						"coordinates": {
+							"type": "array",
+							"items" : {
+								"$ref": "#/definitions/Point2D"
+							}
+						}
+					}
+				}
+			]
+		},
+		"Polygon":{
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type":"object",
+					"properties": {
+						"coordinates": {
+							"type": "array",
+							"items" : {
+								"type": "array",
+								"items":{
+									"$ref": "#/definitions/Point2D"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		"MultiPoint":{
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type":"object",
+					"properties": {
+						"coordinates": {
+							"type": "array",
+							"items" : {
+								"$ref": "#/definitions/Point2D"
+							}
+						}
+					}
+				}
+			]
+		},
+		"MultiLineString":{
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type":"object",
+					"properties": {
+						"coordinates": {
+							"type": "array",
+							"items" : {
+								"type": "array",
+								"items":{
+									"$ref": "#/definitions/Point2D"
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		"MultiPolygon":{
+			"type": "object",
+			"description": "GeoJSon geometry",
+			"allOf": [
+				{"$ref": "#/definitions/Geometry"},
+				{
+					"type":"object",
+					"properties": {
+						"coordinates": {
+							"type": "array",
+							"items" : {
+								"type": "array",
+								"items":{
+									"type": "array",
+									"items":{
+										"$ref": "#/definitions/Point2D"
+									}
+								}
+							}
+						}
+					}
+				}
+			]
+		},
+		"GeometryCollection":{
+    		"type": "object",
+			"description": "GeoJSon geometry collection",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum" : [ "GeometryCollection"]
+				},
+				"geometries":{
+					"type": "array",
+					"items":{
+						"$ref": "#/definitions/Geometry"
+					}
+				}
+			}
+    	},
+    	"Style": {
+    		"type": "object",
+			"description": "GeoJSon feature style",
+			"properties": {
+				"color": {
+					"type": "string"
+				},
+				"fillColor": {
+					"type": "string"
+				},
+				"fillOpacity": {
+					"type": "number",
+					"format": "double"
+				},
+				"opacity": {
+					"type": "number",
+					"format": "double"
+				},
+				"iconColor": {
+					"type": "string"
+				},
+				"iconGlyph": {
+					"type": "string"
+				},
+				"iconShape": {
+					"type": "string"
+				},
+				"weight": {
+					"type": "number",
+					"format": "double"
+				},
+				"geometry": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"iconAnchor": {
+					"type": "array",
+					"items":{
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"dashArray": {
+					"type": "array",
+					"items":{
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"filtering": {
+					"type": "boolean"
+				}
+			}
+    	},
+    	"Feature":{
+    		"type": "object",
+			"description": "GeoJSon feature",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum" : [ "Feature"]
+				},
+				"id":{
+					"type": "string",
+					"format": "uuid"
+				},
+				"geometry":{
+					"$ref": "#/definitions/Geometry"
+				},
+				"style": {
+					"type": "array",
+					"items":{
+						"$ref": "#/definitions/Style"
+					}
+				},
+				"properties":{
+					"type": "object"
+				}
+			}
+    	},
+    	"FeatureCollection":{
+    		"type": "object",
+			"description": "GeoJSon feature collection",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum" : [ "FeatureCollection"]
+				},
+				"features":{
+					"type": "array",
+					"items":{
+						"$ref": "#/definitions/Feature"
+					}
+				},
+				"style": {
+					"type": "array",
+					"items":{
+						"$ref": "#/definitions/Style"
+					}
+				}
+			}
+    	},
+    	"FeatureProperty":{
+    		"type": "object",
+    		"description": "GeoJSon feature property description",
+    		"properties": {
+    			"name":{
+    				"type": "string"
+    			},
+    			"maxOccurs": {
+    				"type": "integer",
+    				"format": "int32"
+    			},
+    			"minOccurs": {
+    				"type": "integer",
+    				"format": "int32"
+    			},
+    			"nillable": {
+    				"type": "boolean"
+    			},
+    			"type": {
+    				"type": "string"
+    			},
+    			"localType": {
+    				"type": "string"
+    			}
+    		}
+    	},
+    	"FeatureType": {
+    		"type": "object",
+    		"description": "GeoJSon feature type",
+    		"properties": {
+    			"typeName":{
+    				"type": "string"
+    			},
+    			"properties":{
+    				"type": "array",
+    				"items": {
+    					"$ref": "#/definitions/FeatureProperty"
+    				}
+    			}
+    		}
+    	},
+    	"FeatureTypeDescription": {	
+    		"type": "object",
+    		"description": "GeoJSon feature type description",
+    		"properties": {
+    			"elementFormDefault":{
+    				"type": "string"
+    			},
+    			"targetNamespace": {
+    				"type": "string"
+    			},
+    			"targetPrefix": {
+    				"type": "string"
+    			},
+				"featureTypes": {
+					"type": "array",
+					"items": {
+    					"$ref": "#/definitions/FeatureType"
+    				}
+				}
+    		}
+    	}
+	}
+}

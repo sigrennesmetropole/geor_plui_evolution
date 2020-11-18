@@ -1,0 +1,35 @@
+---
+version: "3"
+
+volumes:
+  plui-evolution_data:
+
+services:
+
+  mapfishapp:
+    image: georchestra/mapfishapp:19.04
+    depends_on:
+      - database
+    volumes:
+      - ./config:/etc/georchestra
+      - mapfishapp_uploads:/mnt/mapfishapp_uploads
+    environment:
+      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+      - XMS=256M
+      - XMX=2G
+
+  plui-evolution:
+    image: plui-evolution-image
+    depends_on:
+      - database
+      - ldap
+    ports:
+      - "{{plui-evolution_server_expose_port}}:{{plui-evolution_server_port}}"      
+    volumes:
+      - ./config:/etc/georchestra
+      - plui-evolution_data:/opt/plui-evolution/data
+    environment:
+      - JAVA_OPTIONS=-Dorg.eclipse.jetty.annotations.AnnotationParser.LEVEL=OFF
+      - ADD_JAVA_OPTS=
+      - XMX=1G
+

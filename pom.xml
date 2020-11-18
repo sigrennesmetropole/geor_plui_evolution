@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.georchestra</groupId>
+	<artifactId>georchestra-plui-evolution</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>georchestra-plui-evolution</name>
+	<description>Plugin Georchestra Plui'Evolution</description>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<!-- <version>2.2.4.RELEASE</version> -->
+		<version>2.1.10.RELEASE</version>
+		<relativePath />
+	</parent>
+
+	<!-- Modules du projet -->
+	<modules>
+		<module>georchestra-plui-evolution-api</module>
+		<module>georchestra-plui-evolution-service</module>
+		<module>georchestra-plui-evolution-core</module>
+		<module>georchestra-plui-evolution-mapstore-addon</module>
+	</modules>
+
+	<!-- Propriétés du projet -->
+	<properties>
+
+		<!-- dependencies version -->
+		<commons.io.version>2.6</commons.io.version>
+		<commons.lang.version>3.9</commons.lang.version>
+		<commons.collections.version>4.4</commons.collections.version>
+
+		<springfox.version>2.8.0</springfox.version>
+		<mapstruct.version>1.2.0.Final</mapstruct.version>
+		<lombok.version>1.18.6</lombok.version>
+		<minidev.version>2.3</minidev.version>
+		<json.version>20200518</json.version>
+		<jsoup.version>1.12.1</jsoup.version>
+		<itextpdf.version>5.5.13.1</itextpdf.version>
+		<flyingsauver.version>9.1.19</flyingsauver.version>
+		<jtidy.version>r938</jtidy.version>
+		<geotools.version>16.1</geotools.version>
+
+		<activiti.version>7.1.0.M5</activiti.version>
+
+		<swagger.plugin.version>2.4.12</swagger.plugin.version>
+		<maven-replacer-plugin.version>1.4.1</maven-replacer-plugin.version>
+		<compiler.plugin.version>3.5.1</compiler.plugin.version>
+		<assemby.plugin.version>2.6</assemby.plugin.version>
+		<ant.plugin.version>3.0.0</ant.plugin.version>
+
+		<!-- java version -->
+		<java.source.version>11</java.source.version>
+		<java.target.version>11</java.target.version>
+
+		<!-- Project properties -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+		<!-- sonar properties -->
+		<sonar.projectKey>${env.SONAR_KEY}${project.artifactId}</sonar.projectKey>
+		<sonar.projectName>${project.artifactId}</sonar.projectName>
+		<sonar.exclusions>**/config/*.java,**/exception/**/*.java,**/test/*.java</sonar.exclusions>
+		<sonar.global.test.exclusions>**/*Test.java</sonar.global.test.exclusions>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>open.nexus</id>
+			<url>${MVN_RELEASES}</url>
+		</repository>
+		<snapshotRepository>
+			<id>open.nexus</id>
+			<url>${MVN_SNAPSHOTS}</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<!-- Modules -->
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>georchestra-plui-evolution-api</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>georchestra-plui-evolution-service</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>georchestra-plui-evolution-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+
+			<!-- Commons dependencies -->
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${commons.io.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-collections4</artifactId>
+				<version>${commons.collections.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${commons.lang.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
+			<dependency>
+				<groupId>org.jsoup</groupId>
+				<artifactId>jsoup</artifactId>
+				<version>${jsoup.version}</version>
+			</dependency>
+
+			<!-- json -->
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>${minidev.version}</version>
+			</dependency>
+
+			<!-- org.json -->
+			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>${json.version}</version>
+			</dependency>
+
+
+			<!-- Swagger dependencies -->
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox.version}</version>
+			</dependency>
+
+			<!-- Map Struct -->
+			<dependency>
+				<groupId>org.mapstruct</groupId>
+				<artifactId>mapstruct-jdk8</artifactId>
+				<version>${mapstruct.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
+			<dependency>
+				<groupId>org.freemarker</groupId>
+				<artifactId>freemarker</artifactId>
+				<version>${freemarker.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+			<dependency>
+				<groupId>com.itextpdf</groupId>
+				<artifactId>itextpdf</artifactId>
+				<version>${itextpdf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.itextpdf.tool</groupId>
+				<artifactId>xmlworker</artifactId>
+				<version>${itextpdf.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.xhtmlrenderer</groupId>
+				<artifactId>flying-saucer-pdf-itext5</artifactId>
+				<version>${flyingsauver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.jtidy</groupId>
+				<artifactId>jtidy</artifactId>
+				<version>${jtidy.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>geotools</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
+			<dependency>
+				<groupId>com.google.code.maven-replacer-plugin</groupId>
+				<artifactId>maven-replacer-plugin</artifactId>
+				<version>${maven-replacer-plugin.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+
+				<!-- Swagger -->
+				<plugin>
+					<groupId>io.swagger</groupId>
+					<artifactId>swagger-codegen-maven-plugin</artifactId>
+					<version>${swagger.plugin.version}</version>
+				</plugin>
+
+				<!-- Generate Lombok annotation then Mapstruct classes -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${compiler.plugin.version}</version>
+					<configuration>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
+						<showDeprecation>true</showDeprecation>
+						<showWarnings>true</showWarnings>
+						<encoding>${project.build.sourceEncoding}</encoding>
+						<annotationProcessorPaths>
+							<path>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+								<version>${lombok.version}</version>
+							</path>
+							<path>
+								<groupId>org.mapstruct</groupId>
+								<artifactId>mapstruct-processor</artifactId>
+								<version>${mapstruct.version}</version>
+							</path>
+						</annotationProcessorPaths>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>${assemby.plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<version>${ant.plugin.version}</version>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-war-plugin</artifactId>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+				</plugin>
+				
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

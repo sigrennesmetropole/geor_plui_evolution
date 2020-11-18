@@ -1,0 +1,11 @@
+{
+    "plugins": [
+        {
+            "name": "pluievolution",
+            "description": "PLUI Evolution Extension",
+            "dependencies": [
+                "BurgerMenu"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+---
+# vars file for plui-evolution
+
+# database 
+plui-evolution_db_host: database
+plui-evolution_db_name: georchestra
+plui-evolution_db_port: 5432
+plui-evolution_db_user: plui-evolution
+plui-evolution_db_password: plui-evolution
+
+# installation
+plui-evolution_image_directory: /opt/images/plui-evolution
+plui-evolution_war_name: georchestra-plui-evolution-api.war
+plui-evolution_addon_name: georchestra-plui-evolution-api-addon.zip
+plui-evolution_docker_directory: /opt/georchestra/docker
+plui-evolution_config_directory: '{{plui-evolution_docker_directory}}/config/'
+plui-evolution_addon_directory: '{{plui-evolution_docker_directory}}/config/mapfishapp/addons'
+plui-evolution_server_port: 8080
+plui-evolution_server_expose_port: 8082
+#plui-evolution_backend_url: http://plui-evolution:{{plui-evolution_server_port}}/plui-evolution/
+
+plui-evolution_admin_password: 4dM1nApp!
+
+plui-evolution_smtp_host: 10.50.1.113
+plui-evolution_smtp_port: 1025
+plui-evolution_smtp_username:
+plui-evolution_smtp_password:
+
+plui-evolution_ldap_host: ldap
+plui-evolution_ldap_port: 389
+plui-evolution_ldap_username: cn=admin,dc=georchestra,dc=org
+plui-evolution_ldap_password: secret
+
+
+
+ 
+
+

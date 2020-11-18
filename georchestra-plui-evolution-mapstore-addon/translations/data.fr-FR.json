@@ -1,0 +1,38 @@
+{
+    "locale": "fr-FR",
+    "messages": {
+        "pluievolution": {
+            "close": "Fermer",
+			"cancel": "Abandonner",
+			"create": "Créer",
+			"user": "Utilisateur",
+			"login": "Vous aêtes",
+			"organization": "Collectivité",
+			"email": "Votre adresse mail",
+			"description": "Description",			
+			"description.count":"nombre de caracteres restants:",
+			"attachment.add": "Ajouter",
+			"attachment.files": "Piece(s) jointe(s)",
+			"attachment.file": "Piece jointe",
+			"attachment.size": "la taille du fichier est supérieur a : ",
+			"attachment.typeFile": "Vous ne pouvez pas ajouter ce type fichier",
+			"attachment.length": "Vous ne pouvez pas ajouter plus de fichiers",
+			"attachment.error": "le fichier n'a pas été uploadé",
+			"attachment.select": "Sélectionner un document",
+			"attachment.delete": "Supprimer un document",
+			"localization": "Géolocation de l'anomalie",
+			"localization.tips": "Cliquer sur le bouton pour géolocaliser le signalement sur la carte",
+			"localization.drawn": "Signalement géolocalisé",
+			"localization.layer": "La couche n'est pas signalable",
+			"msgBox.title": "PLUi Evolution",
+			"msgBox.info": "Etes-vous sur de vouloir annuler cette demande ?",
+			"msgBox.ok": "Oui",
+			"msgBox.cancel": "Non",
+			"loading": "En cours d'initialisation...",
+			"init.attachmentConfiguration.error": "Impossible de charger la configuration",
+			"init.me.error": "Impossible de charger les données de l'utilisateur",
+			"generic.error": "Une erreur s'est produite",
+			"fileUpload.info": "max. 10 Mo par fichier. Formats autorisés : pdf, doc(x), xls(x), png, jpg, tif, dxf, dwg, kml, geojson"
+        }
+    }
+}
