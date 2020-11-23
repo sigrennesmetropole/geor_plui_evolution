@@ -1,7 +1,6 @@
 package org.georchestra.pluievolution.core.entity.request;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.*;
@@ -14,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.georchestra.pluievolution.core.entity.ged.AttachmentEntity;
 import org.georchestra.pluievolution.core.entity.ref.RequestTypeEntity;
 import org.georchestra.pluievolution.core.entity.ref.StatusEntity;
 
@@ -65,10 +63,6 @@ public class PluiRequestEntity implements LongId {
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "status_id")
 	private StatusEntity status;
-
-	@OneToMany(fetch = FetchType.LAZY)
-	@JoinColumn(name = "attachment_id")
-	private List<AttachmentEntity> attachments;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "type_id")
