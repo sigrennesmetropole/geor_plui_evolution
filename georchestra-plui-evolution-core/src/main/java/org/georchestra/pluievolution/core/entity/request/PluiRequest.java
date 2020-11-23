@@ -1,17 +1,10 @@
-/**
- * 
- */
 package org.georchestra.pluievolution.core.entity.request;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.georchestra.pluievolution.core.common.LongId;
 
@@ -20,6 +13,10 @@ import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
+import org.georchestra.pluievolution.core.entity.ged.AttachmentEntity;
+import org.georchestra.pluievolution.core.entity.ref.RequestTypeEntity;
+import org.georchestra.pluievolution.core.entity.ref.StatusEntity;
 
 /**
  * @author FNI18300
@@ -30,7 +27,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "plui_request")
-public class PluiRequest implements LongId {
+public class PluiRequestEntity implements LongId {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +40,11 @@ public class PluiRequest implements LongId {
 	@Column(name = "redmine_id")
 	private String redmineId;
 
-	@Column(name = "description", length = 1024, nullable = false)
-	private String description;
+	@Column(name = "subject", length = 30, nullable = false)
+	private String subject;
+
+	@Column(name = "object", length = 300, nullable = false)
+	private String object;
 
 	@Column(name = "comment", length = 1024)
 	private String comment;
@@ -58,7 +58,21 @@ public class PluiRequest implements LongId {
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
 
-	// TODO Status
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "area_id")
+	private GeographicAreaEntity area;
+
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "status_id")
+	private StatusEntity status;
+
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "attachment_id")
+	private List<AttachmentEntity> attachments;
+
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "type_id")
+	private RequestTypeEntity type;
 
 	@Override
 	public int hashCode() {
@@ -74,10 +88,10 @@ public class PluiRequest implements LongId {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof PluiRequest)) {
+		if (!(obj instanceof PluiRequestEntity)) {
 			return false;
 		}
-		PluiRequest other = (PluiRequest) obj;
+		PluiRequestEntity other = (PluiRequestEntity) obj;
 		if (getCreationDate() == null) {
 			if (other.getCreationDate() != null) {
 				return false;
