@@ -12,34 +12,32 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name = "status")
+@Table(name = "request_type")
 @ToString
-@Getter  @Setter
-public class StatusEntity implements LongId {
+@Getter
+@Setter
+public class PluiRequestTypeEntity implements LongId {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "value", length = 50)
-    private StatutRefEntityEnum value;
+    @Column(name = "value", length = 20)
+    private PluiRequestTypeEntity.PluiRequestTypeEntityEnum value;
 
-    public enum StatutRefEntityEnum {
-        STATUT_NOUVEAU,
-        STATUT_ANALYSE_EN_COURS,
-        STATUT_EN_ATTENTE_VALIDATION_COMMUNE,
-        STATUT_VALIDE_COMMUNE,
-        STATUT_DEMANDE_NON_RECEVABLE,
-        STATUT_DEMANDE_REFORMULEE
+    public enum PluiRequestTypeEntityEnum {
+        TYPE_COMMUNE,
+        TYPE_INTERCOMMUNE,
+        TYPE_METROPOLITAIN
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof StatusEntity)) return false;
+        if (!(o instanceof PluiRequestTypeEntity)) return false;
 
-        StatusEntity that = (StatusEntity) o;
+        PluiRequestTypeEntity that = (PluiRequestTypeEntity) o;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         return getValue() == that.getValue();

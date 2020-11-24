@@ -13,8 +13,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.georchestra.pluievolution.core.entity.ref.RequestTypeEntity;
-import org.georchestra.pluievolution.core.entity.ref.StatusEntity;
+import org.georchestra.pluievolution.core.entity.ref.PluiRequestTypeEntity;
+import org.georchestra.pluievolution.core.entity.ref.PluiRequestStatusEntity;
 
 /**
  * @author FNI18300
@@ -62,11 +62,11 @@ public class PluiRequestEntity implements LongId {
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "status_id")
-	private StatusEntity status;
+	private PluiRequestStatusEntity status;
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "type_id")
-	private RequestTypeEntity type;
+	private PluiRequestTypeEntity type;
 
 	@Override
 	public int hashCode() {
