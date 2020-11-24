@@ -3,13 +3,16 @@
  */
 package org.georchestra.pluievolution.api.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
 
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.dto.Attachment;
-import org.springframework.core.io.Resource;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
+import org.georchestra.pluievolution.core.dto.PluiRequestType;
+import org.georchestra.pluievolution.core.dto.Status;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,13 +23,31 @@ import org.springframework.web.multipart.MultipartFile;
 public class RequestController implements RequestApi {
 
 	@Override
-	public ResponseEntity<Void> deleteDocument(UUID uuid, Long attachmentId) throws Exception {
+	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseEntity<Resource> downloadDocument(UUID uuid, Long attachmentId) throws Exception {
+	public ResponseEntity<Void> deletePluiRequest(UUID uuid) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<PluiRequest> getPluiRequestByUuid(UUID uuid) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<List<Status>> getPluiRequestStatus() throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseEntity<List<PluiRequestType>> getPluiRequestTypes() throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
