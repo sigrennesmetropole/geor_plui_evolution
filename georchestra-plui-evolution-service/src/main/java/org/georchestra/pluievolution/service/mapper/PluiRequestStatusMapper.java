@@ -10,7 +10,7 @@ public interface PluiRequestStatusMapper extends AbstractMapper<PluiRequestStatu
     @InheritInverseConfiguration
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequestStatus.value", target = "value", qualifiedByName = "convertToStatusEntityEnum")
+                    @Mapping(source = "pluiRequestStatus.value", target = "value", qualifiedByName = "convertToStatusEntity")
             }
     )
     PluiRequestStatusEntity dtoToEntity(PluiRequestStatus pluiRequestStatus);
@@ -18,7 +18,7 @@ public interface PluiRequestStatusMapper extends AbstractMapper<PluiRequestStatu
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequestStatusEntity.value", target = "value", qualifiedByName = "convertToStatusEnum")
+                    @Mapping(source = "pluiRequestStatusEntity.value", target = "value", qualifiedByName = "convertToStatus")
             }
     )
     PluiRequestStatus entityToDto(PluiRequestStatusEntity pluiRequestStatusEntity);
@@ -26,7 +26,7 @@ public interface PluiRequestStatusMapper extends AbstractMapper<PluiRequestStatu
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "s.value", target = "value", qualifiedByName = "convertToStatusEntityEnum")
+                    @Mapping(source = "s.value", target = "value", qualifiedByName = "convertToStatusEntity")
             }
     )
     PluiRequestStatusEntity toEntity(PluiRequestStatus s, @MappingTarget PluiRequestStatusEntity entity);
@@ -36,7 +36,7 @@ public interface PluiRequestStatusMapper extends AbstractMapper<PluiRequestStatu
      * @param statusEnum
      * @return
      */
-    static PluiRequestStatusEntity.PluiRequestStatusEntityEnum convertToStatusEntityEnum(PluiRequestStatusEnum statusEnum) {
+    static PluiRequestStatusEntity.PluiRequestStatusEntityEnum convertToStatusEntity(PluiRequestStatusEnum statusEnum) {
         if (statusEnum != null) {
             return PluiRequestStatusEntity.fromValue(statusEnum.toString());
         }
@@ -50,7 +50,7 @@ public interface PluiRequestStatusMapper extends AbstractMapper<PluiRequestStatu
      */
     static PluiRequestStatusEnum convertToStatus(PluiRequestStatusEntity.PluiRequestStatusEntityEnum statusEntityEnum) {
         if (statusEntityEnum != null) {
-            PluiRequestStatusEnum.fromValue(statusEntityEnum.toString());
+            return PluiRequestStatusEnum.fromValue(statusEntityEnum.toString());
         }
         return null;
     }

@@ -12,7 +12,7 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name = "status")
+@Table(name = "request_status")
 @ToString
 @Getter  @Setter
 public class PluiRequestStatusEntity implements LongId {

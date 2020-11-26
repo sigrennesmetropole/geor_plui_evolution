@@ -155,6 +155,8 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// Lever une exception si echec de l'envoi à redmine
 
 
+		// On ajoute un UUID à la demande
+		pluiRequestEntity.setUuid(UUID.randomUUID());
 		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
 		try {
 			return this.pluiRequestMapper.entityToDto(

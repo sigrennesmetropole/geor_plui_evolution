@@ -11,7 +11,7 @@ public interface PluiRequestTypeMapper extends AbstractMapper<PluiRequestTypeEnt
     @InheritInverseConfiguration
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequestType.value", target = "value", qualifiedByName = "convertToTypeEntityEnum")
+                    @Mapping(source = "pluiRequestType.value", target = "value", qualifiedByName = "convertToTypeEntity")
             }
     )
     PluiRequestTypeEntity dtoToEntity(PluiRequestType pluiRequestType);
@@ -19,7 +19,7 @@ public interface PluiRequestTypeMapper extends AbstractMapper<PluiRequestTypeEnt
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequestTypeEntity.value", target = "value", qualifiedByName = "convertToTypeEnum")
+                    @Mapping(source = "pluiRequestTypeEntity.value", target = "value", qualifiedByName = "convertToType")
             }
     )
     PluiRequestType entityToDto(PluiRequestTypeEntity pluiRequestTypeEntity);
@@ -27,7 +27,7 @@ public interface PluiRequestTypeMapper extends AbstractMapper<PluiRequestTypeEnt
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "s.value", target = "value", qualifiedByName = "convertToTypeEntityEnum")
+                    @Mapping(source = "s.value", target = "value", qualifiedByName = "convertToTypeEntity")
             }
     )
     PluiRequestTypeEntity toEntity(PluiRequestType s, @MappingTarget PluiRequestTypeEntity entity);
@@ -37,7 +37,7 @@ public interface PluiRequestTypeMapper extends AbstractMapper<PluiRequestTypeEnt
      * @param typeEnum
      * @return
      */
-    static PluiRequestTypeEntity.PluiRequestTypeEntityEnum convertToTypeEntityEnum(PluiRequestTypeEnum typeEnum) {
+    static PluiRequestTypeEntity.PluiRequestTypeEntityEnum convertToTypeEntity(PluiRequestTypeEnum typeEnum) {
         if (typeEnum != null) {
             return PluiRequestTypeEntity.fromValue(typeEnum.toString());
         }
@@ -51,7 +51,7 @@ public interface PluiRequestTypeMapper extends AbstractMapper<PluiRequestTypeEnt
      */
     static PluiRequestTypeEnum convertToType(PluiRequestTypeEntity.PluiRequestTypeEntityEnum typeEntityEnum) {
         if (typeEntityEnum != null) {
-            PluiRequestTypeEnum.fromValue(typeEntityEnum.toString());
+            return PluiRequestTypeEnum.fromValue(typeEntityEnum.toString());
         }
         return null;
     }

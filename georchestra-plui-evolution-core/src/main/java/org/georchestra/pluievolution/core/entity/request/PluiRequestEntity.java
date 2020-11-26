@@ -11,9 +11,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.georchestra.pluievolution.core.entity.ref.PluiRequestTypeEntity;
+import lombok.ToString;import org.georchestra.pluievolution.core.entity.ref.PluiRequestTypeEntity;
 import org.georchestra.pluievolution.core.entity.ref.PluiRequestStatusEntity;
 
 /**
@@ -32,7 +30,7 @@ public class PluiRequestEntity implements LongId {
 	@Column(name = "id", nullable = false)
 	private Long id;
 
-	@Column(name = "uuid", nullable = false)
+	@Column(name = "uuid", nullable = false, columnDefinition = "uuid")
 	private UUID uuid;
 
 	@Column(name = "redmine_id")
@@ -57,11 +55,11 @@ public class PluiRequestEntity implements LongId {
 	private Geometry geometry;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "status_id")
+	@JoinColumn(name = "status_id", referencedColumnName = "id")
 	private PluiRequestStatusEntity status;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "type_id")
+	@JoinColumn(name = "type_id", referencedColumnName = "id")
 	private PluiRequestTypeEntity type;
 
 	@Override

@@ -347,6 +347,35 @@
 					}
 				}
 			}
+		},
+		"/request/geographicarea": {
+			"get": {
+				"tags": [
+					"request"
+				],
+				"summary": "Liste des communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestGeographicArea",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicArea"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
 		}
 	},
 	"definitions": {
@@ -806,6 +835,21 @@
 				},
 				"value": {
 					"$ref": "#/definitions/PluiRequestStatusEnum"
+				}
+			}
+		},
+		"GeographicArea": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer",
+					"format": "int64"
+				},
+				"nom": {
+					"type": "string"
+				},
+				"localisation": {
+					"$ref": "#/definitions/Point"
 				}
 			}
 		},
