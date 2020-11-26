@@ -81,6 +81,8 @@ public interface PluiRequestService {
 	 */
 	PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException;
 
+	void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException;
+
 	/**
 	 * Permet d'envoyer une pièce jointe à la demande de uuid @pluiRequestUuid directement sur Redmine
 	 * @param pluiRequestUuid

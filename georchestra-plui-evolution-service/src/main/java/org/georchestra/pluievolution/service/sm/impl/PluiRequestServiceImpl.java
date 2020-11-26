@@ -7,13 +7,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.ref.PluiRequestStatusDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
-import org.georchestra.pluievolution.core.entity.ref.PluiRequestTypeEntity;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
@@ -137,20 +134,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On defini la date de la demande
 		pluiRequestEntity.setCreationDate(new Date());
 
-		// On definit la localisation de la demande si type commune
-		if (pluiRequestEntity.getType().getValue() == PluiRequestTypeEntity.PluiRequestTypeEntityEnum.TYPE_COMMUNE) {
-			GeometryFactory gf = new GeometryFactory();
-			Coordinate coordinate = new Coordinate(pluiRequest.getLocalisation().getCoordinates().get(0).doubleValue(),
-					pluiRequest.getLocalisation().getCoordinates().get(1).doubleValue());
-			pluiRequestEntity.setGeometry(gf.createPoint(coordinate));
-		} else if (pluiRequestEntity.getType().getValue() == PluiRequestTypeEntity.PluiRequestTypeEntityEnum.TYPE_INTERCOMMUNE) {
-			// TODO On definit la geometrie de la demande sur le Point Mairie de Rennes
-			//
-		} else if (pluiRequestEntity.getType().getValue() == PluiRequestTypeEntity.PluiRequestTypeEntityEnum.TYPE_METROPOLITAIN) {
-			// TODO On definit la geometrie de la demande sur le Point Hotel Rennes Metropole
-			//
-		}
-
 		// TODO On envoie à Redmine et on recupere l'id redmine
 		// Lever une exception si echec de l'envoi à redmine
 
@@ -169,5 +152,16 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException {
+		try {
+			pluiRequestDao.deleteByUuid(uuid);
+		} catch (DataAccessException e) {
+			LOGGER.error("Erreur lors de la suppression de la demande dans la BDD");
+			throw new ApiServiceException(e.getMessage(), e);
+		}
+	}
+
 
 }

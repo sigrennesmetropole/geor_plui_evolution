@@ -59,8 +59,8 @@ public class RequestController implements RequestApi {
 
 	@Override
 	public ResponseEntity<Void> deletePluiRequest(UUID uuid) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		pluiRequestService.deletePluiRequestByUuid(uuid);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@Override
