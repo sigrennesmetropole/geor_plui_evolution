@@ -23,15 +23,25 @@ public class PluiRequestStatusEntity implements LongId {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "value", length = 50)
-    private PluiRequestStatutRefEntityEnum value;
+    private PluiRequestStatusEntityEnum value;
 
-    public enum PluiRequestStatutRefEntityEnum {
+    public enum PluiRequestStatusEntityEnum {
         STATUT_NOUVEAU,
         STATUT_ANALYSE_EN_COURS,
+        STATUT_PRODUCTION_EN_COURS,
         STATUT_EN_ATTENTE_VALIDATION_COMMUNE,
         STATUT_VALIDE_COMMUNE,
         STATUT_DEMANDE_NON_RECEVABLE,
         STATUT_DEMANDE_REFORMULEE
+    }
+
+    public static PluiRequestStatusEntityEnum fromValue(String text) {
+        for (PluiRequestStatusEntityEnum b : PluiRequestStatusEntityEnum.values()) {
+            if (b.name().equals(text)) {
+                return b;
+            }
+        }
+        return null;
     }
 
     @Override

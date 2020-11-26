@@ -57,10 +57,6 @@ public class PluiRequestEntity implements LongId {
 	private Geometry geometry;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "area_id")
-	private GeographicAreaEntity area;
-
-	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "status_id")
 	private PluiRequestStatusEntity status;
 

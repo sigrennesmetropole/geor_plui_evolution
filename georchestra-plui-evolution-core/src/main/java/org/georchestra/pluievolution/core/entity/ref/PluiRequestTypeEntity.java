@@ -32,6 +32,15 @@ public class PluiRequestTypeEntity implements LongId {
         TYPE_METROPOLITAIN
     }
 
+    public static PluiRequestTypeEntity.PluiRequestTypeEntityEnum fromValue(String text) {
+        for (PluiRequestTypeEntityEnum b : PluiRequestTypeEntityEnum.values()) {
+            if (b.name().equals(text)) {
+                return b;
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

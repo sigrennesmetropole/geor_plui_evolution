@@ -15,14 +15,6 @@ public interface PluiRequestDao extends QueryDslDao<PluiRequestEntity, Long> {
     Page<PluiRequestEntity> findAll(Pageable pageable);
 
     /**
-     * Permet de trouver la liste des PluiRequestEntity à partir du code insee de leur geographic area
-     * @param pageable
-     * @param codeInsee
-     * @return
-     */
-    Page<PluiRequestEntity> findAllByArea_CodeInsee(Pageable pageable, String codeInsee);
-
-    /**
      * Permet de trouver un PluiRequestEntity à partir de son uuid
      * @param uuid
      * @return
