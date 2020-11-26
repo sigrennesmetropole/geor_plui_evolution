@@ -136,6 +136,57 @@
 				}
 			}
 		},
+		"/request/{uuid}/upload": {
+			"post": {
+				"tags": [
+					"request"
+				],
+				"summary": "Téléversement d'une pièce jointe sur une demande",
+				"description": "",
+				"operationId": "uploadDocument",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "uuid",
+						"description": "Identifiant de la demande",
+						"required": true,
+						"type": "string",
+						"format": "uuid"
+					},
+					{
+						"in": "formData",
+						"name": "file",
+						"description": "Pièce jointe sous la forme d'un blob",
+						"required": true,
+						"type": "file"
+					}
+				],
+				"consumes": [
+					"multipart/form-data",
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "boolean"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
 		"/request": {
 			"post": {
 				"summary": "Création d'une nouvelle demande",
@@ -237,57 +288,6 @@
 				}
 			}
 		},
-		"/request/{uuid}/upload": {
-			"post": {
-				"tags": [
-					"request"
-				],
-				"summary": "Téléversement d'une pièce jointe sur une demande",
-				"description": "",
-				"operationId": "uploadDocument",
-				"produces": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "uuid",
-						"description": "Identifiant de la demande",
-						"required": true,
-						"type": "string",
-						"format": "uuid"
-					},
-					{
-						"in": "formData",
-						"name": "file",
-						"description": "Pièce jointe sous la forme d'un blob",
-						"required": true,
-						"type": "file"
-					}
-				],
-				"consumes": [
-					"multipart/form-data",
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/Attachment"
-						}
-					},
-					"400": {
-						"description": "bad input parameter"
-					},
-					"500": {
-						"description": "Internal server error",
-						"schema": {
-							"$ref": "#/definitions/ApiError"
-						}
-					}
-				}
-			}
-		},
 		"/request/ref/type": {
 			"get": {
 				"tags": [
@@ -335,7 +335,7 @@
 						"schema": {
 							"type": "array",
 							"items": {
-								"$ref": "#/definitions/Status"
+								"$ref": "#/definitions/PluiRequestStatus"
 							}
 						}
 					},
@@ -783,13 +783,9 @@
 					"type": "string",
 					"format": "date"
 				},
-				"geometry": {
+				"localisation": {
 					"description": "Il s'agit de la localisation de la demande qui est un point",
 					"$ref": "#/definitions/Point"
-				},
-				"area": {
-					"description": "Commune associée à la demande",
-					"$ref": "#/definitions/GeographicArea"
 				},
 				"status": {
 					"description": "Statut de la demande",
@@ -798,25 +794,6 @@
 				"type": {
 					"description": "Type de demande",
 					"$ref": "#/definitions/PluiRequestType"
-				}
-			}
-		},
-		"GeographicArea": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"type": "integer",
-					"format": "int32"
-				},
-				"nom": {
-					"type": "string"
-				},
-				"codeInsee": {
-					"type": "integer",
-					"format": "int32"
-				},
-				"geometry": {
-					"$ref": "#/definitions/Geometry"
 				}
 			}
 		},
@@ -837,6 +814,7 @@
 			"enum": [
 				"STATUT_NOUVEAU",
 				"STATUT_ANALYSE_EN_COURS",
+				"STATUT_PRODUCTION_EN_COURS",
 				"STATUT_EN_ATTENTE_VALIDATION_COMMUNE",
 				"STATUT_VALIDE_COMMUNE",
 				"STATUT_DEMANDE_NON_RECEVABLE",
