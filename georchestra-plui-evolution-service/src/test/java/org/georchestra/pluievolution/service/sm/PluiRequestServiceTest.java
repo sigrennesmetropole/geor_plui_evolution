@@ -3,7 +3,6 @@ package org.georchestra.pluievolution.service.sm;
 import org.georchestra.pluievolution.StarterSpringBootTestApplication;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
-import org.georchestra.pluievolution.service.ref.RefService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +14,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = StarterSpringBootTestApplication.class)
@@ -26,21 +24,14 @@ public class PluiRequestServiceTest {
     @Autowired
     PluiRequestService pluiRequestService;
 
-    @Autowired
-    RefService refService;
-
     PluiRequest pluiRequest;
 
     PluiRequest pluiRequest1;
 
-    private List<PluiRequestType> types;
-
-    private List<PluiRequestStatus> status;
-
     @Before
     public void init() {
         pluiRequest = new PluiRequest();
-        pluiRequest.setType(refService.getRequestTypeByValue(PluiRequestTypeEnum.COMMUNE));
+        pluiRequest.setType(PluiRequestType.COMMUNE);
         pluiRequest.setObject("Ici l'objet de la demande");
         pluiRequest.setSubject("Ici le sujet de la demande");
         Point2D pt2D = new Point2D();
@@ -59,6 +50,8 @@ public class PluiRequestServiceTest {
         Assert.assertNotNull("La localisation ne doit etre nulle", pluiRequest1.getLocalisation());
         Assert.assertEquals("La localisation doit etre la meme que celle rensignee", pluiRequest.getLocalisation().hashCode(), pluiRequest1.getLocalisation().hashCode());
         Assert.assertNotNull("La date de creation ne doit etre nulle", pluiRequest1.getCreationDate());
+        Assert.assertNotNull("Le type de demande doit etre renseigné", pluiRequest1.getType());
+        Assert.assertNotNull("Le status de demande doit etre renseigné", pluiRequest1.getStatus());
 
         // Seulement si authentifié
         // Assert.assertNotNull("L'initiateur de la demande doit avoir ete renseigné", pluiRequest1.getInitiator());
