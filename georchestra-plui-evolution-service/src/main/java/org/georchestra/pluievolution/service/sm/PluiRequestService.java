@@ -88,7 +88,7 @@ public interface PluiRequestService {
 	 * @return
 	 * @throws ApiServiceException
 	 */
-	Boolean sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
+	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
 
 	/**
 	 * Permet d'obtenir la liste de tous les status

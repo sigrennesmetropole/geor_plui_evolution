@@ -13,10 +13,7 @@ import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dto.GeographicArea;
-import org.georchestra.pluievolution.core.dto.PluiRequest;
-import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
-import org.georchestra.pluievolution.core.dto.PluiRequestType;
+import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +42,7 @@ public class RequestController implements RequestApi {
 	}
 
 	@Override
-	public ResponseEntity<Boolean> uploadDocument(UUID uuid, @Valid MultipartFile file) throws Exception {
+	public ResponseEntity<Attachment> uploadDocument(UUID uuid, @Valid MultipartFile file) throws Exception {
 
 		File document = java.io.File.createTempFile(UUID.randomUUID().toString(), ".doc");
 		FileUtils.copyInputStreamToFile(file.getInputStream(), document);

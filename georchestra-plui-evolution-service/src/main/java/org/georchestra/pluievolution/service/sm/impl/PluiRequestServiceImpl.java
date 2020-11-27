@@ -58,7 +58,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Boolean sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException {
+	public Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException {
 		PluiRequestEntity pluiRequestEntity = pluiRequestDao.findByUuid(pluiRequestUuid);
 		if (pluiRequestEntity == null) {
 			throw new ApiServiceException("Cette demande n'a pas encore été renseignée");
@@ -73,7 +73,10 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		// On envoie la pièce jointe au redmine
 
-		return false;
+		Attachment result = new Attachment();
+		result.setMimeType(documentContent.getContentType());
+		result.setName(documentContent.getFileName());
+		return result;
 	}
 
 	@Override
@@ -156,6 +159,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	}
 
 	@Override
+	@Transactional(readOnly = false)
 	public void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException {
 		try {
 			pluiRequestDao.deleteByUuid(uuid);

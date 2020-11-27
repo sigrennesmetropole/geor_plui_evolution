@@ -172,7 +172,7 @@
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "boolean"
+							"$ref": "#/definitions/Attachment"
 						}
 					},
 					"400": {
