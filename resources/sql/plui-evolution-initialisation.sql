@@ -34,10 +34,12 @@ ALTER TABLE pluievolution.user_ OWNER to pluievolution;
 
 CREATE TABLE pluievolution.geographic_area
 (
-    id bigint NOT NULL,
+    id bigint NOT NULL DEFAULT nextval('geographic_area_id_seq'::regclass),
+    codeinsee character varying(10) COLLATE pg_catalog."default",
     geometry geometry,
     nom character varying(255) COLLATE pg_catalog."default",
-    CONSTRAINT geographic_area_pkey PRIMARY KEY (id)
+    CONSTRAINT geographic_area_pkey PRIMARY KEY (id),
+    CONSTRAINT uk_i2fohbpkd2ovpbhdatnyoxak7 UNIQUE (codeinsee)
 )
     WITH (
         OIDS = FALSE
@@ -64,15 +66,9 @@ CREATE TABLE pluievolution.plui_request
     uuid uuid NOT NULL,
     status_id bigint,
     type_id bigint,
-    CONSTRAINT plui_request_pkey PRIMARY KEY (id),
-    CONSTRAINT fkmkl6jtq3ukb1bmnly4kr8pjne FOREIGN KEY (status_id)
-        REFERENCES pluievolution.request_status (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT fkt0a4k5nlvslcgrs29x4jir3kb FOREIGN KEY (type_id)
-        REFERENCES pluievolution.request_type (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    status character varying(50) COLLATE pg_catalog."default",
+    type character varying(20) COLLATE pg_catalog."default",
+    CONSTRAINT plui_request_pkey PRIMARY KEY (id)
 )
     WITH (
         OIDS = FALSE
@@ -80,58 +76,4 @@ CREATE TABLE pluievolution.plui_request
     TABLESPACE pg_default;
 
 ALTER TABLE pluievolution.plui_request
-    OWNER to pluievolution;
-
--- Table: pluievolution.request_status
-
--- DROP TABLE pluievolution.request_status;
-
-CREATE TABLE pluievolution.request_status
-(
-    id bigint NOT NULL DEFAULT nextval('request_status_id_seq'::regclass),
-    value character varying(50) COLLATE pg_catalog."default",
-    CONSTRAINT request_status_pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE pluievolution.request_status
-    OWNER to pluievolution;
-
--- Table: pluievolution.request_type
-
--- DROP TABLE pluievolution.request_type;
-
-CREATE TABLE pluievolution.request_type
-(
-    id bigint NOT NULL DEFAULT nextval('request_type_id_seq'::regclass),
-    value character varying(20) COLLATE pg_catalog."default",
-    CONSTRAINT request_type_pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE pluievolution.request_type
-    OWNER to pluievolution;
-
--- Table: pluievolution.request_type
-
--- DROP TABLE pluievolution.request_type;
-
-CREATE TABLE pluievolution.request_type
-(
-    id bigint NOT NULL DEFAULT nextval('request_type_id_seq'::regclass),
-    value character varying(20) COLLATE pg_catalog."default",
-    CONSTRAINT request_type_pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE pluievolution.request_type
     OWNER to pluievolution;
