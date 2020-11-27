@@ -826,18 +826,6 @@
 				}
 			}
 		},
-		"PluiRequestStatus": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"type": "integer",
-					"format": "int64"
-				},
-				"value": {
-					"$ref": "#/definitions/PluiRequestStatusEnum"
-				}
-			}
-		},
 		"GeographicArea": {
 			"type": "object",
 			"properties": {
@@ -848,12 +836,15 @@
 				"nom": {
 					"type": "string"
 				},
+				"codeInsee": {
+					"type": "string"
+				},
 				"localisation": {
 					"$ref": "#/definitions/Point"
 				}
 			}
 		},
-		"PluiRequestStatusEnum": {
+		"PluiRequestStatus": {
 			"type": "string",
 			"enum": [
 				"STATUT_NOUVEAU",
@@ -866,18 +857,6 @@
 			]
 		},
 		"PluiRequestType": {
-			"type": "object",
-			"properties": {
-				"id": {
-					"type": "integer",
-					"format": "int64"
-				},
-				"value": {
-					"$ref": "#/definitions/PluiRequestTypeEnum"
-				}
-			}
-		},
-		"PluiRequestTypeEnum": {
 			"type": "string",
 			"enum": [
 				"TYPE_COMMUNE",

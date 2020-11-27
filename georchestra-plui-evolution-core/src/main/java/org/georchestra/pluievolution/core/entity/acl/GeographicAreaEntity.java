@@ -3,10 +3,7 @@
  */
 package org.georchestra.pluievolution.core.entity.acl;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
@@ -26,11 +23,15 @@ import org.georchestra.pluievolution.core.common.LongId;
 public class GeographicAreaEntity implements LongId {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id", nullable = false)
 	private Long id;
 
 	@Column(name = "nom", length = 255)
 	private String nom;
+
+	@Column(name = "codeinsee", length = 10, unique = true)
+	private String codeInsee;
 
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
