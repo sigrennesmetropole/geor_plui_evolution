@@ -18,7 +18,6 @@ import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
-import org.georchestra.pluievolution.service.ref.RefService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,9 +38,6 @@ public class RequestController implements RequestApi {
 
 	@Autowired
 	GeographicAreaService geographicAreaService;
-
-	@Autowired
-	RefService refService;
 
 	@Override
 	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
@@ -76,12 +72,12 @@ public class RequestController implements RequestApi {
 
 	@Override
 	public ResponseEntity<List<PluiRequestStatus>> getPluiRequestStatus() throws Exception {
-		return new ResponseEntity<>(refService.getAllRequestStatus(), HttpStatus.OK);
+		return new ResponseEntity<>(pluiRequestService.getAllRequestStatus(), HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<List<PluiRequestType>> getPluiRequestTypes() throws Exception {
-		return new ResponseEntity<>(refService.getAllRequestType(), HttpStatus.OK);
+		return new ResponseEntity<>(pluiRequestService.getAllRequestType(), HttpStatus.OK);
 	}
 
 }

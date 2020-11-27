@@ -9,7 +9,7 @@ import org.mapstruct.*;
 
 import java.math.BigDecimal;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {PluiRequestTypeMapper.class, PluiRequestStatusMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, PluiRequest> {
     @Override
     @InheritInverseConfiguration

@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dto.Attachment;
-import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
-import org.georchestra.pluievolution.core.dto.PluiRequest;
+import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 
@@ -91,5 +89,17 @@ public interface PluiRequestService {
 	 * @throws ApiServiceException
 	 */
 	Boolean sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
+
+	/**
+	 * Permet d'obtenir la liste de tous les status
+	 * @return
+	 */
+	List<PluiRequestStatus> getAllRequestStatus();
+
+	/**
+	 * Permet d'obtenir la liste de tous les types de demandes
+	 * @return
+	 */
+	List<PluiRequestType> getAllRequestType();
 
 }

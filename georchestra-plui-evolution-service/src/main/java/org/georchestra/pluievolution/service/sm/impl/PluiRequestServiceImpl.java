@@ -3,12 +3,12 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dao.ref.PluiRequestStatusDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
@@ -17,7 +17,6 @@ import org.georchestra.pluievolution.service.exception.DocumentRepositoryExcepti
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
-import org.georchestra.pluievolution.service.ref.RefService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	
 	@Autowired
 	private AuthentificationHelper authentificationHelper;
-	
+
 	@Autowired
 	private AttachmentHelper attachmentHelper;
 
@@ -47,12 +46,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	@Autowired
 	PluiRequestDao pluiRequestDao;
-
-	@Autowired
-	PluiRequestStatusDao pluiRequestStatusDao;
-
-	@Autowired
-	RefService refService;
 
 
 
@@ -81,6 +74,16 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On envoie la pièce jointe au redmine
 
 		return false;
+	}
+
+	@Override
+	public List<PluiRequestStatus> getAllRequestStatus() {
+		return Arrays.asList(PluiRequestStatus.values());
+	}
+
+	@Override
+	public List<PluiRequestType> getAllRequestType() {
+		return Arrays.asList(PluiRequestType.values());
 	}
 
 	@Override
@@ -121,9 +124,8 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	public PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException {
 
 		// On defini le statut de  la demande si non defini ou different de nouveau
-		if (pluiRequest.getStatus() == null || pluiRequest.getStatus().getValue() != PluiRequestStatusEnum.NOUVEAU) {
-			PluiRequestStatus statusNouveau = refService.getRequestStatusByValue(PluiRequestStatusEnum.NOUVEAU);
-			pluiRequest.setStatus(statusNouveau);
+		if (pluiRequest.getStatus() == null || pluiRequest.getStatus() != PluiRequestStatus.NOUVEAU) {
+			pluiRequest.setStatus(PluiRequestStatus.NOUVEAU);
 		}
 
 		// On converti le dto en entité
@@ -162,6 +164,8 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(e.getMessage(), e);
 		}
 	}
+
+
 
 
 }
