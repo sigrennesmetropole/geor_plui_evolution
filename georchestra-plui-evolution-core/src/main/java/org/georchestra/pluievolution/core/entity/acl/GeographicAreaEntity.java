@@ -44,15 +44,13 @@ public class GeographicAreaEntity implements LongId {
 		GeographicAreaEntity that = (GeographicAreaEntity) o;
 
 		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-		if (getNom() != null ? !getNom().equals(that.getNom()) : that.getNom() != null) return false;
-		return getGeometry() != null ? getGeometry().equals(that.getGeometry()) : that.getGeometry() == null;
+		return getCodeInsee().equals(that.getCodeInsee());
 	}
 
 	@Override
 	public int hashCode() {
 		int result = getId() != null ? getId().hashCode() : 0;
-		result = 31 * result + (getNom() != null ? getNom().hashCode() : 0);
-		result = 31 * result + (getGeometry() != null ? getGeometry().hashCode() : 0);
+		result = 31 * result + getCodeInsee().hashCode();
 		return result;
 	}
 }

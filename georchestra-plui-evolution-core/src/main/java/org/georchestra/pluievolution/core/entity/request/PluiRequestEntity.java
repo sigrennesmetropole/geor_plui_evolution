@@ -64,38 +64,22 @@ public class PluiRequestEntity implements LongId {
 	private PluiRequestType type;
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((getCreationDate() == null) ? 0 : getCreationDate().hashCode());
-		result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-		return result;
-	}
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof PluiRequestEntity)) return false;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (!(obj instanceof PluiRequestEntity)) {
-			return false;
-		}
-		PluiRequestEntity other = (PluiRequestEntity) obj;
-		if (getCreationDate() == null) {
-			if (other.getCreationDate() != null) {
-				return false;
-			}
-		} else if (!getCreationDate().equals(other.getCreationDate())) {
-			return false;
-		}
-		if (getId() == null) {
-			if (other.getId() != null) {
-				return false;
-			}
-		} else if (!getId().equals(other.getId())) {
-			return false;
-		}
+		PluiRequestEntity that = (PluiRequestEntity) o;
+
+		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
+		if (!getUuid().equals(that.getUuid())) return false;
+
 		return true;
 	}
 
+	@Override
+	public int hashCode() {
+		int result = getId() != null ? getId().hashCode() : 0;
+		result = 31 * result + getUuid().hashCode();
+		return result;
+	}
 }
