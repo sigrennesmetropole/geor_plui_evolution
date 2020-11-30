@@ -3,7 +3,6 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -77,16 +76,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		result.setMimeType(documentContent.getContentType());
 		result.setName(documentContent.getFileName());
 		return result;
-	}
-
-	@Override
-	public List<PluiRequestStatus> getAllRequestStatus() {
-		return Arrays.asList(PluiRequestStatus.values());
-	}
-
-	@Override
-	public List<PluiRequestType> getAllRequestType() {
-		return Arrays.asList(PluiRequestType.values());
 	}
 
 	@Override

@@ -90,16 +90,4 @@ public interface PluiRequestService {
 	 */
 	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
 
-	/**
-	 * Permet d'obtenir la liste de tous les status
-	 * @return
-	 */
-	List<PluiRequestStatus> getAllRequestStatus();
-
-	/**
-	 * Permet d'obtenir la liste de tous les types de demandes
-	 * @return
-	 */
-	List<PluiRequestType> getAllRequestType();
-
 }

@@ -67,14 +67,4 @@ public class RequestController implements RequestApi {
 		return null;
 	}
 
-	@Override
-	public ResponseEntity<List<PluiRequestStatus>> getPluiRequestStatus() throws Exception {
-		return new ResponseEntity<>(pluiRequestService.getAllRequestStatus(), HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity<List<PluiRequestType>> getPluiRequestTypes() throws Exception {
-		return new ResponseEntity<>(pluiRequestService.getAllRequestType(), HttpStatus.OK);
-	}
-
 }

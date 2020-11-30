@@ -288,66 +288,6 @@
 				}
 			}
 		},
-		"/request/ref/type": {
-			"get": {
-				"tags": [
-					"request"
-				],
-				"summary": "Permet de retourner les ref de tous les types de demande",
-				"description": "References des types de demandes",
-				"operationId": "getPluiRequestTypes",
-				"produces": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "Liste des types de PluiRequest",
-						"schema": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/PluiRequestType"
-							}
-						}
-					},
-					"500": {
-						"description": "Internal server error",
-						"schema": {
-							"$ref": "#/definitions/ApiError"
-						}
-					}
-				}
-			}
-		},
-		"/request/ref/status": {
-			"get": {
-				"tags": [
-					"request"
-				],
-				"summary": "Permet de retourner les ref de tous les status de demande",
-				"description": "References des status de demandes",
-				"operationId": "getPluiRequestStatus",
-				"produces": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "Liste des status de PluiRequest",
-						"schema": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/PluiRequestStatus"
-							}
-						}
-					},
-					"500": {
-						"description": "Internal server error",
-						"schema": {
-							"$ref": "#/definitions/ApiError"
-						}
-					}
-				}
-			}
-		},
 		"/request/geographicarea": {
 			"get": {
 				"tags": [
