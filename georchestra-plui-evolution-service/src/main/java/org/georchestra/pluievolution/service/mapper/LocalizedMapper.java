@@ -11,16 +11,16 @@ import org.mapstruct.*;
 import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public abstract class LocalizedMapper {
+public interface LocalizedMapper {
 
-    static Geometry  dtoToEntity(Point point) {
+    default Geometry  dtoToEntity(Point point) {
         GeometryFactory gf = new GeometryFactory();
         Coordinate coordinate = new Coordinate(point.getCoordinates().get(0).doubleValue(),
                 point.getCoordinates().get(1).doubleValue());
         return gf.createPoint(coordinate);
     }
 
-    static Point entityToDto(Geometry geometry) {
+    default Point entityToDto(Geometry geometry) {
         Point2D pt2D = new Point2D();
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().x));
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().y));
@@ -30,7 +30,7 @@ public abstract class LocalizedMapper {
         return point;
     }
 
-    static Geometry toEntity(Point s, @MappingTarget Geometry entity) {
+    default Geometry toEntity(Point s, @MappingTarget Geometry entity) {
         if (s != null) {
             return dtoToEntity(s);
         }

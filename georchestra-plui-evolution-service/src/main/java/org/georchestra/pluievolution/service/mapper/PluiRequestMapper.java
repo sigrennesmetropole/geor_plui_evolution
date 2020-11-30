@@ -7,6 +7,7 @@ import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {LocalizedMapper.class})
 public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, PluiRequest> {
+
     @Override
     @InheritInverseConfiguration
     @Mappings(
@@ -28,9 +29,9 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
     PluiRequestEntity toEntity(PluiRequest s, @MappingTarget PluiRequestEntity entity);
 
     @AfterMapping
-    static void afterMapping(PluiRequest s, @MappingTarget PluiRequestEntity entity) {
+    default void afterMapping(PluiRequest s, @MappingTarget PluiRequestEntity entity) {
         if (entity.getGeometry() == null && s.getLocalisation() != null) {
-            entity.setGeometry(LocalizedMapper.dtoToEntity(s.getLocalisation()));
+            entity.setGeometry(new LocalizedMapperImpl().dtoToEntity(s.getLocalisation()));
         }
     }
 }

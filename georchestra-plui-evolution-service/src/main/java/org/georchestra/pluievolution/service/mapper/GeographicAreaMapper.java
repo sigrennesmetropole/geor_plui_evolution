@@ -1,40 +1,39 @@
 package org.georchestra.pluievolution.service.mapper;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
-import org.georchestra.pluievolution.core.dto.GeometryType;
-import org.georchestra.pluievolution.core.dto.Point;
-import org.georchestra.pluievolution.core.dto.Point2D;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
-import org.mapstruct.ReportingPolicy;
+import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
+import org.mapstruct.*;
 
-import java.math.BigDecimal;
-
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = LocalizedMapper.class)
 public interface GeographicAreaMapper extends AbstractMapper<GeographicAreaEntity, GeographicArea> {
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "geographicAreaEntity.geometry", target = "localisation", qualifiedByName = "convertToLocalisation")
+                    @Mapping(source = "geographicAreaEntity.geometry", target = "localisation")
             }
     )
     GeographicArea entityToDto(GeographicAreaEntity geographicAreaEntity);
 
-    /**
-     * Converti la geometrie de GeographicAreaEntity en une un point
-     * @param geometry
-     * @return
-     */
-    static Point convertToLocalisation(Geometry geometry) {
-        Point2D coords = new Point2D();
-        coords.add(BigDecimal.valueOf(geometry.getCoordinate().x));
-        coords.add(BigDecimal.valueOf(geometry.getCoordinate().y));
-        Point point = new Point();
-        point.setCoordinates(coords);
-        point.setType(GeometryType.POINT);
-        return point;
+    @Override
+    @InheritInverseConfiguration
+    @Mappings(
+            value = {
+                    @Mapping(source = "geographicArea.localisation", target = "geometry")
+            }
+    )
+    GeographicAreaEntity dtoToEntity(GeographicArea geographicArea);
+
+    @Override
+    GeographicAreaEntity toEntity(GeographicArea s, @MappingTarget GeographicAreaEntity entity);
+
+    @AfterMapping
+    default void afterMapping(PluiRequest s, @MappingTarget PluiRequestEntity entity) {
+        if (entity.getGeometry() == null && s.getLocalisation() != null) {
+            entity.setGeometry(new LocalizedMapperImpl().dtoToEntity(s.getLocalisation()));
+        }
     }
+
+
 }
