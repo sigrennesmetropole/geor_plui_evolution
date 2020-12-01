@@ -288,13 +288,13 @@
 				}
 			}
 		},
-		"/request/geographicarea": {
+		"/request/etablissementarea": {
 			"get": {
 				"tags": [
 					"request"
 				],
 				"summary": "Liste des communes, plus ville et métropole, d'où les demandes peuvent être émises",
-				"operationId": "getAllPluiRequestGeographicArea",
+				"operationId": "getAllPluiRequestEtablissement",
 				"produces": [
 					"application/json"
 				],
@@ -304,7 +304,7 @@
 						"schema": {
 							"type": "array",
 							"items": {
-								"$ref": "#/definitions/GeographicArea"
+								"$ref": "#/definitions/Etablissement"
 							}
 						}
 					},
@@ -312,6 +312,38 @@
 						"description": "Internal server error",
 						"schema": {
 							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/wfs": {
+			"post": {
+				"summary": "Requete WFS",
+				"tags": [
+					"api-carto"
+				],
+				"description": "Requete WFS de recuperation d'un claque",
+				"operationId": "getWfsRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "wfsContent",
+						"description": "Contenu WFS au format XML",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
 						}
 					}
 				}
@@ -766,7 +798,7 @@
 				}
 			}
 		},
-		"GeographicArea": {
+		"Etablissement": {
 			"type": "object",
 			"properties": {
 				"id": {
