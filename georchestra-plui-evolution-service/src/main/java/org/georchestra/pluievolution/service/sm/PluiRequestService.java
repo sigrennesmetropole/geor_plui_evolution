@@ -7,15 +7,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dto.Attachment;
-import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
+import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 
 /**
  * @author FNI18300
  *
  */
-public interface RequestService {
+public interface PluiRequestService {
 
 	
 	/**
@@ -26,7 +26,7 @@ public interface RequestService {
 	 * @return
 	 * @throws DocumentRepositoryException
 	 */
-	Attachment addAttachment(UUID reportingUuid, DocumentContent content) throws DocumentRepositoryException;
+	Attachment addAttachment(UUID reportingUuid, DocumentContent content) throws DocumentRepositoryException, ApiServiceException;
 
 	/**
 	 * Retourne la description d'un attachment pour un signalement et un id
@@ -71,5 +71,23 @@ public interface RequestService {
 	 * @return
 	 */
 	AttachmentConfiguration getAttachmentConfiguration();
+
+	/**
+	 * Crée une nouvelle demande
+	 * @param pluiRequest
+	 * @return
+	 */
+	PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException;
+
+	void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException;
+
+	/**
+	 * Permet d'envoyer une pièce jointe à la demande de uuid @pluiRequestUuid directement sur Redmine
+	 * @param pluiRequestUuid
+	 * @param documentContent
+	 * @return
+	 * @throws ApiServiceException
+	 */
+	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
 
 }

@@ -3,17 +3,12 @@
  */
 package org.georchestra.pluievolution.core.entity.acl;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-import org.geolatte.geom.Geometry;
+import com.vividsolutions.jts.geom.Geometry;
+import lombok.Getter;
+import lombok.Setter;
 import org.georchestra.pluievolution.core.common.LongId;
-
-import lombok.Data;
 
 /**
  * Représente un ensemble de point pour désigner les communes et le centre de RM
@@ -22,7 +17,7 @@ import lombok.Data;
  * @author FNI18300
  *
  */
-@Data
+@Getter @Setter
 @Entity
 @Table(name = "geographic_area")
 public class GeographicAreaEntity implements LongId {
@@ -35,9 +30,27 @@ public class GeographicAreaEntity implements LongId {
 	@Column(name = "nom", length = 255)
 	private String nom;
 
-	@Column(name = "codeinsee", length = 5)
+	@Column(name = "codeinsee", length = 10, unique = true)
 	private String codeInsee;
 
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof GeographicAreaEntity)) return false;
+
+		GeographicAreaEntity that = (GeographicAreaEntity) o;
+
+		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
+		return getCodeInsee().equals(that.getCodeInsee());
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getId() != null ? getId().hashCode() : 0;
+		result = 31 * result + getCodeInsee().hashCode();
+		return result;
+	}
 }
