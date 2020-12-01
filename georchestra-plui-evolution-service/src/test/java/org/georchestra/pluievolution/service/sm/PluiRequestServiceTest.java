@@ -59,7 +59,5 @@ public class PluiRequestServiceTest {
         Assert.assertEquals("L'objet de la demande doit le meme que celui renseigné", pluiRequest.getObject(), pluiRequest1.getObject());
         Assert.assertEquals("Le sujet de la demade doit etre le meme que celui renseigné", pluiRequest.getSubject(), pluiRequest1.getSubject());
 
-        // On supprime la demande cree precedemment
-        pluiRequestService.deletePluiRequestByUuid(pluiRequest1.getUuid());
     }
 }
