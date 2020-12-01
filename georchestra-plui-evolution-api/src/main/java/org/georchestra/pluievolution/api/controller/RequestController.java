@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dto.*;
-import org.georchestra.pluievolution.service.acl.GeographicAreaService;
+import org.georchestra.pluievolution.service.acl.EtablissementService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class RequestController implements RequestApi {
 	PluiRequestService pluiRequestService;
 
 	@Autowired
-	GeographicAreaService geographicAreaService;
+	EtablissementService etablissementService;
 
 	@Override
 	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
@@ -57,14 +57,21 @@ public class RequestController implements RequestApi {
 	}
 
 	@Override
-	public ResponseEntity<List<GeographicArea>> getAllPluiRequestGeographicArea() throws Exception {
-		return new ResponseEntity<>(geographicAreaService.getAllGeographicArea(), HttpStatus.OK);
+	public ResponseEntity<List<Etablissement>> getAllPluiRequestEtablissement() throws Exception {
+		return null;
 	}
+
 
 	@Override
 	public ResponseEntity<PluiRequest> getPluiRequestByUuid(UUID uuid) throws Exception {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public ResponseEntity<String> getWfsRequest(@Valid String wfsContent) throws Exception {
+	    // TODO
+        return null;
+    }
 
 }
