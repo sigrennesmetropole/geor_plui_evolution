@@ -33,6 +33,7 @@ public class EtablissementEntity implements LongId {
 	@Column(name = "codeinsee", length = 10, unique = true)
 	private String codeInsee;
 
+	// Dans cette geometrie seront enregistrés des points
 	@Column(name = "geometry", columnDefinition = "Geometry")
 	private Geometry geometry;
 
