@@ -20,6 +20,6 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
     @Override
     public GeographicAreaEntity getGeographicAreaByNom(String nom) {
         // Appliquer d'abord le formatage qu'il faut au nom avant de lancer la requete
-        return geographicAreaDao.findByName(nom);
+        return geographicAreaDao.findByNom(nom);
     }
 }

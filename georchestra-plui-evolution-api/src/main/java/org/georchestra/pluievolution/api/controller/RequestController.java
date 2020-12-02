@@ -68,10 +68,9 @@ public class RequestController implements RequestApi {
 		return null;
 	}
 
-    @Override
-    public ResponseEntity<String> getWfsRequest(@Valid String wfsContent) throws Exception {
-	    // TODO
-        return null;
-    }
+	@Override
+	public ResponseEntity<FeatureCollection> getWfsRequest(@Valid List<Double> bbox) throws Exception {
+		return new ResponseEntity<>(pluiRequestService.getWfsAuthorizedPluiRequest(bbox), HttpStatus.OK);
+	}
 
 }

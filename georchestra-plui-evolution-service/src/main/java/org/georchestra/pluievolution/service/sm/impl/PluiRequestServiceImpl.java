@@ -3,20 +3,27 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.common.DocumentContent;
+import org.georchestra.pluievolution.core.dao.acl.UserDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
+import org.georchestra.pluievolution.core.entity.acl.UserEntity;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
+import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
+import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
+import org.geotools.geometry.jts.JTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +45,9 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	private AuthentificationHelper authentificationHelper;
 
 	@Autowired
+	private UserDao userDao;
+
+	@Autowired
 	private AttachmentHelper attachmentHelper;
 
 	@Autowired
@@ -46,7 +56,11 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	@Autowired
 	PluiRequestDao pluiRequestDao;
 
+	@Autowired
+	GeographicAreaService geographicAreaService;
 
+	@Autowired
+	GeoserverService geoserverService;
 
 	@Override
 	@Transactional(readOnly = false)
@@ -76,6 +90,31 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		result.setMimeType(documentContent.getContentType());
 		result.setName(documentContent.getFileName());
 		return result;
+	}
+
+	@Override
+	public FeatureCollection getWfsAuthorizedPluiRequest(List<Double> bbox) throws ApiServiceException, IOException {
+		// On recupere l'organisation a laquelle appartient le user connecté
+		String username = authentificationHelper.getUsername();
+		UserEntity currentUser = userDao.findByLogin(username);
+		String organisation;
+		if (currentUser != null) { // on recupere l'organisation de l'utilisateur
+			organisation = currentUser.getOrganization();
+		} else {
+			throw new ApiServiceException("Utilisateur introuvable", "404");
+		}
+
+		// On recupere la geographic area ayant correspondante a l'organisation du user
+		GeographicAreaEntity geographicAreaEntity = geographicAreaService.getGeographicAreaByNom(organisation);
+
+		if (geographicAreaEntity == null) {
+			throw new ApiServiceException("Organisation inconnue", "404");
+		}
+
+		Geometry area = geographicAreaEntity.getGeometry(); // nul pour rm
+		Envelope bboxEnvelope = new Envelope(bbox.get(0), bbox.get(1), bbox.get(2), bbox.get(3));
+		Geometry bboxPolygon = JTS.toGeometry(bboxEnvelope);
+		return geoserverService.handleWfs(bboxPolygon, area);
 	}
 
 	@Override
