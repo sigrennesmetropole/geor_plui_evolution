@@ -19,5 +19,5 @@ public interface GeographicAreaDao extends QueryDslDao<EtablissementEntity, Long
      * @param nom
      * @return
      */
-    GeographicAreaEntity findByName(String nom);
+    GeographicAreaEntity findByNom(String nom);
 }

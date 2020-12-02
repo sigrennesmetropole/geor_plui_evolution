@@ -3,6 +3,7 @@
  */
 package org.georchestra.pluievolution.service.sm;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -89,5 +90,11 @@ public interface PluiRequestService {
 	 * @throws ApiServiceException
 	 */
 	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
+
+	/**
+	 * Permet par uine requete WFS d'obtenir la liste des pluirequest (sous forme de string) auxquels l'utilisateur courant à accès
+	 * et tout en filtrant dans une boundingbox donné
+	 */
+	FeatureCollection getWfsAuthorizedPluiRequest(List<Double> bbox) throws ApiServiceException, IOException;
 
 }
