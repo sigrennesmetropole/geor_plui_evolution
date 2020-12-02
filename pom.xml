@@ -201,6 +201,12 @@
 				<version>${geotools.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-wfs-ng</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+
 			<!-- https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
 			<dependency>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
