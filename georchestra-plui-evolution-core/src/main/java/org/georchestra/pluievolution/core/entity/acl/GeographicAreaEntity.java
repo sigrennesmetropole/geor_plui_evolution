@@ -33,9 +33,9 @@ public class GeographicAreaEntity implements LongId {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof EtablissementEntity)) return false;
+        if (!(o instanceof GeographicEtablissementEntity)) return false;
 
-        EtablissementEntity that = (EtablissementEntity) o;
+        GeographicEtablissementEntity that = (GeographicEtablissementEntity) o;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
         return getCodeInsee().equals(that.getCodeInsee());

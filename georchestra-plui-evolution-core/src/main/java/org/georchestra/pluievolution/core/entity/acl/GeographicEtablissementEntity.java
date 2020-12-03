@@ -19,8 +19,8 @@ import org.georchestra.pluievolution.core.common.LongId;
  */
 @Getter @Setter
 @Entity
-@Table(name = "etablissement")
-public class EtablissementEntity implements LongId {
+@Table(name = "geographic_etablissement")
+public class GeographicEtablissementEntity implements LongId {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +40,9 @@ public class EtablissementEntity implements LongId {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof EtablissementEntity)) return false;
+		if (!(o instanceof GeographicEtablissementEntity)) return false;
 
-		EtablissementEntity that = (EtablissementEntity) o;
+		GeographicEtablissementEntity that = (GeographicEtablissementEntity) o;
 
 		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 		return getCodeInsee().equals(that.getCodeInsee());

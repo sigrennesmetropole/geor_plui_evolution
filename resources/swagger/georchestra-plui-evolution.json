@@ -288,35 +288,6 @@
 				}
 			}
 		},
-		"/request/etablissementarea": {
-			"get": {
-				"tags": [
-					"request"
-				],
-				"summary": "Liste des communes, plus ville et métropole, d'où les demandes peuvent être émises",
-				"operationId": "getAllPluiRequestEtablissement",
-				"produces": [
-					"application/json"
-				],
-				"responses": {
-					"200": {
-						"description": "Liste des communes + ville + metropole",
-						"schema": {
-							"type": "array",
-							"items": {
-								"$ref": "#/definitions/Etablissement"
-							}
-						}
-					},
-					"500": {
-						"description": "Internal server error",
-						"schema": {
-							"$ref": "#/definitions/ApiError"
-						}
-					}
-				}
-			}
-		},
 		"/request/wfs": {
 			"post": {
 				"summary": "Requete WFS",
@@ -350,6 +321,64 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/FeatureCollection"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/etablissements": {
+			"get": {
+				"tags": [
+					"request"
+				],
+				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestEtablissements",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des mairies de communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicEtablissement"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas": {
+			"get": {
+				"tags": [
+					"request"
+				],
+				"summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestAreas",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des emprises de communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicArea"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
 						}
 					}
 				}
@@ -804,7 +833,7 @@
 				}
 			}
 		},
-		"Etablissement": {
+		"Geographic": {
 			"type": "object",
 			"properties": {
 				"id": {
@@ -816,11 +845,40 @@
 				},
 				"codeInsee": {
 					"type": "string"
-				},
-				"localisation": {
-					"$ref": "#/definitions/Point"
 				}
 			}
+		},
+		"GeographicEtablissement": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Point"
+						}
+					}
+				}
+			]
+		},
+		"GeographicArea": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Polygon"
+						}
+					}
+				}
+			]
 		},
 		"PluiRequestStatus": {
 			"type": "string",

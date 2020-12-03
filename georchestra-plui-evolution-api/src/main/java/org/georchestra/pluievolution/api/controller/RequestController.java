@@ -14,7 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dto.*;
-import org.georchestra.pluievolution.service.acl.EtablissementService;
+import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +34,7 @@ public class RequestController implements RequestApi {
 	PluiRequestService pluiRequestService;
 
 	@Autowired
-	EtablissementService etablissementService;
+    GeographicEtablissementService geographicEtablissementService;
 
 	@Override
 	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
@@ -54,11 +54,6 @@ public class RequestController implements RequestApi {
 	public ResponseEntity<Void> deletePluiRequest(UUID uuid) throws Exception {
 		pluiRequestService.deletePluiRequestByUuid(uuid);
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	@Override
-	public ResponseEntity<List<Etablissement>> getAllPluiRequestEtablissement() throws Exception {
-		return null;
 	}
 
 

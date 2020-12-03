@@ -2,21 +2,16 @@ package org.georchestra.pluievolution.service.sm.impl;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.service.mapper.FeatureMapper;
-import org.geotools.feature.FeatureCollection;
-import org.georchestra.pluievolution.core.dto.PluiRequestType;
-import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.georchestra.pluievolution.core.dto.PluiRequestType;
+import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.geotools.data.Query;
 import org.geotools.data.simple.SimpleFeatureSource;
-import org.geotools.data.wfs.WFSDataStoreFactory;
-import org.geotools.data.wfs.impl.WFSDataAccessFactory;
 import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.factory.GeoTools;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.util.Version;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.PropertyIsNotEqualTo;
@@ -26,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.URL;
+import java.io.Serializable;
 import java.util.*;
 
 @Service
@@ -55,11 +50,9 @@ public class GeoserverServiceImpl implements GeoserverService {
     @Override
     public org.georchestra.pluievolution.core.dto.FeatureCollection handleWfs(Geometry bbox, Geometry area) throws IOException {
         // Parametres de connexion
-        String getCapabilities = WFSDataStoreFactory.createGetCapabilitiesRequest(new URL(String.format("%s/wfs", geoserverUrl)), new Version("1.1.0")).toString();
-        Map<String, String> connectionParameters = new HashMap<>();
-        connectionParameters.put(WFSDataAccessFactory.URL.key, getCapabilities);
-        connectionParameters.put(WFSDataAccessFactory.PASSWORD.key, geoserverPassword);
-        connectionParameters.put(WFSDataAccessFactory.USERNAME.key, geoserverUsername);
+        String getCapabilities = String.format("%s/wfs?REQUEST=GetCapabilities&version=1.0.0", geoserverUrl);
+        Map<String, Serializable> connectionParameters = new HashMap<>();
+        connectionParameters.put("WFSDataStoreFactory:GET_CAPABILITIES_URL", getCapabilities);
 
         // Connection
         DataStore data = DataStoreFinder.getDataStore(connectionParameters);
@@ -68,7 +61,7 @@ public class GeoserverServiceImpl implements GeoserverService {
         String typeName = String.format("%s:plui_request", geoserverDefaultWorkspace);
         SimpleFeatureSource source = data.getFeatureSource(typeName);
 
-        FilterFactory2 filterFactory = CommonFactoryFinder.getFilterFactory2( GeoTools.getDefaultHints() );
+        FilterFactory2 filterFactory = CommonFactoryFinder.getFilterFactory2();
 
         // On initialise la liste des filtres
         List<Filter> filters = new ArrayList<>();
@@ -94,7 +87,7 @@ public class GeoserverServiceImpl implements GeoserverService {
         Query query = new Query(typeName, filter, new String[]{GEOMETRY_COLUMN_NAME});
 
         // Execution de la requete
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = source.getFeatures( query );
+        SimpleFeatureCollection features = source.getFeatures( query );
 
         // On cree la collection de retour dans laquelle nous allons mapper les features recues
         org.georchestra.pluievolution.core.dto.FeatureCollection fc = new org.georchestra.pluievolution.core.dto.FeatureCollection();

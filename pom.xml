@@ -56,8 +56,8 @@
 		<ant.plugin.version>3.0.0</ant.plugin.version>
 
 		<!-- java version -->
-		<java.source.version>11</java.source.version>
-		<java.target.version>11</java.target.version>
+		<java.source.version>1.8</java.source.version>
+		<java.target.version>1.8</java.target.version>
 
 		<!-- Project properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -205,6 +205,19 @@
 				<groupId>org.geotools</groupId>
 				<artifactId>gt-wfs-ng</artifactId>
 				<version>${geotools.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-epsg-hsql</artifactId>
+				<version>${geotools.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.vividsolutions</groupId>
+				<artifactId>jts</artifactId>
+				<version>1.8</version>
 			</dependency>
 
 			<!-- https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
