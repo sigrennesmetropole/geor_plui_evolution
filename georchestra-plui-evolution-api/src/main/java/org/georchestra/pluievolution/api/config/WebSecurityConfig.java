@@ -6,6 +6,8 @@ import javax.servlet.Filter;
 
 import org.georchestra.pluievolution.api.security.PreAuthenticationFilter;
 import org.georchestra.pluievolution.api.security.PreAuthenticationProvider;
+import org.georchestra.pluievolution.service.sm.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,6 +22,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private UserService userService;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -67,6 +72,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 
 	private Filter createPreAuthenticationFilter() {
-		return new PreAuthenticationFilter();
+		return new PreAuthenticationFilter(userService);
 	}
 }
