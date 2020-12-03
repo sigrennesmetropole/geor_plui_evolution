@@ -25,6 +25,10 @@
 		{
 			"name": "request",
 			"description": "Services de gestion des demandes"
+		},
+		{
+			"name": "geographic",
+			"description": "Service de recuperation des geographics"
 		}
 	],
 	"schemes": [
@@ -94,6 +98,34 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/User"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/user/etablissement":{
+			"get": {
+				"tags": [
+					"user"
+				],
+				"summary": "Récupération de l'établissement auquel est asocié le user courant",
+				"operationId": "getCurrentUserEtablissement",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
 						}
 					},
 					"500": {
@@ -329,7 +361,7 @@
 		"/geographic/etablissements": {
 			"get": {
 				"tags": [
-					"request"
+					"geographic"
 				],
 				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
 				"operationId": "getAllPluiRequestEtablissements",
@@ -358,7 +390,7 @@
 		"/geographic/areas": {
 			"get": {
 				"tags": [
-					"request"
+					"geographic"
 				],
 				"summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
 				"operationId": "getAllPluiRequestAreas",
