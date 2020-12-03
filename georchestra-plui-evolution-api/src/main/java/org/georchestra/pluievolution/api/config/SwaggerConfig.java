@@ -18,10 +18,8 @@ import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
-@EnableSwagger2
 public class SwaggerConfig {
 
 	@Bean
@@ -43,6 +41,7 @@ public class SwaggerConfig {
 		return result;
 	}
 
+	@SuppressWarnings("squid:S1488")
 	protected List<SecurityContext> securityContexts() {
 		List<SecurityContext> securityContexts = Arrays.asList(SecurityContext.builder()
 				.forPaths(PathSelectors.regex("/administration/.*")).securityReferences(securityReferences()).build());
