@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import javax.persistence.*;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.common.LongId;
 
-import com.vividsolutions.jts.geom.Geometry;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +52,7 @@ public class PluiRequestEntity implements LongId {
 	@Column(name = "creation_date", nullable = false)
 	private Date creationDate;
 
-	@Column(name = "geometry", columnDefinition = "Geometry")
+	@Column(name = "geometry", columnDefinition = "geometry")
 	private Geometry geometry;
 
 	@Enumerated(EnumType.STRING)

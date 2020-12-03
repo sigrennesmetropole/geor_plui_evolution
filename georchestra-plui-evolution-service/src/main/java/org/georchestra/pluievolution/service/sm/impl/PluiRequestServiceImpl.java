@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.acl.UserDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
@@ -30,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 
 /**
  * @author FNI18300
@@ -113,7 +115,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		Geometry area = geographicAreaEntity.getGeometry(); // nul pour rm
 		Envelope bboxEnvelope = new Envelope(bbox.get(0), bbox.get(1), bbox.get(2), bbox.get(3));
-		Geometry bboxPolygon = JTS.toGeometry(bboxEnvelope);
+		Polygon bboxPolygon = JTS.toGeometry(bboxEnvelope);
 		return geoserverService.handleWfs(bboxPolygon, area);
 	}
 
