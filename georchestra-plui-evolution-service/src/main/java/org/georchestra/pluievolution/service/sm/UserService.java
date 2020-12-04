@@ -15,7 +15,7 @@ public interface UserService {
 	/**
 	 * Retourne l'utilisateur courant stocké dans le security context
 	 * 
-	 * @see UserService.getUserByLogin
+	 * @see UserService.loadUserByUsername
 	 * @return l'utilisateur courant avec ses rôles
 	 */
 	User getMe();
@@ -26,7 +26,7 @@ public interface UserService {
 	 * @param login
 	 * @return
 	 */
-	User getUserByLogin(String login);
+	User loadUserByUsername(String login);
 
 	/**
 	 * Créé un utilisateur
