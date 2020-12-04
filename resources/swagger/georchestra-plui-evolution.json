@@ -320,40 +320,20 @@
 				}
 			}
 		},
-		"/request/wfs": {
-			"post": {
-				"summary": "Requete WFS",
+		"/request/wms": {
+			"get": {
+				"summary": "Requete WMS",
 				"tags": [
-					"api-carto"
+					"request"
 				],
-				"description": "Requete WFS de recuperation des request auxquelles le user courant a accès",
-				"operationId": "getWfsRequest",
+				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
+				"operationId": "getWms",
 				"produces": [
-					"application/json"
-				],
-				"parameters": [
-					{
-						"in": "body",
-						"name": "bbox",
-						"description": "BoundingBox contenant les request concernnées",
-						"required": true,
-						"schema": {
-							"type": "array",
-							"items": {
-								"type": "number",
-								"format": "double",
-								"maxItems": 4,
-								"minItems": 4
-							}
-						}
-					}
+					"image/png"
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/FeatureCollection"
-						}
+						"description": "Reponse du geoserver"
 					}
 				}
 			}
@@ -405,6 +385,41 @@
 							"items": {
 								"$ref": "#/definitions/GeographicArea"
 							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Emprises d'une communes ou ville où métropole à partir de son code Insee",
+				"operationId": "getPluiRequestAreaByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee de la geographique area",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Emprises de commune | ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicArea"
 						}
 					},
 					"500": {

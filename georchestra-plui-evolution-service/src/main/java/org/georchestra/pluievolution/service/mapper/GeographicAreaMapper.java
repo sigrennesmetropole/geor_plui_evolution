@@ -1,6 +1,7 @@
 package org.georchestra.pluievolution.service.mapper;
 
 import org.georchestra.pluievolution.core.dto.GeographicArea;
+import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.mapstruct.*;
@@ -27,6 +28,7 @@ public interface GeographicAreaMapper extends AbstractMapper<GeographicAreaEntit
             pt.add(BigDecimal.valueOf(coordinate.y));
             return pt;
         }).collect(Collectors.toList()));
+        polygonDto.setType(GeometryType.POLYGON);
         dto.setLocalisation(polygonDto);
     }
 }
