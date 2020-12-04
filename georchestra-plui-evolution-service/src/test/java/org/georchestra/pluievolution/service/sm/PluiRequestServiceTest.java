@@ -3,6 +3,7 @@ package org.georchestra.pluievolution.service.sm;
 import org.georchestra.pluievolution.StarterSpringBootTestApplication;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,10 +11,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
+import java.util.Date;
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = StarterSpringBootTestApplication.class)
@@ -23,6 +28,9 @@ import java.math.BigDecimal;
 public class PluiRequestServiceTest {
     @Autowired
     PluiRequestService pluiRequestService;
+
+    @Autowired
+    PluiRequestMapper pluiRequestMapper;
 
     PluiRequest pluiRequest;
 
@@ -41,11 +49,15 @@ public class PluiRequestServiceTest {
         point.setCoordinates(pt2D);
         point.setType(GeometryType.POINT);
         pluiRequest.setLocalisation(point);
+        pluiRequest.setCreationDate(new Date());
+        pluiRequest.setUuid(UUID.randomUUID());
+        pluiRequest.setStatus(PluiRequestStatus.NOUVEAU);
     }
 
     @Test
-    public void createPluiRequest() throws ApiServiceException {
-        pluiRequest1 = pluiRequestService.createPluiRequest(pluiRequest);
+    public void mappingPluiRequest() {
+        pluiRequest1 = pluiRequestMapper.entityToDto(
+                pluiRequestMapper.dtoToEntity(pluiRequest));
         Assert.assertNotNull("Le uuid ne doit être nul", pluiRequest1.getUuid());
         Assert.assertNotNull("La localisation ne doit etre nulle", pluiRequest1.getLocalisation());
         Assert.assertEquals("La localisation doit etre la meme que celle rensignee", pluiRequest.getLocalisation().hashCode(), pluiRequest1.getLocalisation().hashCode());
@@ -60,4 +72,5 @@ public class PluiRequestServiceTest {
         Assert.assertEquals("Le sujet de la demade doit etre le meme que celui renseigné", pluiRequest.getSubject(), pluiRequest1.getSubject());
 
     }
+
 }

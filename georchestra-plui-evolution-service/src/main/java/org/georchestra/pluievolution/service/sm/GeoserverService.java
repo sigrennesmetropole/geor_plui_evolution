@@ -1,16 +1,17 @@
 package org.georchestra.pluievolution.service.sm;
 
-import com.vividsolutions.jts.geom.Geometry;
-import org.georchestra.pluievolution.core.dto.FeatureCollection;
+import org.georchestra.pluievolution.core.dto.GeographicArea;
 
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public interface GeoserverService {
     /**
      * Handle wfs request to geoserver
-     * @param bbox
      * @param area
+     * @param queryString
      * @return
      */
-    FeatureCollection handleWfs(Geometry bbox, Geometry area) throws IOException;
+    InputStream getWms(GeographicArea area, String queryString) throws IOException, TransformerException;
 }

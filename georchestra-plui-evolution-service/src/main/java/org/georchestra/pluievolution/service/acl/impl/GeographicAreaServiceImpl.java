@@ -1,6 +1,5 @@
 package org.georchestra.pluievolution.service.acl.impl;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dao.acl.GeographicAreaDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.Point;
@@ -9,6 +8,7 @@ import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
+import org.georchestra.pluievolution.service.mapper.LocalizedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +23,9 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 
     @Autowired
     GeographicAreaMapper geographicAreaMapper;
+
+    @Autowired
+    LocalizedMapper localizedMapper;
 
     @Override
     public GeographicArea getGeographicAreaByCodeInsee(String codeInsee) {
@@ -41,21 +44,27 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
     }
 
     @Override
-    public Geometry getCurrentUserArea() throws ApiServiceException {
+    public GeographicArea getCurrentUserArea() throws ApiServiceException {
         // On recupere l'organisation a laquelle appartient le user connecté
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User details  = (User) authentication.getDetails();
         String nom = details.getOrganization();
-        GeographicAreaEntity entity = geographicAreaDao.findByNom(nom);
-        if (entity == null) {
+        GeographicArea area = getGeographicAreaByNom(nom);
+        if (area == null) {
             throw new ApiServiceException("Organisation inconnue", "404");
         }
-        return entity.getGeometry();
+        return area;
     }
 
     @Override
     public GeographicAreaEntity getGeographicAreaByPoint(Point point) {
-        return geographicAreaDao.getByCoords(point.getCoordinates().get(0).doubleValue(), point.getCoordinates().get(1).doubleValue());
+        List<GeographicAreaEntity> geographicAreaEntities = geographicAreaDao.findAll();
+        for(GeographicAreaEntity entity : geographicAreaEntities) {
+            if (entity.getGeometry().intersects(localizedMapper.dtoToEntity(point)) && !entity.getCodeInsee().equals("243500139")) {
+                return entity;
+            }
+        }
+        return null;
     }
 
     @Override

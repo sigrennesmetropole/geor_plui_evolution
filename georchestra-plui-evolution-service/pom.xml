@@ -135,18 +135,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-wfs-ng</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>com.vividsolutions</groupId>
 			<artifactId>jts</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-epsg-hsql</artifactId>
 		</dependency>
 	</dependencies>
 
