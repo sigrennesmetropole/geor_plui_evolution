@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -26,6 +27,11 @@ public class GeographicController implements GeographicApi {
     @Override
     public ResponseEntity<List<GeographicArea>> getAllPluiRequestAreas() throws Exception {
         return new ResponseEntity<>(geographicAreaService.getAllGeographicArea(), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<GeographicArea> getPluiRequestAreaByCodeInsee(@Valid String codeInsee) throws Exception {
+        return new ResponseEntity<>(geographicAreaService.getGeographicAreaByCodeInsee(codeInsee), HttpStatus.OK);
     }
 
     @Override

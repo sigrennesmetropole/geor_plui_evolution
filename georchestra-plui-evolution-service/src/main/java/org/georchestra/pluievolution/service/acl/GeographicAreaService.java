@@ -1,7 +1,8 @@
 package org.georchestra.pluievolution.service.acl;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
-import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 
 import java.util.List;
 
@@ -12,18 +13,24 @@ public interface GeographicAreaService {
      * @param codeInsee
      * @return
      */
-    GeographicAreaEntity getGeographicAreaByCodeInsee(String codeInsee);
+    GeographicArea getGeographicAreaByCodeInsee(String codeInsee);
 
     /**
      * obtenir une geographic area à partir de son nom
      * @param nom
      * @return
      */
-    GeographicAreaEntity getGeographicAreaByNom(String nom);
+    GeographicArea getGeographicAreaByNom(String nom);
 
     /**
      * Permet de recuperer la liste de toutes les geographic area
      * @return
      */
     List<GeographicArea> getAllGeographicArea();
+
+    /**
+     * Obtenir la zone accessible à l'utilisateur notamment sa commune
+     * @return
+     */
+    Geometry getCurrentUserArea() throws ApiServiceException;
 }
