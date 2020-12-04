@@ -3,6 +3,7 @@ package org.georchestra.pluievolution.service.acl.impl;
 import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dao.acl.GeographicAreaDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
+import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.dto.User;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
@@ -50,5 +51,15 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
             throw new ApiServiceException("Organisation inconnue", "404");
         }
         return entity.getGeometry();
+    }
+
+    @Override
+    public GeographicAreaEntity getGeographicAreaByPoint(Point point) {
+        return geographicAreaDao.getByCoords(point.getCoordinates().get(0).doubleValue(), point.getCoordinates().get(1).doubleValue());
+    }
+
+    @Override
+    public GeographicAreaEntity getGeographicAreaEntityByCodeInsee(String codeInsee) {
+        return geographicAreaDao.findByCodeInsee(codeInsee);
     }
 }

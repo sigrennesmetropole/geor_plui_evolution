@@ -3,34 +3,32 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
-import java.io.IOException;
 import java.util.*;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.acl.UserDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.georchestra.pluievolution.core.entity.acl.UserEntity;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
+import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
-import org.geotools.geometry.jts.JTS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 
 
 /**
@@ -64,6 +62,9 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	@Autowired
 	GeoserverService geoserverService;
 
+	@Autowired
+	GeographicAreaMapper geographicAreaMapper;
+
 	@Override
 	@Transactional(readOnly = false)
 	public Attachment addAttachment(UUID reportingUuid, DocumentContent documentContent)
@@ -92,31 +93,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		result.setMimeType(documentContent.getContentType());
 		result.setName(documentContent.getFileName());
 		return result;
-	}
-
-	@Override
-	public FeatureCollection getWfsAuthorizedPluiRequest(List<Double> bbox) throws ApiServiceException, IOException {
-		// On recupere l'organisation a laquelle appartient le user connecté
-		String username = authentificationHelper.getUsername();
-		UserEntity currentUser = userDao.findByLogin(username);
-		String organisation;
-		if (currentUser != null) { // on recupere l'organisation de l'utilisateur
-			organisation = currentUser.getOrganization();
-		} else {
-			throw new ApiServiceException("Utilisateur introuvable", "404");
-		}
-
-		// On recupere la geographic area ayant correspondante a l'organisation du user
-		GeographicAreaEntity geographicAreaEntity = geographicAreaService.getGeographicAreaByNom(organisation);
-
-		if (geographicAreaEntity == null) {
-			throw new ApiServiceException("Organisation inconnue", "404");
-		}
-
-		Geometry area = geographicAreaEntity.getGeometry(); // nul pour rm
-		Envelope bboxEnvelope = new Envelope(bbox.get(0), bbox.get(1), bbox.get(2), bbox.get(3));
-		Polygon bboxPolygon = JTS.toGeometry(bboxEnvelope);
-		return geoserverService.handleWfs(bboxPolygon, area);
 	}
 
 	@Override
@@ -164,14 +140,38 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On converti le dto en entité
 		PluiRequestEntity pluiRequestEntity = pluiRequestMapper.dtoToEntity(pluiRequest);
 
-		// On ajoute l'initiateur de la demande
-		pluiRequestEntity.setInitiator(authentificationHelper.getUsername());
 		// On defini la date de la demande
 		pluiRequestEntity.setCreationDate(new Date());
 
+		// On trouve la geograohic area associée à l'individu et on l'ajoute à la demande
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User details  = (User) authentication.getDetails();
+		String initiator = details.getLogin();
+		GeographicAreaEntity area = null;
+		if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
+			// trouver la geographic area a partir des coordonnees
+			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getLocalisation());
+		} else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("35238");
+		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("243500139");
+
+		} else {
+			throw new ApiServiceException("Le type de demande doit être précisé");
+		}
+
+		if (area == null) {
+			throw new ApiServiceException("Organisation inconnue", "404");
+		}
+
+		// Peut etre en fonction de l'area trouvé et de l'organisation de l'initiateur dire si oui ou non il est autorisé à créer cette demande
+
+		// On ajoute l'initiateur de la demande
+		pluiRequestEntity.setInitiator(initiator);
+		pluiRequestEntity.setArea(area);
+
 		// TODO On envoie à Redmine et on recupere l'id redmine
 		// Lever une exception si echec de l'envoi à redmine
-
 
 		// On ajoute un UUID à la demande
 		pluiRequestEntity.setUuid(UUID.randomUUID());
