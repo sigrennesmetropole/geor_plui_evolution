@@ -90,4 +90,12 @@ public interface PluiRequestService {
 	 */
 	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException;
 
+	/**
+	 * Permet de mettre à jour une pluiRequest
+	 * @param pluiRequest
+	 * @return
+	 * @throws ApiServiceException
+	 */
+	PluiRequest updatePluiRequest(PluiRequest pluiRequest) throws ApiServiceException;
+
 }

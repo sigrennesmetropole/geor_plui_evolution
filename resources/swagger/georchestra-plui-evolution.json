@@ -29,6 +29,10 @@
 		{
 			"name": "geographic",
 			"description": "Service de recuperation des geographics"
+		},
+		{
+			"name": "carto",
+			"description": "Service de gestion des requetes cartographiques"
 		}
 	],
 	"schemes": [
@@ -255,6 +259,42 @@
 						}
 					}
 				}
+			},
+			"put": {
+				"summary": "Maj d'une demande",
+				"tags": [
+					"request"
+				],
+				"description": "Permet de mettre à jour une demande",
+				"operationId": "updatePluiRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "pluiRequest",
+						"description": "Demande à metre à jour",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Demande mise à jour",
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
 			}
 		},
 		"/request/{uuid}": {
@@ -320,11 +360,11 @@
 				}
 			}
 		},
-		"/request/wms": {
+		"/carto/wms": {
 			"get": {
 				"summary": "Requete WMS",
 				"tags": [
-					"request"
+					"carto"
 				],
 				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
 				"operationId": "getWms",
@@ -333,7 +373,8 @@
 				],
 				"responses": {
 					"200": {
-						"description": "Reponse du geoserver"
+						"description": "Reponse du geoserver",
+						"content": "image/png"
 					}
 				}
 			}
