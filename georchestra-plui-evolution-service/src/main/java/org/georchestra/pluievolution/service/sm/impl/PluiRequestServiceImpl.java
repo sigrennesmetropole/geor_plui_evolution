@@ -6,7 +6,6 @@ package org.georchestra.pluievolution.service.sm.impl;
 import java.util.*;
 
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dao.acl.UserDao;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
@@ -14,7 +13,6 @@ import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
-import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
@@ -40,12 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PluiRequestServiceImpl implements PluiRequestService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluiRequestServiceImpl.class);
-	
-	@Autowired
-	private AuthentificationHelper authentificationHelper;
-
-	@Autowired
-	private UserDao userDao;
 
 	@Autowired
 	private AttachmentHelper attachmentHelper;
@@ -96,6 +88,88 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	}
 
 	@Override
+	public PluiRequest updatePluiRequest(PluiRequest pluiRequest) throws ApiServiceException {
+		// On recupere la demande en base
+		PluiRequestEntity entityInDb = null;
+		if (pluiRequest.getUuid() != null) {
+			entityInDb = pluiRequestDao.findByUuid(pluiRequest.getUuid());
+		} else {
+			throw new ApiServiceException("UUID non fourni");
+		}
+
+		if (entityInDb == null) {
+			throw new ApiServiceException("Entité non trouvée en base");
+		}
+
+		// On converti le dto en entité
+		PluiRequestEntity pluiRequestEntity = pluiRequestMapper.dtoToEntity(pluiRequest);
+
+		// On defini le statut de  la demande si non defini ou different de nouveau
+		if (pluiRequestEntity.getStatus() == null && entityInDb.getStatus() == null) {
+			pluiRequestEntity.setStatus(PluiRequestStatus.NOUVEAU);
+		} else {
+			entityInDb.setStatus(pluiRequestEntity.getStatus());
+		}
+
+		// On defini la date de la demande
+		if (entityInDb.getCreationDate() == null && pluiRequestEntity.getCreationDate() == null) {
+			entityInDb.setCreationDate(new Date());
+		} else if (entityInDb.getCreationDate() == null && pluiRequestEntity.getCreationDate() != null) {
+			entityInDb.setCreationDate(pluiRequestEntity.getCreationDate());
+		}
+
+		if (entityInDb.getInitiator() == null) {
+			entityInDb.setInitiator(getPluiRequestInitiator());
+		}
+
+		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
+		if (!entityInDb.getGeometry().equals(pluiRequestEntity.getGeometry())) {
+			entityInDb.setArea(getPluiRequestArea(pluiRequest));
+		}
+
+		// TODO On met à jour les info dans le redmine
+		// Lever une exception si echec de l'envoi à redmine
+
+		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
+		try {
+			return this.pluiRequestMapper.entityToDto(
+					this.pluiRequestDao.save(
+							entityInDb
+					)
+			);
+		} catch (DataAccessException e) {
+			LOGGER.error("Erreur lors de l'enregistrement de la demande dans la BDD");
+			throw new ApiServiceException(e.getMessage(), e);
+		}
+	}
+
+	private String getPluiRequestInitiator() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User details  = (User) authentication.getDetails();
+		return details.getLogin();
+	}
+
+	private GeographicAreaEntity getPluiRequestArea(PluiRequest pluiRequest) throws ApiServiceException {
+		GeographicAreaEntity area = null;
+		if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
+			// trouver la geographic area a partir des coordonnees
+			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getLocalisation());
+		} else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("35238");
+		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("243500139");
+
+		} else {
+			throw new ApiServiceException("Le type de demande doit être précisé");
+		}
+
+		if (area == null) {
+			throw new ApiServiceException("Organisation inconnue", "404");
+		}
+		return area;
+	}
+
+	@Override
 	public Attachment getAttachment(UUID reportingUuid, Long attachmentId) throws DocumentRepositoryException {
 		Attachment result = null;
 		
@@ -143,32 +217,16 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On defini la date de la demande
 		pluiRequestEntity.setCreationDate(new Date());
 
-		// On trouve la geograohic area associée à l'individu et on l'ajoute à la demande
+		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		User details  = (User) authentication.getDetails();
 		String initiator = details.getLogin();
-		GeographicAreaEntity area = null;
-		if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
-			// trouver la geographic area a partir des coordonnees
-			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getLocalisation());
-		} else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
-			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("35238");
-		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
-			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("243500139");
-
-		} else {
-			throw new ApiServiceException("Le type de demande doit être précisé");
-		}
-
-		if (area == null) {
-			throw new ApiServiceException("Organisation inconnue", "404");
-		}
 
 		// Peut etre en fonction de l'area trouvé et de l'organisation de l'initiateur dire si oui ou non il est autorisé à créer cette demande
 
 		// On ajoute l'initiateur de la demande
 		pluiRequestEntity.setInitiator(initiator);
-		pluiRequestEntity.setArea(area);
+		pluiRequestEntity.setArea(getPluiRequestArea(pluiRequest));
 
 		// TODO On envoie à Redmine et on recupere l'id redmine
 		// Lever une exception si echec de l'envoi à redmine
@@ -198,6 +256,8 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(e.getMessage(), e);
 		}
 	}
+
+
 
 
 
