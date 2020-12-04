@@ -37,12 +37,12 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public User getMe() {
-		return getUserByLogin(authentificationHelper.getUsername());
+		return loadUserByUsername(authentificationHelper.getUsername());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public User getUserByLogin(String username) {
+	public User loadUserByUsername(String username) {
 		LOGGER.info("Search user by login {}", username);
 		UserEntity userEntity = userDao.findByLogin(username);
 		return userMapper.entityToDto(userEntity);
@@ -70,5 +70,4 @@ public class UserServiceImpl implements UserService {
 		userDao.save(userEntity);
 		return userMapper.entityToDto(userEntity);
 	}
-
 }

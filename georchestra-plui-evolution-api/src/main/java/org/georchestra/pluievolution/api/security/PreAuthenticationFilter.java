@@ -87,7 +87,7 @@ public class PreAuthenticationFilter implements Filter {
 			roles = Arrays.asList(rolesString.split(";"));
 			rolesSet.addAll(roles);
 		}
-		User user = userService.getUserByLogin(username);
+		User user = userService.loadUserByUsername(username);
 		if (user == null) {
 			user = new User();
 			user.setLogin(username);
