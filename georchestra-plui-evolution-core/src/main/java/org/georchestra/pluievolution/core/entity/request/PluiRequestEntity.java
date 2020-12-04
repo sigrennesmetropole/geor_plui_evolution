@@ -14,6 +14,7 @@ import lombok.Setter;
 import lombok.ToString;
 import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
+import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 
 /**
  * @author FNI18300
@@ -62,6 +63,10 @@ public class PluiRequestEntity implements LongId {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", length = 20)
 	private PluiRequestType type;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "area_id")
+	private GeographicAreaEntity area;
 
 	@Override
 	public boolean equals(Object o) {

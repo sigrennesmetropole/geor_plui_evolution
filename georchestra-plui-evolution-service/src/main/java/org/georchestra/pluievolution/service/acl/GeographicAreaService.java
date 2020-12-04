@@ -2,6 +2,8 @@ package org.georchestra.pluievolution.service.acl;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
+import org.georchestra.pluievolution.core.dto.Point;
+import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 
 import java.util.List;
@@ -33,4 +35,16 @@ public interface GeographicAreaService {
      * @return
      */
     Geometry getCurrentUserArea() throws ApiServiceException;
+
+    /**
+     * Obtenir la commune à laquelle appartient appartient un point donné
+     */
+    GeographicAreaEntity getGeographicAreaByPoint(Point point);
+
+    /**
+     * Permet d'obtneir une geographic area entity par son code insee
+     * @param codeInsee
+     * @return
+     */
+    public GeographicAreaEntity getGeographicAreaEntityByCodeInsee(String codeInsee);
 }
