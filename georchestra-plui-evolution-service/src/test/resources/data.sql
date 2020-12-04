@@ -8,13 +8,13 @@ INSERT INTO pluievolution.user_ ( login, first_name, last_name, email, organizat
 -- Insertion de Plui Requests
 
 INSERT INTO pluievolution.plui_request (id, comment, creation_date, geometry, initiator, object, redmine_id, status, subject, type, uuid, area_id) VALUES
-(1,'','2020-12-02 15:25:55.938000','POINT(48.123487 -1.671661)','user_rennes','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','e706285a-0046-4bc9-8d52-6b603a2afc74', 38);
+(1,'','2020-12-02 15:25:55.938000','POINT(-1.671661 48.123487)','user_rennes','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','e706285a-0046-4bc9-8d52-6b603a2afc74', 38);
 
 INSERT INTO pluievolution.plui_request (id, comment, creation_date, geometry, initiator, object, redmine_id, status, subject, type, uuid, area_id) VALUES
-(2,'','2020-12-02 15:34:56.314000','POINT(48.128116 -1.590976)','user_rm','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','a2ba3b60-f80d-4999-ba5a-4f223bb991be', 39);
+(2,'','2020-12-02 15:34:56.314000','POINT(-1.590976 48.128116)','user_rm','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','a2ba3b60-f80d-4999-ba5a-4f223bb991be', 39);
 
 INSERT INTO pluievolution.plui_request (id, comment, creation_date, geometry, initiator, object, redmine_id, status, subject, type, uuid, area_id) VALUES
-(3,'','2020-12-02 15:36:20.459000','POINT(48.118215 -1.758677)','user_vezin','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','36a1c0a1-7772-4a34-88be-f1f0bf1efc07', 22);
+(3,'','2020-12-02 15:36:20.459000','POINT(-1.758677 48.118215)','user_vezin','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','COMMUNE','36a1c0a1-7772-4a34-88be-f1f0bf1efc07', 22);
 
 INSERT INTO pluievolution.plui_request (id, comment, creation_date, geometry, initiator, object, redmine_id, status, subject, type, uuid, area_id) VALUES
 (4,'','2020-12-02 15:44:20.459000','POINT(-1.68010984183675 48.1113665416512)','user_vezin','Ici l''objet de la demande',null,'NOUVEAU','Ici le sujet de la demande','INTERCOMMUNE','71ef78e3-859b-4eea-8dca-3e73c7d07414', 38);
