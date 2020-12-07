@@ -2,7 +2,6 @@ package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.StarterSpringBootTestApplication;
 import org.georchestra.pluievolution.core.dto.*;
-import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,8 +10,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
