@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.test.context.TestPropertySource;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @SpringBootTest(classes = StarterSpringBootTestApplication.class)
 @ComponentScan({ "org.georchestra.pluievolution.api", "org.georchestra.pluievolution.service",
         "org.georchestra.pluievolution.core" })
+@EntityScan({"org.georchestra.pluievolution.core.entity"})
 @TestPropertySource(value = { "classpath:plui-evolution.properties", "classpath:plui-evolution-common.properties" })
 public class PluiRequestServiceTest {
     @Autowired
