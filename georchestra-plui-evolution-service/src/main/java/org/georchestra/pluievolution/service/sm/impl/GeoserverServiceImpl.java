@@ -2,11 +2,9 @@ package org.georchestra.pluievolution.service.sm.impl;
 
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
-import org.georchestra.pluievolution.service.mapper.FeatureMapper;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriBuilder;
@@ -20,9 +18,6 @@ import java.net.URLDecoder;
 public class GeoserverServiceImpl implements GeoserverService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeoserverServiceImpl.class);
-
-    @Autowired
-    FeatureMapper featureMapper;
 
     @Value("${pluievolution.geoserver.url}")
     private String geoserverUrl;
