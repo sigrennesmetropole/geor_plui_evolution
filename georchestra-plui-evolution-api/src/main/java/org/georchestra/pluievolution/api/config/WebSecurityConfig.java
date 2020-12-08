@@ -1,6 +1,7 @@
 package org.georchestra.pluievolution.api.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import javax.servlet.Filter;
 
@@ -53,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Url autorisées
 		// 4200 pour les développement | 8080 pour le déploiement
-		configuration.setAllowedOrigins(Arrays.asList("*"));
+		configuration.setAllowedOrigins(Collections.singletonList("*"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
