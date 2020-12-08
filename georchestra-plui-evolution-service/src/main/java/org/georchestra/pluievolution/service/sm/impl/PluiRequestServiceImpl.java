@@ -17,7 +17,6 @@ import org.georchestra.pluievolution.service.helper.authentification.Authentific
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
-import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,13 +50,13 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	GeographicAreaService geographicAreaService;
 
 	@Autowired
-	GeoserverService geoserverService;
-
-	@Autowired
 	GeographicAreaMapper geographicAreaMapper;
 
 	@Autowired
 	AuthentificationHelper authentificationHelper;
+
+	private static final String CODE_INSEE_RENNES = "35238";
+	private static final String CODE_INSEE_RM = "243500139";
 
 	@Override
 	@Transactional(readOnly = false)
@@ -151,9 +150,9 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			// trouver la geographic area a partir des coordonnees
 			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getGeometry());
 		} else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
-			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("35238");
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee(CODE_INSEE_RENNES);
 		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
-			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("243500139");
+			area = geographicAreaService.getGeographicAreaEntityByCodeInsee(CODE_INSEE_RM);
 
 		} else {
 			throw new ApiServiceException("Le type de demande doit être précisé");
