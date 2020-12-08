@@ -2,6 +2,7 @@ package org.georchestra.pluievolution.api.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
@@ -43,11 +44,9 @@ public class SwaggerConfig {
 		return result;
 	}
 
-	@SuppressWarnings("squid:S1488")
 	protected List<SecurityContext> securityContexts() {
-		List<SecurityContext> securityContexts = Arrays.asList(SecurityContext.builder()
+		return Collections.singletonList(SecurityContext.builder()
 				.forPaths(PathSelectors.regex("/administration/.*")).securityReferences(securityReferences()).build());
-		return securityContexts;
 	}
 
 	private List<SecurityReference> securityReferences() {
