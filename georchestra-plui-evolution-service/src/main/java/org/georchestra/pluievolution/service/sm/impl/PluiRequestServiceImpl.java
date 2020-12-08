@@ -126,7 +126,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
 		if (!entityInDb.getGeometry().equals(pluiRequestEntity.getGeometry())) {
-			entityInDb.setArea(getPluiRequestArea(pluiRequest));
+			entityInDb.setArea(getPluiRequestArea(pluiRequestEntity));
 		}
 
 		// TODO On met à jour les info dans le redmine
@@ -145,11 +145,11 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 	}
 
-	private GeographicAreaEntity getPluiRequestArea(PluiRequest pluiRequest) throws ApiServiceException {
+	private GeographicAreaEntity getPluiRequestArea(PluiRequestEntity pluiRequest) throws ApiServiceException {
 		GeographicAreaEntity area = null;
 		if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
 			// trouver la geographic area a partir des coordonnees
-			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getLocalisation());
+			area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getGeometry());
 		} else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
 			area = geographicAreaService.getGeographicAreaEntityByCodeInsee("35238");
 		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
@@ -220,7 +220,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		// On ajoute l'initiateur de la demande
 		pluiRequestEntity.setInitiator(initiator);
-		pluiRequestEntity.setArea(getPluiRequestArea(pluiRequest));
+		pluiRequestEntity.setArea(getPluiRequestArea(pluiRequestEntity));
 
 		// TODO On envoie à Redmine et on recupere l'id redmine
 		// Lever une exception si echec de l'envoi à redmine

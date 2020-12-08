@@ -1,8 +1,8 @@
 package org.georchestra.pluievolution.service.acl.impl;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dao.acl.GeographicAreaDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
-import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
@@ -56,14 +56,12 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
     }
 
     @Override
-    public GeographicAreaEntity getGeographicAreaByPoint(Point point) {
-        List<GeographicAreaEntity> geographicAreaEntities = geographicAreaDao.findAll();
-        for(GeographicAreaEntity entity : geographicAreaEntities) {
-            if (entity.getGeometry().intersects(localizedMapper.dtoToEntity(point)) && !entity.getCodeInsee().equals("243500139")) {
-                return entity;
-            }
+    public GeographicAreaEntity getGeographicAreaByPoint(Geometry point) throws ApiServiceException {
+        GeographicAreaEntity entity = geographicAreaDao.getByCoords(point);
+        if (entity == null) {
+            throw new ApiServiceException("Ce point n'est dans aucune commune connue");
         }
-        return null;
+        return entity;
     }
 
     @Override

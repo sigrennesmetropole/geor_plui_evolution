@@ -1,7 +1,7 @@
 package org.georchestra.pluievolution.service.acl;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
-import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 
@@ -38,7 +38,7 @@ public interface GeographicAreaService {
     /**
      * Obtenir la commune à laquelle appartient appartient un point donné
      */
-    GeographicAreaEntity getGeographicAreaByPoint(Point point);
+    GeographicAreaEntity getGeographicAreaByPoint(Geometry point) throws ApiServiceException;
 
     /**
      * Permet d'obtneir une geographic area entity par son code insee
