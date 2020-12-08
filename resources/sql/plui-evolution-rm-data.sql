@@ -1,4 +1,7 @@
-INSERT INTO pluievolution.user_ ( login, first_name, last_name, email) VALUES ( 't.brule', 'Thomas', 'Brulé', 't.brule@rennesmetropole.fr');
+INSERT INTO pluievolution.user_ ( login, first_name, last_name, email, organization, roles) VALUES ( 't.brule', 'Thomas', 'Brulé', 't.brule@rennesmetropole.fr', 'Rennes', 'USER');
+
+INSERT INTO pluievolution.user_ ( login, first_name, last_name, email, organization, roles) VALUES ( 'testuser', 'test', 'user', 'psc+testuser@georchestra.org', 'Rennes', 'USER');
+
 
 -- Insertion des differentes mairies de communes
 INSERT INTO pluievolution.geographic_etablissement (nom, codeinsee, geometry) VALUES ('Mairie d''Acigné','35001', 'POINT(-1.53408492518922 48.1335911914006)');
