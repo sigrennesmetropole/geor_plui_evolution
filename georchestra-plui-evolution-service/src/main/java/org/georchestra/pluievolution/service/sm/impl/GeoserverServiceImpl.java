@@ -74,9 +74,7 @@ public class GeoserverServiceImpl implements GeoserverService {
             }
 
 
-        } catch (final IOException e) {
-            LOG.error(GEOSERVER_REQUEST_ERROR, e);
-        } catch (final Exception e) {
+        } catch (final IOException | ApiServiceException e) {
             LOG.error(GEOSERVER_REQUEST_ERROR, e);
         }
         return null;
