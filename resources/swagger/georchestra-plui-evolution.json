@@ -471,6 +471,41 @@
 					}
 				}
 			}
+		},
+		"/geographic/etablissements/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Hotel de ville d'une commune (ou Rennes Metropole) par son code insee",
+				"operationId": "getPluiRequestEtablissementByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee du geographique etablissement",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Hotel de ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
 		}
 	},
 	"definitions": {

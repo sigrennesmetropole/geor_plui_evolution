@@ -25,6 +25,11 @@ public class GeographicEtablissementServiceImpl implements GeographicEtablisseme
     AuthentificationHelper authentificationHelper;
 
     @Override
+    public GeographicEtablissement getGeographicEtablissementByCodeInsee(String codeInsee) {
+        return geographicEtablissementMapper.entityToDto(geographicEtablissementDao.findByCodeInsee(codeInsee));
+    }
+
+    @Override
     public List<GeographicEtablissement> getAllEtablissement() {
         return geographicEtablissementMapper.entitiesToDto(geographicEtablissementDao.findAll());
     }

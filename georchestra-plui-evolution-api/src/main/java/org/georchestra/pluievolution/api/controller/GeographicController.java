@@ -18,6 +18,8 @@ import java.util.List;
 @Api(tags = "geographic")
 public class GeographicController implements GeographicApi {
 
+
+
     @Autowired
     GeographicEtablissementService geographicEtablissementService;
 
@@ -32,6 +34,11 @@ public class GeographicController implements GeographicApi {
     @Override
     public ResponseEntity<GeographicArea> getPluiRequestAreaByCodeInsee(@Valid String codeInsee) throws Exception {
         return new ResponseEntity<>(geographicAreaService.getGeographicAreaByCodeInsee(codeInsee), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<GeographicEtablissement> getPluiRequestEtablissementByCodeInsee(String codeInsee) throws Exception {
+        return new ResponseEntity<>(geographicEtablissementService.getGeographicEtablissementByCodeInsee(codeInsee), HttpStatus.OK);
     }
 
     @Override
