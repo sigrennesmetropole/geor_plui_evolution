@@ -5,6 +5,7 @@ package org.georchestra.pluievolution.service.sm.impl;
 
 import java.util.*;
 
+import com.taskadapter.redmineapi.RedmineException;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.*;
@@ -15,6 +16,7 @@ import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
+import org.georchestra.pluievolution.service.helper.request.RedmineHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
@@ -57,6 +59,9 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	private static final String CODE_INSEE_RENNES = "35238";
 	private static final String CODE_INSEE_RM = "243500139";
+
+	@Autowired
+	RedmineHelper redmineHelper;
 
 	@Override
 	@Transactional(readOnly = false)
@@ -199,7 +204,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	@Override
 	@Transactional(readOnly = false)
-	public PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException {
+	public PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException, RedmineException {
 
 		// On defini le statut de  la demande si non defini ou different de nouveau
 		if (pluiRequest.getStatus() == null || pluiRequest.getStatus() != PluiRequestStatus.NOUVEAU) {
@@ -221,11 +226,13 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		pluiRequestEntity.setInitiator(initiator);
 		pluiRequestEntity.setArea(getPluiRequestArea(pluiRequestEntity));
 
-		// TODO On envoie à Redmine et on recupere l'id redmine
-		// Lever une exception si echec de l'envoi à redmine
-
 		// On ajoute un UUID à la demande
 		pluiRequestEntity.setUuid(UUID.randomUUID());
+
+		// TODO On envoie à Redmine et on recupere l'id redmine
+		// Lever une exception si echec de l'envoi à redmine
+		pluiRequestEntity = redmineHelper.createPluiRequestIssue(pluiRequestEntity);
+
 		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
 		try {
 			return this.pluiRequestMapper.entityToDto(

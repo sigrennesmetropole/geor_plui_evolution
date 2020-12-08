@@ -6,6 +6,7 @@ package org.georchestra.pluievolution.service.sm;
 import java.util.List;
 import java.util.UUID;
 
+import com.taskadapter.redmineapi.RedmineException;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
@@ -77,7 +78,7 @@ public interface PluiRequestService {
 	 * @param pluiRequest
 	 * @return
 	 */
-	PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException;
+	PluiRequest createPluiRequest(PluiRequest pluiRequest) throws ApiServiceException, RedmineException;
 
 	void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException;
 
