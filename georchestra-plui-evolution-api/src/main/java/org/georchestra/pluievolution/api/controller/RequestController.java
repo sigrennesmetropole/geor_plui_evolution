@@ -4,7 +4,6 @@
 package org.georchestra.pluievolution.api.controller;
 
 import java.io.File;
-import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -15,6 +14,7 @@ import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dto.*;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
+import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,11 +34,19 @@ public class RequestController implements RequestApi {
 	PluiRequestService pluiRequestService;
 
 	@Autowired
+    GeographicEtablissementService geographicEtablissementService;
+
+	@Autowired
 	GeographicAreaService geographicAreaService;
 
 	@Override
 	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
 		return new ResponseEntity<>(pluiRequestService.createPluiRequest(pluiRequest), HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<PluiRequest> updatePluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
+		return new ResponseEntity<>(pluiRequestService.updatePluiRequest(pluiRequest), HttpStatus.OK);
 	}
 
 	@Override
@@ -56,10 +64,6 @@ public class RequestController implements RequestApi {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@Override
-	public ResponseEntity<List<GeographicArea>> getAllPluiRequestGeographicArea() throws Exception {
-		return new ResponseEntity<>(geographicAreaService.getAllGeographicArea(), HttpStatus.OK);
-	}
 
 	@Override
 	public ResponseEntity<PluiRequest> getPluiRequestByUuid(UUID uuid) throws Exception {

@@ -25,6 +25,14 @@
 		{
 			"name": "request",
 			"description": "Services de gestion des demandes"
+		},
+		{
+			"name": "geographic",
+			"description": "Service de recuperation des geographics"
+		},
+		{
+			"name": "carto",
+			"description": "Service de gestion des requetes cartographiques"
 		}
 	],
 	"schemes": [
@@ -94,6 +102,34 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/User"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/user/etablissement":{
+			"get": {
+				"tags": [
+					"user"
+				],
+				"summary": "Récupération de l'établissement auquel est asocié le user courant",
+				"operationId": "getCurrentUserEtablissement",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
 						}
 					},
 					"500": {
@@ -223,6 +259,42 @@
 						}
 					}
 				}
+			},
+			"put": {
+				"summary": "Maj d'une demande",
+				"tags": [
+					"request"
+				],
+				"description": "Permet de mettre à jour une demande",
+				"operationId": "updatePluiRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "pluiRequest",
+						"description": "Demande à metre à jour",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Demande mise à jour",
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
 			}
 		},
 		"/request/{uuid}": {
@@ -288,24 +360,142 @@
 				}
 			}
 		},
-		"/request/geographicarea": {
+		"/carto/wms": {
+			"get": {
+				"summary": "Requete WMS",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
+				"operationId": "getWms",
+				"produces": [
+					"image/png"
+				],
+				"responses": {
+					"200": {
+						"description": "Reponse du geoserver",
+						"content": "image/png"
+					}
+				}
+			}
+		},
+		"/geographic/etablissements": {
 			"get": {
 				"tags": [
-					"request"
+					"geographic"
 				],
-				"summary": "Liste des communes, plus ville et métropole, d'où les demandes peuvent être émises",
-				"operationId": "getAllPluiRequestGeographicArea",
+				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestEtablissements",
 				"produces": [
 					"application/json"
 				],
 				"responses": {
 					"200": {
-						"description": "Liste des communes + ville + metropole",
+						"description": "Liste des mairies de communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicEtablissement"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestAreas",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des emprises de communes + ville + metropole",
 						"schema": {
 							"type": "array",
 							"items": {
 								"$ref": "#/definitions/GeographicArea"
 							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Emprises d'une communes ou ville où métropole à partir de son code Insee",
+				"operationId": "getPluiRequestAreaByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee de la geographique area",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Emprises de commune | ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicArea"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/etablissements/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Hotel de ville d'une commune (ou Rennes Metropole) par son code insee",
+				"operationId": "getPluiRequestEtablissementByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee du geographique etablissement",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Hotel de ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
 						}
 					},
 					"500": {
@@ -766,7 +956,7 @@
 				}
 			}
 		},
-		"GeographicArea": {
+		"Geographic": {
 			"type": "object",
 			"properties": {
 				"id": {
@@ -778,11 +968,40 @@
 				},
 				"codeInsee": {
 					"type": "string"
-				},
-				"localisation": {
-					"$ref": "#/definitions/Point"
 				}
 			}
+		},
+		"GeographicEtablissement": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Point"
+						}
+					}
+				}
+			]
+		},
+		"GeographicArea": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Polygon"
+						}
+					}
+				}
+			]
 		},
 		"PluiRequestStatus": {
 			"type": "string",

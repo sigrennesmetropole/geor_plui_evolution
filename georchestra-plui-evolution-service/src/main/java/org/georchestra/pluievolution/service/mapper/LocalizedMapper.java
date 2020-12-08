@@ -17,7 +17,9 @@ public interface LocalizedMapper {
         GeometryFactory gf = new GeometryFactory();
         Coordinate coordinate = new Coordinate(point.getCoordinates().get(0).doubleValue(),
                 point.getCoordinates().get(1).doubleValue());
-        return gf.createPoint(coordinate);
+        com.vividsolutions.jts.geom.Point pointGeom = gf.createPoint(coordinate);
+        pointGeom.setSRID(4326);
+        return pointGeom;
     }
 
     default Point entityToDto(Geometry geometry) {
