@@ -150,29 +150,6 @@ CREATE TABLE pluievolution.plui_request
 ALTER TABLE pluievolution.plui_request
     OWNER to pluievolution;
 
--- Table: pluievolution.user_
-
--- DROP TABLE pluievolution.user_;
-
-CREATE TABLE pluievolution.user_
-(
-    id bigint NOT NULL DEFAULT nextval('user__id_seq1'::regclass),
-    email character varying(150) COLLATE pg_catalog."default" NOT NULL,
-    first_name character varying(150) COLLATE pg_catalog."default",
-    last_name character varying(150) COLLATE pg_catalog."default",
-    login character varying(100) COLLATE pg_catalog."default" NOT NULL,
-    organization character varying(150) COLLATE pg_catalog."default",
-    roles character varying(1024) COLLATE pg_catalog."default",
-    CONSTRAINT user__pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE pluievolution.user_
-    OWNER to pluievolution;
-
 
 -- View: pluievolution.detailed_plui_request
 
