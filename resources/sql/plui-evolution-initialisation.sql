@@ -54,8 +54,8 @@ CREATE TABLE pluievolution.geographic_area
     geometry geometry,
     nom character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT geographic_area_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_i2fohbpkd2ovpbhdatnyoxak7 UNIQUE (codeinsee),
-    CONSTRAINT uk_lgayp5llyd5coxhym5qad8xgc UNIQUE (nom)
+    CONSTRAINT uk_geographic_area_codeinsee UNIQUE (codeinsee),
+    CONSTRAINT uk_geographic_area_nom UNIQUE (nom)
 )
     WITH (
         OIDS = FALSE
@@ -91,7 +91,7 @@ CREATE TABLE pluievolution.geographic_etablissement
     geometry geometry,
     nom character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT geographic_etablissement_pkey PRIMARY KEY (id),
-    CONSTRAINT uk_lx2oij2axxl77lihj5howp84j UNIQUE (codeinsee)
+    CONSTRAINT uk_geographic_etablissement_codeinsee UNIQUE (codeinsee)
 )
     WITH (
         OIDS = FALSE
@@ -137,7 +137,7 @@ CREATE TABLE pluievolution.plui_request
     uuid uuid NOT NULL,
     area_id bigint,
     CONSTRAINT plui_request_pkey PRIMARY KEY (id),
-    CONSTRAINT fkfe497si9dk5ncqh648j3148u5 FOREIGN KEY (area_id)
+    CONSTRAINT fk_plui_request_area_id FOREIGN KEY (area_id)
         REFERENCES pluievolution.geographic_area (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
