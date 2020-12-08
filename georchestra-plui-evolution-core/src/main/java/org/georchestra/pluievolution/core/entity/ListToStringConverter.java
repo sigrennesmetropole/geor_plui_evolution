@@ -1,16 +1,12 @@
-/**
- * 
- */
 package org.georchestra.pluievolution.core.entity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author FNI18300
@@ -36,6 +32,6 @@ public class ListToStringConverter implements AttributeConverter<List<String>, S
 		}
 
 		String[] data = dbData.split(SEPARATOR);
-		return Arrays.asList(data);
+		return new ArrayList<>(Arrays.asList(data));
 	}
 }
