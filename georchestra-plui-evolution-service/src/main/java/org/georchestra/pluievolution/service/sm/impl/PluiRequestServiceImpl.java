@@ -13,6 +13,7 @@ import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
+import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
@@ -22,8 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +55,9 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	@Autowired
 	GeographicAreaMapper geographicAreaMapper;
+
+	@Autowired
+	AuthentificationHelper authentificationHelper;
 
 	@Override
 	@Transactional(readOnly = false)
@@ -119,7 +121,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 
 		if (entityInDb.getInitiator() == null) {
-			entityInDb.setInitiator(getPluiRequestInitiator());
+			entityInDb.setInitiator(authentificationHelper.getUsername());
 		}
 
 		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
@@ -141,12 +143,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			LOGGER.error("Erreur lors de l'enregistrement de la demande dans la BDD");
 			throw new ApiServiceException(e.getMessage(), e);
 		}
-	}
-
-	private String getPluiRequestInitiator() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User details  = (User) authentication.getDetails();
-		return details.getLogin();
 	}
 
 	private GeographicAreaEntity getPluiRequestArea(PluiRequest pluiRequest) throws ApiServiceException {
@@ -218,9 +214,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		pluiRequestEntity.setCreationDate(new Date());
 
 		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User details  = (User) authentication.getDetails();
-		String initiator = details.getLogin();
+		String initiator = authentificationHelper.getUsername();
 
 		// Peut etre en fonction de l'area trouvé et de l'organisation de l'initiateur dire si oui ou non il est autorisé à créer cette demande
 

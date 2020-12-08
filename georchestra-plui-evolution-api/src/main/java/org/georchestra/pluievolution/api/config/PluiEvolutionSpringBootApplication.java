@@ -8,7 +8,6 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Classe de configuration globale de l'application.
@@ -21,7 +20,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @PropertySource(value = { "file:${georchestra.datadir}/default.properties" }, ignoreResourceNotFound = false)
 @PropertySource(value = { "file:${georchestra.datadir}/plui-evolution/plui-evolution.properties" }, ignoreResourceNotFound = false)
 @PropertySource(value = { "classpath:plui-evolution-common.properties" }, ignoreResourceNotFound = false)
-@EnableSwagger2
 public class PluiEvolutionSpringBootApplication extends SpringBootServletInitializer {
 
 	public static void main(final String[] args) {

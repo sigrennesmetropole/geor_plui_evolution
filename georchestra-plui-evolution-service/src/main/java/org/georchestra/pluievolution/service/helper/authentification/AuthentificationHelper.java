@@ -6,6 +6,7 @@ package org.georchestra.pluievolution.service.helper.authentification;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.georchestra.pluievolution.core.dto.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -66,5 +67,10 @@ public class AuthentificationHelper {
 					.filter(authority -> authority.getAuthority().equalsIgnoreCase(roleName)).count() > 0;
 		}
 		return result;
+	}
+	public String getOrganisation() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		User details  = (User) authentication.getDetails();
+		return details.getOrganization();
 	}
 }
