@@ -175,15 +175,7 @@ export const displayEtablissement = action$ =>
 
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap(response => Rx.Observable.of(response.data))
-                .catch(e => Rx.Observable.of(
-                    show({
-                        title: "pluievolution.error.title",
-                        message: "pluievolution.localisation.error.etablissement",
-                        uid: "pluievolution.localisation.error.etablissement",
-                        position: "tr",
-                        autoDismiss: 4
-                    }, 'warning')
-                ))
+                .catch(e => Rx.Observable.throw(e))
                 .switchMap((geographicEtablissement) => {
                     const existingLocalisation = geographicEtablissement && geographicEtablissement.localisation && geographicEtablissement.localisation.coordinates && geographicEtablissement.localisation.coordinates.length > 0;
                     let coordinates;
@@ -215,7 +207,15 @@ export const displayEtablissement = action$ =>
                         changeDrawingStatus("replace", GeometryType.POINT, "pluievolution", [feature], {}),
                         updateLocalisation(geographicEtablissement.localisation),
                     ]);
-                });
+                }).catch(() => Rx.Observable.of(
+                    show({
+                        title: "pluievolution.error.title",
+                        message: "pluievolution.localisation.error.etablissement",
+                        uid: "pluievolution.localisation.error.etablissement",
+                        position: "tr",
+                        autoDismiss: 4
+                    }, 'warning')
+                ));
         });
 
 export const geometryChangeEpic = action$ =>
