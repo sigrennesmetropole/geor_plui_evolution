@@ -4,25 +4,20 @@ import {actions, status} from '../actions/plui-evolution-action';
 const initialState = {
     user: null,
     attachments: [],
-    attachmentConfiguration: {},
+    attachmentConfiguration: {}
 }
 
 export default (state = initialState, action) => {
     console.log("sig reduce:" + action.type);
     switch (action.type) {
-        case actions.INIT_ERROR: {
-            return assign({}, state, {error: action.error});
-        }
-        case actions.ACTION_ERROR: {
-            return assign({}, state, {error: action.error});
+        case actions.PLUI_EVOLUTION_ACTION_ERROR: {
+            return assign({}, state, {error: action.error, loading: false});
         }
         case actions.ATTACHMENT_CONFIGURATION_LOADED: {
             return assign({}, state, {attachmentConfiguration: action.attachmentConfiguration});
         }
-        case actions.ATTACHMENT_ADDED: {
-            let attachments = [...state.attachments];
-            attachments.push(action.attachment);
-            return assign({}, state, {attachments: attachments });
+        case actions.ATTACHMENTS_UPDATED: {
+            return assign({}, state, {error: null, attachments: action.attachments});
         }
         case actions.ATTACHMENT_REMOVED: {
             let attachments = [...state.attachments];
@@ -32,6 +27,21 @@ export default (state = initialState, action) => {
         case actions.USER_ME_GOT: {
             return assign({}, state, {user: action.user});
         }
+        case actions.PLUI_EVOLUTION_PLUIREQUEST_SAVED: {
+            return assign({}, state, {pluiRequest: action.pluiRequest});
+        }
+        case actions.PLUI_EVOLUTION_LOADING: {
+            return assign({}, state, {loading: true});
+        }
+        case actions.PLUI_EVOLUTION_OPEN_PANEL: {
+            return assign({}, state, {open: true, status: action.status, pluiRequest: action.pluiRequest});
+        }
+        case actions.PLUI_EVOLUTION_CLOSE_PANEL: {
+            return assign({}, state, {open: false, status: status.EMPTY});
+        }
+        case actions.PLUI_EVOLUTION_CLOSE_REQUEST: {
+            return assign({}, state, {pluiRequest: null, status: status.CLEAN_REQUEST, loading: false});
+        }
         case actions.PLUI_EVOLUTION_CLOSING: {
             return assign({}, state, {closing: true});
         }
@@ -39,17 +49,14 @@ export default (state = initialState, action) => {
             return assign({}, state, {closing: false});
         }
         case actions.PLUI_EVOLUTION_CONFIRM_CLOSING: {
-            return assign({}, state, {closing: false, status: status.REQUEST_UNLOAD_TASK});
+            return assign({}, state, {closing: false, status: status.CLEAN_REQUEST});
         }
         case actions.PLUI_EVOLUTION_UPDATE_LOCALISATION: {
             return {
                 ...state,
-                task: {
-                    ...state.task,
-                    asset: {
-                        ...state.task.asset,
-                        localisation: action.localisation
-                    }
+                pluiRequest: {
+                    ...state.pluiRequest,
+                    localisation: action.localisation
                 }
             };
         }

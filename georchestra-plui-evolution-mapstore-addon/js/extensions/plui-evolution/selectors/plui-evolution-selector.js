@@ -10,6 +10,8 @@ export const getPluiEvolutionState = createSelector(
 
 export const isOpen = (state) => get(state, "pluievolution.open");
 
+export const isLoadingSelector = (state) => get(state, "pluievolution.loading");
+
 export const pluiEvolutionAttachmentConfigurationSelector = (state) => get(state, "pluievolution.attachmentConfiguration");
 
 export const pluiEvolutionMeSelector = (state) => get(state, "pluievolution.user");
