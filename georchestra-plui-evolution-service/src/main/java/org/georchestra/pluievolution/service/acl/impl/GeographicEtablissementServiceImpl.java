@@ -36,7 +36,7 @@ public class GeographicEtablissementServiceImpl implements GeographicEtablisseme
 
     @Override
     public GeographicEtablissement getCurrentUserEtablissement() throws ApiServiceException {
-        String nom = authentificationHelper.getOrganisation();
+        String nom = authentificationHelper.getUsername();
         GeographicEtablissementEntity entity = geographicEtablissementDao.findByNom(nom);
         if (entity == null) {
             throw new ApiServiceException("Organisation inconnue", "404");
