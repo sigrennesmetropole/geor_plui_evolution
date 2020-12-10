@@ -30,6 +30,9 @@ public class GeographicAreaEntity implements LongId {
     @Column(name = "geometry", columnDefinition = "Geometry")
     private Geometry geometry;
 
+    @Column(name = "identifiant_redmine", length = 63)
+    private String identifiantRedmine;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
