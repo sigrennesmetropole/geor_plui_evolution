@@ -1,6 +1,7 @@
 package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.core.dto.GeographicArea;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 
 import javax.xml.transform.TransformerException;
 import java.io.IOException;
@@ -13,5 +14,5 @@ public interface GeoserverService {
      * @param queryString
      * @return
      */
-    InputStream getWms(GeographicArea area, String queryString) throws IOException, TransformerException;
+    InputStream getWms(GeographicArea area, String queryString, String contentType) throws ApiServiceException;
 }
