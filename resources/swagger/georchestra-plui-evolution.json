@@ -360,7 +360,7 @@
 				}
 			}
 		},
-		"/carto/wms": {
+		"/carto/wmsRequest": {
 			"get": {
 				"summary": "Requete WMS",
 				"tags": [

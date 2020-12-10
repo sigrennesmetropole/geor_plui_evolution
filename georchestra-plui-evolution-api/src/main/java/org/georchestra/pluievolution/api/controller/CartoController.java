@@ -41,15 +41,14 @@ public class CartoController implements CartoApi {
 
         OutputStream out = response.getOutputStream();
         if ("GetMap".equals(request.getParameter("REQUEST"))) {
-            response.setContentType("image/png");
-            InputStream stream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(), request.getQueryString());
+           InputStream stream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(), request.getQueryString(), "application/img");
             if (stream != null) {
                 BufferedImage bi = ImageIO.read(stream);
                 ImageIO.write(bi, "png", out);
 
             }
         } else {
-            InputStream stream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(), request.getQueryString());
+            InputStream stream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(), request.getQueryString(), "application/json");
             if (stream != null) {
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
