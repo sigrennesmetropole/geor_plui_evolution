@@ -97,6 +97,6 @@ public interface PluiRequestService {
 	 * @return
 	 * @throws ApiServiceException
 	 */
-	PluiRequest updatePluiRequest(PluiRequest pluiRequest) throws ApiServiceException;
+	PluiRequest updatePluiRequest(PluiRequest pluiRequest) throws ApiServiceException, RedmineException;
 
 }
