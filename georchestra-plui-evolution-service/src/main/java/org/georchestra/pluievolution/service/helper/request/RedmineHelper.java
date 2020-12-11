@@ -121,6 +121,8 @@ public class RedmineHelper {
             issue.delete();
         } catch (RedmineException e) {
             throw new ApiServiceException(e.getMessage(), e);
+        } catch (Exception e) {
+            // Ignore
         }
     }
 
