@@ -373,8 +373,58 @@
 				],
 				"responses": {
 					"200": {
+						"description": "Reponse du geoserver"
+					}
+				}
+			}
+		},
+		"/carto/wfsRequest": {
+			"get": {
+				"summary": "Requete WFS get (essentiellement pour la description des features)",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WFS de récupération des informations sur le service",
+				"operationId": "getWfs",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
 						"description": "Reponse du geoserver",
-						"content": "image/png"
+						"schema": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Requete WFS post (notamment pour les features)",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WFS de recuperation d'un claque",
+				"operationId": "postWfs",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "wfsContent",
+						"description": "Contenu WFS au format XML",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
 					}
 				}
 			}

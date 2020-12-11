@@ -14,6 +14,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -59,4 +60,24 @@ public class CartoController implements CartoApi {
         out.close();
         return null;
     }
+
+    @Override
+    public ResponseEntity<String> getWfs() throws Exception {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
+
+        String json = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(), request.getQueryString());
+        return ResponseEntity.ok(json);
+    }
+
+    @Override
+    public ResponseEntity<String> postWfs(@Valid String wfsContent) throws Exception {
+
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
+
+        String json = geoserverService.postWfs(geographicAreaService.getCurrentUserArea(), request.getQueryString(), wfsContent);
+        return ResponseEntity.ok(json);
+    }
+
 }
