@@ -146,11 +146,13 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
 		try {
-			return this.pluiRequestMapper.entityToDto(
+			pluiRequest = this.pluiRequestMapper.entityToDto(
 					this.pluiRequestDao.save(
 							entityInDb
 					)
 			);
+			redmineHelper.updatePluiRequestIssue(entityInDb);
+			return pluiRequest;
 		} catch (DataAccessException e) {
 			LOGGER.error("Erreur lors de la mise à jour de la demande dans la BDD");
 			throw new ApiServiceException(e.getMessage(), e);

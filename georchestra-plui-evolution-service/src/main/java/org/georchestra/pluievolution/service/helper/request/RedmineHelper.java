@@ -210,4 +210,29 @@ public class RedmineHelper {
 
         return documentContent;
     }
+
+    /**
+     * Permet de mettre à jour une demande
+     * @param pluiRequest
+     * @return
+     * @throws ApiServiceException
+     * @throws RedmineException
+     */
+    public PluiRequestEntity updatePluiRequestIssue(PluiRequestEntity pluiRequest) throws ApiServiceException, RedmineException {
+        if (pluiRequest.getRedmineId() == null) {
+            throw new ApiServiceException("issue id might not be null");
+        }
+        Issue issue = getIssueByRedmineId(pluiRequest.getRedmineId());
+        issue.setSubject(pluiRequest.getSubject())
+                .setCreatedOn(pluiRequest.getCreationDate())
+                .setDescription(pluiRequest.getObject());
+        try {
+            issue.update();
+        } catch (RedmineException e) {
+            throw new ApiServiceException(e.getMessage(), e);
+        } catch (Exception e) {
+            // Ignore
+        }
+        return pluiRequest;
+    }
 }
