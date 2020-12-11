@@ -3,6 +3,7 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.taskadapter.redmineapi.RedmineException;
@@ -16,7 +17,6 @@ import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
-import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.helper.request.RedmineHelper;
@@ -75,18 +75,20 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	RedmineHelper redmineHelper;
 
 	@Override
-	@Transactional(readOnly = false)
-	public Attachment addAttachment(UUID reportingUuid, DocumentContent documentContent)
-			throws DocumentRepositoryException {
-		return null;
-	}
-
-	@Override
 	@Transactional(readOnly = true)
-	public Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException {
+	public Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException, IOException, RedmineException {
 		PluiRequestEntity pluiRequestEntity = pluiRequestDao.findByUuid(pluiRequestUuid);
 		if (pluiRequestEntity == null) {
 			throw new ApiServiceException("Cette demande n'a pas encore été renseignée");
+		}
+		// Verification de la piece jointe
+			// Verification du mimetype
+		if (!getAttachmentConfiguration().getMimeTypes().contains(documentContent.getContentType())) {
+			throw new ApiServiceException(String.format("Les fichiers de types %s ne sont pas autorisés", documentContent.getContentType()));
+		}
+			// Verification de la taille du fichier
+		if (getAttachmentConfiguration().getMaxSize() < documentContent.getFileSize()) {
+			throw new ApiServiceException("Taille du fichier superieure à la taille maximale");
 		}
 		// On recupère le redmine id
 		Integer redmineId = pluiRequestEntity.getRedmineId();
@@ -97,6 +99,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 
 		// On envoie la pièce jointe au redmine
+		documentContent = redmineHelper.addAttachmentToIssue(redmineId, documentContent);
 
 		Attachment result = new Attachment();
 		result.setMimeType(documentContent.getContentType());
@@ -235,34 +238,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 	}
 
 	@Override
-	public Attachment getAttachment(UUID reportingUuid, Long attachmentId) throws DocumentRepositoryException {
-		Attachment result = null;
-		
-		return result;
-	}
-
-	@Override
-	public List<Attachment> getAttachments(UUID reportingUuid) {
-		List<Attachment> result = null;
-		
-		return result;
-	}
-
-	@Override
-	public DocumentContent getAttachmentContent(UUID reportingUuid, Long attachmentId)
-			throws DocumentRepositoryException {
-		DocumentContent result = null;
-		return result;
-	}
-
-	@Override
-	@Transactional(readOnly = false)
-	public void removeAttachment(UUID reportingUuid, Long attachmentId) throws DocumentRepositoryException {
-		//
-	}
-
-
-	@Override
 	public AttachmentConfiguration getAttachmentConfiguration() {
 		return attachmentHelper.getAttachmentConfiguration();
 	}
@@ -328,10 +303,5 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(e.getMessage(), e);
 		}
 	}
-
-
-
-
-
 
 }

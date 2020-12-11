@@ -3,6 +3,7 @@ package org.georchestra.pluievolution.service.helper.request;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.Transport;
+import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
@@ -12,6 +13,8 @@ import org.georchestra.pluievolution.service.helper.authentification.Authentific
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 import java.util.List;
 
 
@@ -167,5 +170,42 @@ public class RedmineHelper {
     private ProjectManager getProjectManager() {
         RedmineManager mgr = getRedmineManager();
         return mgr.getProjectManager();
+    }
+
+    private AttachmentManager getAttachmentManager() {
+        RedmineManager mgr = getRedmineManager();
+        return mgr.getAttachmentManager();
+    }
+
+    public DocumentContent addAttachmentToIssue(Integer issueId, DocumentContent documentContent) throws RedmineException, ApiServiceException, IOException {
+        Attachment attachment = null;
+        Issue issue = getIssueByRedmineId(issueId);
+        try {
+            // on crée la pièce jointe dans redmine
+            attachment = getAttachmentManager().uploadAttachment(
+                    documentContent.getFileName(),
+                    documentContent.getContentType(),
+                    documentContent.getFileStream()
+            );
+            documentContent.setContentType(attachment.getContentType());
+            documentContent.setUrl(attachment.getContentURL());
+            documentContent.setFileName(attachment.getFileName());
+        } catch (IOException | RedmineException e) {
+            throw new ApiServiceException(e.getMessage(), e);
+        }
+
+        try {
+            // on associe la piece jointe a la demande souhaitee
+            issue.addAttachment(attachment);
+            issue.update();
+        } catch (RedmineException e) {
+            throw new ApiServiceException(e.getMessage(), e);
+        } catch (Exception e) {
+            //ignore
+            //il demande forcement qu'il y'ai une reponse donc erreur sur les methodes renvoyant void; meme si l'operation se deroule bien sur le redmine
+            // du coup nous allons ignorer les exceptions autres que RedmineException et IOException
+        }
+
+        return documentContent;
     }
 }
