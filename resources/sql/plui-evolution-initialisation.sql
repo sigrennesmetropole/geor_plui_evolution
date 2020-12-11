@@ -63,6 +63,7 @@ CREATE TABLE pluievolution.geographic_area
     codeinsee character varying(10) COLLATE pg_catalog."default",
     geometry geometry,
     nom character varying(255) COLLATE pg_catalog."default",
+    identifiant_redmine character varying(63) COLLATE pg_catalog."default",
     CONSTRAINT geographic_area_pkey PRIMARY KEY (id),
     CONSTRAINT uk_geographic_area_codeinsee UNIQUE (codeinsee),
     CONSTRAINT uk_geographic_area_nom UNIQUE (nom)
@@ -140,7 +141,7 @@ CREATE TABLE pluievolution.plui_request
     geometry geometry,
     initiator character varying(150) COLLATE pg_catalog."default",
     object character varying(300) COLLATE pg_catalog."default" NOT NULL,
-    redmine_id character varying(255) COLLATE pg_catalog."default",
+    redmine_id integer,
     status character varying(50) COLLATE pg_catalog."default",
     subject character varying(30) COLLATE pg_catalog."default" NOT NULL,
     type character varying(20) COLLATE pg_catalog."default",
