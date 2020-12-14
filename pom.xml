@@ -46,6 +46,7 @@
 		<flyingsauver.version>9.1.19</flyingsauver.version>
 		<jtidy.version>r938</jtidy.version>
 		<geotools.version>16.1</geotools.version>
+		<redmine.java.api.version>4.0.0.rc2</redmine.java.api.version>
 
 		<activiti.version>7.1.0.M5</activiti.version>
 
@@ -213,6 +214,14 @@
 				<artifactId>maven-replacer-plugin</artifactId>
 				<version>${maven-replacer-plugin.version}</version>
 			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/com.taskadapter/redmine-java-api -->
+			<dependency>
+				<groupId>com.taskadapter</groupId>
+				<artifactId>redmine-java-api</artifactId>
+				<version>${redmine.java.api.version}</version>
+			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 

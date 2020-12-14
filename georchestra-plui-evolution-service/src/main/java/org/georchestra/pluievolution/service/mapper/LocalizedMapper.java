@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 public interface LocalizedMapper {
 
     default Geometry  dtoToEntity(Point point) {
+        if (point == null) {
+            return null;
+        }
         GeometryFactory gf = new GeometryFactory();
         Coordinate coordinate = new Coordinate(point.getCoordinates().get(0).doubleValue(),
                 point.getCoordinates().get(1).doubleValue());
@@ -23,6 +26,9 @@ public interface LocalizedMapper {
     }
 
     default Point entityToDto(Geometry geometry) {
+        if (geometry == null) {
+            return null;
+        }
         Point2D pt2D = new Point2D();
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().x));
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().y));

@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -54,7 +56,7 @@ public class PreAuthenticationFilter implements Filter {
 					LOGGER.info("header:{}", names.nextElement());
 				}
 			}
-			final String username = httpServletRequest.getHeader(SEC_USERNAME);
+			final String username = encodeStringToUtf8(httpServletRequest.getHeader(SEC_USERNAME));
 			if (username != null) {
 				SecurityContextHolder.getContext().setAuthentication(createAuthentication(httpServletRequest));
 
@@ -79,8 +81,8 @@ public class PreAuthenticationFilter implements Filter {
 	 * @return
 	 */
 	private Authentication createAuthentication(HttpServletRequest httpServletRequest) {
-		final String username = httpServletRequest.getHeader(SEC_USERNAME);
-		final String rolesString = httpServletRequest.getHeader(SEC_ROLES);
+		final String username = encodeStringToUtf8(httpServletRequest.getHeader(SEC_USERNAME));
+		final String rolesString = encodeStringToUtf8(httpServletRequest.getHeader(SEC_ROLES));
 		Set<String> rolesSet = new LinkedHashSet<>();
 		List<String> roles = null;
 		if (rolesString != null) {
@@ -104,22 +106,22 @@ public class PreAuthenticationFilter implements Filter {
 
 	private boolean assignUserData(User user, HttpServletRequest httpServletRequest, List<String> roles) {
 		boolean update = false;
-		String email = httpServletRequest.getHeader(SEC_EMAIL);
+		String email = encodeStringToUtf8(httpServletRequest.getHeader(SEC_EMAIL));
 		if (StringUtils.isNotEmpty(email) && !email.equals(user.getEmail())) {
 			user.setEmail(email);
 			update = true;
 		}
-		String firstName = httpServletRequest.getHeader(SEC_FIRSTNAME);
+		String firstName = encodeStringToUtf8(httpServletRequest.getHeader(SEC_FIRSTNAME));
 		if (StringUtils.isNotEmpty(firstName) && !firstName.equals(user.getFirstName())) {
 			user.setFirstName(firstName);
 			update = true;
 		}
-		String lastName = httpServletRequest.getHeader(SEC_LASTNAME);
+		String lastName = encodeStringToUtf8(httpServletRequest.getHeader(SEC_LASTNAME));
 		if (StringUtils.isNotEmpty(lastName) && !lastName.equals(user.getLastName())) {
 			user.setLastName(lastName);
 			update = true;
 		}
-		String organization = httpServletRequest.getHeader(SEC_ORGNAME);
+		String organization = encodeStringToUtf8(httpServletRequest.getHeader(SEC_ORGNAME));
 		if (StringUtils.isNotEmpty(organization) && !organization.equals(user.getOrganization())) {
 			user.setOrganization(organization);
 			update = true;
@@ -129,6 +131,17 @@ public class PreAuthenticationFilter implements Filter {
 			update = true;
 		}
 		return update;
+	}
+
+	/**
+	 * Permet d'encoder un string en utf8
+	 * @param toEncode
+	 * @return
+	 */
+	private String encodeStringToUtf8(String toEncode) {
+		ByteBuffer buffer = StandardCharsets.ISO_8859_1.encode(toEncode);
+
+		return StandardCharsets.UTF_8.decode(buffer).toString();
 	}
 
 }
