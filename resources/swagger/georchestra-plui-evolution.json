@@ -1003,6 +1003,9 @@
 				"type": {
 					"description": "Type de demande",
 					"$ref": "#/definitions/PluiRequestType"
+				},
+				"codeInsee": {
+					"type": "string"
 				}
 			}
 		},
@@ -1048,6 +1051,9 @@
 					"properties": {
 						"localisation": {
 							"$ref": "#/definitions/Polygon"
+						},
+						"identifiantRedmine": {
+							"type": "string"
 						}
 					}
 				}
