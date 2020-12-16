@@ -1,30 +1,82 @@
 import * as Rx from 'rxjs';
 import axios from 'axios';
+import {head} from 'lodash';
+import { saveAs } from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
-import {changeMapInfoState} from "@mapstore/actions/mapInfo";
+import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
+import {CLICK_ON_MAP} from '@mapstore/actions/map';
+import {changeMapInfoState, featureInfoClick, LOAD_FEATURE_INFO, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
 import { success, error, show } from '@mapstore/actions/notifications';
 import {
     actions,
     closeRequest,
     initPluiEvolutionDone,
     loadedAttachmentConfiguration,
+    getAttachments,
     gotMe,
+    initDrawingSupport,
     loadActionError,
+    loadingPluiCreateForm,
+    loadingPluiUpdateForm,
+    loadPluiForm,
+    openingPanel,
+    openPanel,
     pluiRequestSaved,
     setDrawing,
-    updateLocalisation
+    setAllPluiRequestDisplay,
+    updateAttachments,
+    updateLocalisation, status
 } from '../actions/plui-evolution-action';
 import {
     CODE_INSEE_RENNES_METROPOLE,
     FeatureProjection,
     GeometryType,
-    PluiRequestType
+    PluiRequestType,
+    PLUI_EVOLUTION_LAYER_ID,
+    PLUI_EVOLUTION_LAYER_NAME,
+    PLUI_EVOLUTION_LAYER_TITLE
 } from "../constants/plui-evolution-constants";
+import {SET_CURRENT_BACKGROUND_LAYER} from "@mapstore/actions/backgroundselector";
+import {SET_CONTROL_PROPERTY} from "@mapstore/actions/controls";
+
 
 let backendURLPrefix = "/pluievolution";
 
+export const openPanelEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_OPEN_PANEL)
+        .switchMap((action) => {
+
+            return Rx.Observable.from(
+                [initDrawingSupport()]
+                    .concat(action.pluiRequest
+                        ? [loadingPluiUpdateForm(action.pluiRequest)]
+                        : [loadingPluiCreateForm()])
+                    .concat([openingPanel(action.pluiRequest)])
+            );
+        });
+
+export const loadingPluiUpdateFormEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_LOADING_UPDATE_FORM)
+        .switchMap((action) => {
+            return Rx.Observable.from([
+                showMapinfoMarker(),
+                getAttachments(action.pluiRequest.uuid),
+                loadPluiForm(action.pluiRequest, status.LOAD_REQUEST)
+            ]);
+        });
+
+export const loadingPluiCreateFormEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_LOADING_CREATE_FORM)
+        .switchMap((action) => {
+            return Rx.Observable.from([
+                hideMapinfoMarker(),
+                updateAttachments(null),
+                loadPluiForm(null, status.INIT_FORM_REQUEST)
+            ]);
+        });
+
 export const initPluiEvolutionEpic = (action$) =>
-    action$.ofType(actions.INIT_PLUI_EVOLUTION)
+    action$.ofType(actions.PLUI_EVOLUTION_INIT)
         .switchMap((action) => {
             console.log("pluie epics init:"+ action.url);
             if( action.url ) {
@@ -34,7 +86,7 @@ export const initPluiEvolutionEpic = (action$) =>
         });
 
 export const loadAttachmentConfigurationEpic = (action$) =>
-    action$.ofType(actions.ATTACHMENT_CONFIGURATION_LOAD)
+    action$.ofType(actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD)
         .switchMap((action) => {
             if (action.attachmentConfiguration) {
                 return Rx.Observable.of(loadedAttachmentConfiguration(action.attachmentConfiguration)).delay(0);
@@ -45,8 +97,56 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
 
+export const getAttachmentsEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_GET_ATTACHMENTS)
+        .switchMap((action) => {
+            const url = backendURLPrefix + "/request/" + action.uuid + "/attachments";
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => Rx.Observable.of(updateAttachments(response.data)))
+                .catch(e => Rx.Observable.of(
+                    show({
+                        title: "pluievolution.error.title",
+                        message: "pluievolution.attachment.error.get",
+                        uid: "pluievolution.attachment.error.get",
+                        position: "tr",
+                        autoDismiss: 5
+                    }, 'warning')
+                ));
+        });
+
+export const downloadAttachmentEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_DOWNLOAD_ATTACHMENT)
+        .switchMap((action) => {
+            const url = backendURLPrefix + "/attachment/" + action.attachment.id + "/download";
+            return Rx.Observable.defer(() => axios.get(url, {
+                responseType: 'arraybuffer'
+            }))
+                .switchMap((response) => {
+                    const fileBlob = new Blob([response.data], {type: response.headers['content-type']});
+                    saveAs(fileBlob, action.attachment.name);
+                    return Rx.Observable.of(
+                        success({
+                            title: "pluievolution.success.title",
+                            message: "pluievolution.attachment.download.title",
+                            uid: "pluievolution.attachment.download",
+                            position: "tr",
+                            autoDismiss: 3
+                        }),
+                    )
+                })
+                .catch(e => Rx.Observable.of(
+                    show({
+                        title: "pluievolution.error.title",
+                        message: "pluievolution.attachment.error.download",
+                        uid: "pluievolution.attachment.download",
+                        position: "tr",
+                        autoDismiss: 3
+                    }, 'warning')
+                ));
+        });
+
 export const loadMeEpic = (action$) =>
-    action$.ofType(actions.USER_ME_GET)
+    action$.ofType(actions.PLUI_EVOLUTION_USER_ME_GET)
         .switchMap((action) => {
             if (action.user) {
                 return Rx.Observable.of(gotMe(action.user)).delay(0);
@@ -82,13 +182,14 @@ export const savePluiRequest = (action$) =>
                 })
                 .switchMap(() => Rx.Observable.from([
                     success({
-                        title: "pluievolution.msgBox.requestSaved.title",
+                        title: "pluievolution.success.title",
                         message: "pluievolution.msgBox.requestSaved.message",
                         uid: "pluievolution.msgBox.requestSaved",
-                        position: "tc",
+                        position: "tr",
                         autoDismiss: 5
                     }),
-                    closeRequest()
+                    closeRequest(),
+                    refreshLayerVersion(PLUI_EVOLUTION_LAYER_ID)
                 ]))
                 .catch(e => {
                     // Erreur lors de l'enregistrement de la requete plui
@@ -107,11 +208,11 @@ export const savePluiRequest = (action$) =>
 
                     // Erreur lors de la sauvegarde des fichiers joints
                     return Rx.Observable.from([
-                        loadActionError("pluievolution.attachment.error", {filename: e.attachment.name}, e),
+                        loadActionError("pluievolution.attachment.error.update", {filename: e.attachment.name}, e),
                         pluiRequestSaved(actualPluiRequestSaved),
                         error({
                             title: "pluievolution.error.title",
-                            message: "pluievolution.attachment.error",
+                            message: "pluievolution.attachment.error.update",
                             uid: "pluievolution.msgBox.requestSaved",
                             position: "tr",
                             values: {filename: e.attachment.name},
@@ -123,9 +224,46 @@ export const savePluiRequest = (action$) =>
 
 export const initDrawingSupportEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_INIT_SUPPORT_DRAWING)
-        .switchMap(() => {
-            return Rx.Observable.of(changeMapInfoState(false));
-        });
+        .switchMap(() => Rx.Observable.of(changeMapInfoState(false)));
+
+export const displayAllPluiRequest = (action$, store) =>
+    action$.ofType(SET_CURRENT_BACKGROUND_LAYER)
+        .filter(() => {
+            return head(store.getState().layers.flat.filter(l => l.id === PLUI_EVOLUTION_LAYER_ID)) === null;
+        })
+        .merge(action$.ofType(SET_CONTROL_PROPERTY)
+            .filter((action) => {
+                return action.control === 'backgroundSelector';
+            })
+            .take(1)
+            .switchMap((action) => {
+                const url = backendURLPrefix + "/carto/wmsRequest";
+                return Rx.Observable.from([
+                    addLayer({
+                        handleClickOnLayer: true,
+                        hideLoading: true,
+                        id: PLUI_EVOLUTION_LAYER_ID,
+                        name: PLUI_EVOLUTION_LAYER_NAME,
+                        title: PLUI_EVOLUTION_LAYER_TITLE,
+                        type: "wms",
+                        search: {
+                            type: "wfs",
+                            url: backendURLPrefix + "/carto/wfsRequest"
+                        },
+                        params: {
+                            exceptions: 'application/vnd.ogc.se_xml'
+                        },
+                        format: "image/png",
+                        singleTile: false,
+                        url: url,
+                        visibility: true
+                    }),
+                    setAllPluiRequestDisplay(true),
+                    selectNode(PLUI_EVOLUTION_LAYER_ID,"layer",false)
+                ]);
+            })
+        );
+
 
 export const startDrawingEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
@@ -268,7 +406,7 @@ export const stopDrawingEpic = (action$, store) =>
                 transformToFeatureCollection: false,
                 translateEnabled: false
             };
-            //let actualFeatures = changedGeometriesSelector(state);
+
             //work around to avoid import of draw.js - see issues with geosolutions
             let actualFeatures = state && state.draw && state.draw.tempFeatures;
             if (!actualFeatures || actualFeatures.length === 0) {
@@ -296,6 +434,39 @@ export const stopDrawingSupportEpic = action$ =>
                 changeMapInfoState(true),
                 changeDrawingStatus("clean", null, "pluievolution", [], {})
             ]);
+        });
+
+export const clickMapEpic = (action$) =>
+    action$.ofType(CLICK_ON_MAP)
+        .switchMap((action) => {
+            const overrideParams = {};
+            overrideParams[PLUI_EVOLUTION_LAYER_NAME] = {
+                info_format: "application/json"
+            };
+            return Rx.Observable.of(featureInfoClick(action.point, PLUI_EVOLUTION_LAYER_NAME, [], overrideParams));
+        });
+
+export const loadFeatureInfoEpic = (action$) =>
+    action$.ofType(LOAD_FEATURE_INFO)
+        .filter(action => action.layer && action.layer.id === PLUI_EVOLUTION_LAYER_ID)
+        .switchMap((action) => {
+            if (action.data) {
+                const features = action.data.features;
+                if (features.length === 1) {
+                    const properties = features[0].properties;
+                    console.log('selected point', properties);
+                    return Rx.Observable.from([
+                        getAttachments(properties.uuid),
+                        openPanel(properties),
+                        showMapinfoMarker()
+                    ]);
+                }
+                else if (features.length > 1) {
+                    // TODO: Ouverture panel plusieurs pluiRequest
+                }
+            }
+            // pas de demande request sur la carte sur ce point
+            return Rx.Observable.empty();
         });
 
 const buildAttachmentsRequest = (uuid, attachments) => {

@@ -4,6 +4,7 @@
 package org.georchestra.pluievolution.api.controller;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -62,6 +63,11 @@ public class RequestController implements RequestApi {
 	public ResponseEntity<Void> deletePluiRequest(UUID uuid) throws Exception {
 		pluiRequestService.deletePluiRequestByUuid(uuid);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<List<Attachment>> getAttachementsByPluiRequestUuid(UUID uuid) throws Exception {
+		return new ResponseEntity<>(pluiRequestService.getAttachments(uuid), HttpStatus.OK);
 	}
 
 

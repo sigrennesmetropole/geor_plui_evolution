@@ -3,7 +3,7 @@ import {actions, status} from '../actions/plui-evolution-action';
 
 const initialState = {
     user: null,
-    attachments: [],
+    attachments: null,
     attachmentConfiguration: {}
 }
 
@@ -13,19 +13,17 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_ACTION_ERROR: {
             return assign({}, state, {error: action.error, loading: false});
         }
-        case actions.ATTACHMENT_CONFIGURATION_LOADED: {
+        case actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED: {
             return assign({}, state, {attachmentConfiguration: action.attachmentConfiguration});
         }
-        case actions.ATTACHMENTS_UPDATED: {
+        case actions.PLUI_EVOLUTION_ATTACHMENTS_UPDATED: {
             return assign({}, state, {error: null, attachments: action.attachments});
         }
-        case actions.ATTACHMENT_REMOVED: {
-            let attachments = [...state.attachments];
-            attachments.splice(action.attachmentIndex, 1)
-            return assign({}, state, {attachments: attachments });
-        }
-        case actions.USER_ME_GOT: {
+        case actions.PLUI_EVOLUTION_USER_ME_GOT: {
             return assign({}, state, {user: action.user});
+        }
+        case actions.PLUI_EVOLUTION_ALL_DISPLAYED: {
+            return assign({}, state, {allPluiRequestLoaded: action.allPluiRequestLoaded});
         }
         case actions.PLUI_EVOLUTION_PLUIREQUEST_SAVED: {
             return assign({}, state, {pluiRequest: action.pluiRequest});
@@ -33,8 +31,8 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_LOADING: {
             return assign({}, state, {loading: true});
         }
-        case actions.PLUI_EVOLUTION_OPEN_PANEL: {
-            return assign({}, state, {open: true, status: action.status, pluiRequest: action.pluiRequest});
+        case actions.PLUI_EVOLUTION_OPENING_PANEL: {
+            return assign({}, state, {open: true});
         }
         case actions.PLUI_EVOLUTION_CLOSE_PANEL: {
             return assign({}, state, {open: false, status: status.EMPTY});
@@ -48,8 +46,8 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_CANCEL_CLOSING: {
             return assign({}, state, {closing: false});
         }
-        case actions.PLUI_EVOLUTION_CONFIRM_CLOSING: {
-            return assign({}, state, {closing: false, status: status.CLEAN_REQUEST});
+        case actions.PLUI_EVOLUTION_LOAD_FORM: {
+            return assign({}, state, {status: action.status, pluiRequest: action.pluiRequest});
         }
         case actions.PLUI_EVOLUTION_UPDATE_LOCALISATION: {
             return {
@@ -62,6 +60,9 @@ export default (state = initialState, action) => {
         }
         case actions.PLUI_EVOLUTION_SET_DRAWING: {
             return assign({}, state, {drawing: action.drawing});
+        }
+        case actions.PLUI_EVOLUTION_CHANGE_FORM_STATUS: {
+            return assign({}, state, {status: action.status});
         }
         default: {
             return state;

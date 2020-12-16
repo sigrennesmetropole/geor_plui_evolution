@@ -4,6 +4,9 @@
 		"pluievolution": {
 			"close": "Fermer",
 			"cancel": "Annuler",
+			"open": {
+				"loading": "Chargement en cours..."
+			},
 			"validate": "Valider",
 			"user": "Utilisateur",
 			"login": "Vous aêtes",
@@ -23,7 +26,12 @@
 				"placeholder": "Saisissez l'objet de la demande",
 				"error": "L'objet de la demande est absent"
 			},
-			"comment":"Commentaires des services",
+			"comment": {
+				"title": "Commentaires des services"
+			},
+			"status": {
+				"title": "Statut de la demande"
+			},
 			"attachment": {
 				"add": "Ajouter",
 				"files": "Piece(s) jointe(s)",
@@ -31,9 +39,22 @@
 				"size": "la taille du fichier est supérieur à: ",
 				"typeFile": "Vous ne pouvez pas ajouter ce type fichier",
 				"length": "Vous ne pouvez pas ajouter plus de fichiers",
-				"error": "le fichier {filename} n'a pas été uploadé",
+				"error": {
+					"update": "le fichier {filename} n'a pas été uploadé",
+					"get": "Une erreur s'est produite lors de la récupération des documents de la demande PLUi",
+					"download": "Une erreur s'est produite lors de la récupération du document"
+				},
 				"select": "Sélectionner un document",
-				"delete": "Supprimer un document"
+				"delete": "Supprimer un document",
+				"tableName": {
+					"title": "Nom"
+				},
+				"tableAction": {
+					"title": "Action"
+				},
+				"download": {
+					"title": "Fichier téléchargé avec succès"
+				}
 			},
 			"localisation": {
 				"legend": "Géolocalisation de la demande",
@@ -51,6 +72,7 @@
 				}
 			},
 			"type": {
+				"title": "Type de la demande",
 				"error": "Le type de la demande n'est pas sélectionné"
 			},
 			"msgBox": {
@@ -86,6 +108,9 @@
 			},
 			"error": {
 				"title": "Erreur"
+			},
+			"success": {
+				"title": "Succès"
 			}
 		}
 	}

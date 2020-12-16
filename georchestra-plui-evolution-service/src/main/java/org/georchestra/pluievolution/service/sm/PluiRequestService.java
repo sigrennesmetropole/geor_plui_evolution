@@ -1,15 +1,15 @@
-/**
- * 
- */
 package org.georchestra.pluievolution.service.sm;
-
-import java.io.IOException;
-import java.util.UUID;
 
 import com.taskadapter.redmineapi.RedmineException;
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.core.dto.Attachment;
+import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * @author FNI18300
@@ -50,4 +50,11 @@ public interface PluiRequestService {
 	 */
 	PluiRequest updatePluiRequest(PluiRequest pluiRequest) throws ApiServiceException, RedmineException;
 
+	/**
+	 * Récupération des pièces jointes d'une demande plui
+	 * @param uuid identifiant de la demande
+	 * @return liste des pièces jointes
+	 * @throws ApiServiceException erreur lors de la récupérationd des pièces jointes
+	 */
+    List<Attachment> getAttachments(UUID uuid) throws ApiServiceException;
 }

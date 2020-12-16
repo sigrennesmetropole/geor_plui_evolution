@@ -42,7 +42,7 @@ public class RedmineHelper {
     GeographicAreaService geographicAreaService;
 
     /**
-     * Permet de créer un ticket concernat la pluirequest dans redmine
+     * Permet de créer un ticket concernant la pluirequest dans redmine
      * @param pluiRequest
      * @return
      * @throws RedmineException
@@ -101,9 +101,31 @@ public class RedmineHelper {
      * @throws RedmineException
      * @throws ApiServiceException
      */
-    private Issue getIssueByRedmineId(Integer redmineId) throws RedmineException, ApiServiceException {
+    private Issue getIssueByRedmineId(Integer redmineId) throws ApiServiceException {
         try {
             return getRedmineManager().getIssueManager().getIssueById(redmineId);
+        } catch (RedmineException e) {
+            throw new ApiServiceException(e.getMessage());
+        }
+
+    }
+
+    /**
+     * Permet de recuperer une issue redmine à partir de son id
+     * @param redmineId                 identifiant redmine
+     * @param withAttachment            true si avec les fichiers joints
+     * @return                          issue redmine
+     * @throws RedmineException         erreur lors de la récupération de l'issue
+     * @throws ApiServiceException      erreur lors de la récupération de l'issue
+     */
+    public Issue getIssueByRedmineId(Integer redmineId, boolean withAttachment) throws ApiServiceException {
+        try {
+            if (!withAttachment) {
+                return getIssueByRedmineId(redmineId);
+            }
+            else {
+                return getRedmineManager().getIssueManager().getIssueById(redmineId, Include.attachments);
+            }
         } catch (RedmineException e) {
             throw new ApiServiceException(e.getMessage());
         }
@@ -123,6 +145,34 @@ public class RedmineHelper {
             throw new ApiServiceException(e.getMessage(), e);
         } catch (Exception e) {
             // Ignore
+        }
+    }
+
+    /**
+     * Téléchargement du contenu d'un pièce jointe
+     * @param attachment                pièce jointe
+     * @return                          contenu
+     * @throws ApiServiceException      erreur lors de la récupération du contenu de la pièce jointe
+     */
+    public byte[] downloadAttachment(Attachment attachment) throws ApiServiceException {
+        try {
+            return getAttachmentManager().downloadAttachmentContent(attachment);
+        } catch (RedmineException e) {
+            throw new ApiServiceException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Récupération d'un pièce jointe redmine via son id
+     * @param attachmentId              identifiant redmine de la pièce jointe
+     * @return                          pièce jointe redmine
+     * @throws ApiServiceException      erreur lors de la récupération de la pièce jointe
+     */
+    public Attachment getAttachmentById(Integer attachmentId) throws ApiServiceException {
+        try {
+            return getAttachmentManager().getAttachmentById(attachmentId);
+        } catch (RedmineException e) {
+            throw new ApiServiceException(e.getMessage(), e);
         }
     }
 
@@ -213,12 +263,10 @@ public class RedmineHelper {
 
     /**
      * Permet de mettre à jour une demande
-     * @param pluiRequest
-     * @return
-     * @throws ApiServiceException
-     * @throws RedmineException
+     * @param pluiRequest               demande plui
+     * @throws ApiServiceException      erreur lors la mise à jour
      */
-    public PluiRequestEntity updatePluiRequestIssue(PluiRequestEntity pluiRequest) throws ApiServiceException, RedmineException {
+    public void updatePluiRequestIssue(PluiRequestEntity pluiRequest) throws ApiServiceException {
         if (pluiRequest.getRedmineId() == null) {
             throw new ApiServiceException("issue id might not be null");
         }
@@ -230,9 +278,6 @@ public class RedmineHelper {
             issue.update();
         } catch (RedmineException e) {
             throw new ApiServiceException(e.getMessage(), e);
-        } catch (Exception e) {
-            // Ignore
         }
-        return pluiRequest;
     }
 }

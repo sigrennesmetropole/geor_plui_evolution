@@ -3,14 +3,16 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
-import java.io.IOException;
-import java.util.*;
-
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.bean.Issue;
 import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
-import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.core.dto.Attachment;
+import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
+import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
+import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.core.entity.acl.GeographicEtablissementEntity;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
@@ -28,8 +30,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 
@@ -37,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author FNI18300
  *
  */
-@Component
+@Service
 @Transactional(readOnly = true)
 public class PluiRequestServiceImpl implements PluiRequestService {
 
@@ -159,7 +167,31 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 	}
 
-	private PluiRequestEntity updatePositionAndArea(PluiRequestEntity pluiRequest, String codeInsee) throws ApiServiceException {
+	@Override
+	public List<Attachment> getAttachments(UUID uuid) throws ApiServiceException {
+		if (uuid == null) {
+			throw new ApiServiceException("UUID non fourni");
+		}
+		PluiRequestEntity pluiRequestEntity = pluiRequestDao.findByUuid(uuid);
+		if (pluiRequestEntity == null) {
+			throw new ApiServiceException("Entité non trouvée en base");
+		}
+		Issue redmineIssue = redmineHelper.getIssueByRedmineId(pluiRequestEntity.getRedmineId(), true);
+		if (redmineIssue == null) {
+			throw new ApiServiceException("La demande plui id = " + pluiRequestEntity.getId() + " n'existe pas dans Redmine.");
+		}
+		return redmineIssue.getAttachments().stream()
+				.map(redmineAttachment -> {
+					Attachment attachment = new Attachment();
+					attachment.setId(redmineAttachment.getId().longValue());
+					attachment.setName(redmineAttachment.getFileName());
+					attachment.setMimeType(redmineAttachment.getContentType());
+					return attachment;
+				})
+				.collect(Collectors.toList());
+	}
+
+	private void updatePositionAndArea(PluiRequestEntity pluiRequest, String codeInsee) throws ApiServiceException {
 		// Si type communale alors position de la demande ajoutée depuis le front
 		if (pluiRequest.getType() == PluiRequestType.COMMUNE && pluiRequest.getGeometry() == null) {
 			throw new ApiServiceException(COMMUNAL_REQUEST_LOCALISATION_NOT_FOUND);
@@ -173,7 +205,6 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 		// On associe a la demande la geographicArea correspondante
 		pluiRequest.setArea(getGeographicArea(pluiRequest, codeInsee));
-		return pluiRequest;
 	}
 
 	/**

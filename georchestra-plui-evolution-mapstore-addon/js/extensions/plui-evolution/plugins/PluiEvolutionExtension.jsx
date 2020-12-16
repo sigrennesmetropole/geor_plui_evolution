@@ -9,27 +9,30 @@ import * as epics from '../epics/plui-evolution-epic';
 import pluiEvolutionReducer from '../reducers/plui-evolution-reducer';
 import {
     initPluiEvolution,
+    changeFormStatus,
     clearDrawn,
     closeRequest,
-    initDrawingSupport,
+    downloadAttachment,
     loadAttachmentConfiguration,
     closePanel,
+    getAttachments,
     getMe,
     displayEtablissement,
     savePluiRequest,
     confirmClosing,
     cancelClosing,
+    loadingPluiCreateForm,
     openPanel,
     requestClosing,
     startDrawing,
     stopDrawing,
-    stopDrawingSupport,
     updateAttachments,
     loadActionError
 } from '../actions/plui-evolution-action';
 import {
     isOpen,
     isLoadingSelector,
+    isReadOnlySelector,
     pluiEvolutionAttachmentConfigurationSelector,
     pluiEvolutionMeSelector,
 } from '../selectors/plui-evolution-selector';
@@ -39,9 +42,11 @@ const isEnabled = createControlEnabledSelector('pluievolution');
 const Connected = connect((state) => ({
     active: !!isOpen(state),
     loading: !!isLoadingSelector(state),
+    readOnly: !!isReadOnlySelector(state),
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
     user: pluiEvolutionMeSelector(state),
     pluiRequest: state.pluievolution.pluiRequest,
+    allPluiRequestLoaded: state.pluievolution.allPluiRequestLoaded,
     attachments: state.pluievolution.attachments,
     status: state.pluievolution.status,
     drawing: state.pluievolution.drawing,
@@ -50,22 +55,24 @@ const Connected = connect((state) => ({
     state : state
 }), {
     initPluiEvolution: initPluiEvolution,
-    initDrawingSupport: initDrawingSupport,
-    stopDrawingSupport: stopDrawingSupport,
     startDrawing: startDrawing,
     stopDrawing: stopDrawing,
     clearDrawn: clearDrawn,
     loadAttachmentConfiguration: loadAttachmentConfiguration,
     updateAttachments: updateAttachments,
+    getAttachments: getAttachments,
+    downloadAttachment: downloadAttachment,
     getMe: getMe,
     displayEtablissement: displayEtablissement,
     savePluiRequest: savePluiRequest,
+    loadingPluiCreateForm: loadingPluiCreateForm,
     requestClosing: requestClosing,
     cancelClosing: cancelClosing,
     confirmClosing: confirmClosing,
     closeRequest: closeRequest,
     loadActionError: loadActionError,
-    toggleControl: () => closePanel()
+    changeFormStatus: changeFormStatus,
+    toggleControl: closePanel
 })(PluiEvolutionPanelComponent);
 
 export default {

@@ -1,18 +1,26 @@
+import {hideMapinfoMarker} from "@mapstore/actions/mapInfo";
+
 export const actions = {
-	INIT_PLUI_EVOLUTION: 'PLUI_EVOLUTION:INIT',
-	INIT_PLUI_EVOLUTION_DONE: 'PLUI_EVOLUTION:INIT_DONE',
-	ATTACHMENT_CONFIGURATION_LOAD: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOAD',
-	ATTACHMENT_CONFIGURATION_LOADED: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOADED',
-	USER_ME_GET: 'PLUI_EVOLUTION:USER:GET',
-	USER_ME_GOT: 'PLUI_EVOLUTION:USER:GOT',
+	PLUI_EVOLUTION_INIT: 'PLUI_EVOLUTION:INIT',
+	PLUI_EVOLUTION_INIT_DONE: 'PLUI_EVOLUTION:INIT_DONE',
+	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOAD',
+	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOADED',
+	PLUI_EVOLUTION_USER_ME_GET: 'PLUI_EVOLUTION:USER:GET',
+	PLUI_EVOLUTION_USER_ME_GOT: 'PLUI_EVOLUTION:USER:GOT',
 	PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT: 'PLUI_EVOLUTION:ETABLISSEMENT:GET',
+	PLUI_EVOLUTION_DISPLAY_ALL: 'PLUI_EVOLUTION:ALL:DISPLAY',
+	PLUI_EVOLUTION_ALL_DISPLAYED: 'PLUI_EVOLUTION:ALL:DISPLAYED',
+	PLUI_EVOLUTION_OPENING_PANEL: 'PLUI_EVOLUTION:PANEL:OPENING',
 	PLUI_EVOLUTION_OPEN_PANEL: 'PLUI_EVOLUTION:PANEL:OPEN',
 	PLUI_EVOLUTION_CLOSE_PANEL: 'PLUI_EVOLUTION:PANEL:CLOSE',
+	PLUI_EVOLUTION_LOAD_FORM: 'PLUI_EVOLUTION:FORM:LOAD',
+	PLUI_EVOLUTION_LOADING_CREATE_FORM: 'PLUI_EVOLUTION:CREATE_FORM:LOADING',
+	PLUI_EVOLUTION_LOADING_UPDATE_FORM: 'PLUI_EVOLUTION:UPDATE_FORM:LOADING',
 	PLUI_EVOLUTION_SAVE_PLUIREQUEST: 'PLUI_EVOLUTION:PLUIREQUEST:SAVE',
 	PLUI_EVOLUTION_PLUIREQUEST_SAVED: 'PLUI_EVOLUTION:PLUIREQUEST:SAVED',
-	ATTACHMENTS_UPDATED: 'PLUI_EVOLUTION:ATTACHMENTS:UPDATED',
-	REMOVE_ATTACHMENT: 'PLUI_EVOLUTION:ATTACHMENT:REMOVE',
-	ATTACHMENT_REMOVED: 'PLUI_EVOLUTION:ATTACHMENT:REMOVED',
+	PLUI_EVOLUTION_ATTACHMENTS_UPDATED: 'PLUI_EVOLUTION:ATTACHMENTS:UPDATED',
+	PLUI_EVOLUTION_GET_ATTACHMENTS: 'PLUI_EVOLUTION:ATTACHMENTS:GET',
+	PLUI_EVOLUTION_DOWNLOAD_ATTACHMENT: 'PLUI_EVOLUTION:ATTACHMENT:DOWNLOAD',
 	PLUI_EVOLUTION_ACTION_ERROR: 'PLUI_EVOLUTION:ACTION:ERROR',
 	PLUI_EVOLUTION_CLOSING: 'PLUI_EVOLUTION:CLOSING',
 	PLUI_EVOLUTION_CANCEL_CLOSING: 'PLUI_EVOLUTION:CANCEL:CLOSING',
@@ -25,74 +33,107 @@ export const actions = {
 	PLUI_EVOLUTION_START_DRAWING: 'PLUI_EVOLUTION:START:DRAWING',
 	PLUI_EVOLUTION_STOP_DRAWING: 'PLUI_EVOLUTION:STOP:DRAWING',
 	PLUI_EVOLUTION_UPDATE_LOCALISATION: 'PLUI_EVOLUTION:UPDATE:LOCALISATION',
-	PLUI_EVOLUTION_CLEAR_DRAWN: 'PLUI_EVOLUTION:CLEAR:DRAWN'
+	PLUI_EVOLUTION_CLEAR_DRAWN: 'PLUI_EVOLUTION:CLEAR:DRAWN',
+	PLUI_EVOLUTION_CHANGE_FORM_STATUS: 'PLUI_EVOLUTION:FORM_STATUS:CHANGE'
 };
 
 export const status = {
+	INIT_FORM_REQUEST: "INIT_FORM_REQUEST",
 	CREATE_REQUEST: "CREATE_REQUEST",
 	CLEAN_REQUEST: "CLEAN_REQUEST",
 	LOAD_REQUEST: "LOAD_REQUEST",
 	EMPTY: "EMPTY"
 };
 
+export function changeFormStatus(formStatus) {
+	return {
+		type: actions.PLUI_EVOLUTION_CHANGE_FORM_STATUS,
+		status: formStatus
+	}
+}
+
 export function initPluiEvolution(url){
 	return {
-		type: actions.INIT_PLUI_EVOLUTION,
+		type: actions.PLUI_EVOLUTION_INIT,
 		url: url
 	};
 }
 
 export function initPluiEvolutionDone(){
 	return {
-		type: actions.INIT_PLUI_EVOLUTION_DONE
+		type: actions.PLUI_EVOLUTION_INIT_DONE
 	};
 }
 
 export function loadAttachmentConfiguration() {
 	return {
-		type: actions.ATTACHMENT_CONFIGURATION_LOAD
+		type: actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD
 	};
 }
 
 export function loadedAttachmentConfiguration(attachmentConfiguration) {
 	return {
-		type: actions.ATTACHMENT_CONFIGURATION_LOADED,
+		type: actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED,
 		attachmentConfiguration: attachmentConfiguration
 	};
 }
 
-export function updateAttachments(attachments) {
-	console.log('added files action: ')
+export function getAttachments(uuid) {
 	return {
-		type: actions.ATTACHMENTS_UPDATED,
+		type: actions.PLUI_EVOLUTION_GET_ATTACHMENTS,
+		uuid: uuid
+	};
+}
+
+export function downloadAttachment(attachment) {
+	return {
+		type: actions.PLUI_EVOLUTION_DOWNLOAD_ATTACHMENT,
+		attachment: attachment
+	};
+}
+
+export function updateAttachments(attachments) {
+	return {
+		type: actions.PLUI_EVOLUTION_ATTACHMENTS_UPDATED,
 		attachments: attachments
 	};
 }
 
 export function getMe() {
 	return {
-		type: actions.USER_ME_GET
+		type: actions.PLUI_EVOLUTION_USER_ME_GET
 	};
 }
 
 export function gotMe(me) {
 	return {
-		type: actions.USER_ME_GOT,
+		type: actions.PLUI_EVOLUTION_USER_ME_GOT,
 		user: me
 	};
+}
+
+export function openingPanel(pluiRequest, requestStatus) {
+	return {
+		type: actions.PLUI_EVOLUTION_OPENING_PANEL,
+		status: requestStatus,
+		pluiRequest: pluiRequest
+	}
 }
 
 export function openPanel(pluiRequest) {
 	return {
 		type: actions.PLUI_EVOLUTION_OPEN_PANEL,
-		status: pluiRequest ? status.LOAD_REQUEST : status.CREATE_REQUEST,
 		pluiRequest: pluiRequest
-	};
+	}
 }
 
 export function closePanel(){
-	return {
-		type: actions.PLUI_EVOLUTION_CLOSE_PANEL
+	return (dispatch) => {
+		dispatch(hideMapinfoMarker());
+		dispatch(stopDrawingSupport());
+		dispatch({
+			type: actions.PLUI_EVOLUTION_CLOSE_PANEL
+		});
 	};
 }
 
@@ -195,6 +236,12 @@ export function stopDrawing(geometryType) {
 	};
 }
 
+export function clearDrawn() {
+	return {
+		type: actions.PLUI_EVOLUTION_CLEAR_DRAWN
+	};
+}
+
 export function updateLocalisation(localisation) {
 	return {
 		type: actions.PLUI_EVOLUTION_UPDATE_LOCALISATION,
@@ -206,11 +253,39 @@ export function displayEtablissement(pluiRequestType) {
 	return {
 		type: actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT,
 		pluiRequestType: pluiRequestType
+	};
+}
+
+export function displayAllPluiRequest() {
+	return {
+		type: actions.PLUI_EVOLUTION_DISPLAY_ALL
+	};
+}
+
+export function setAllPluiRequestDisplay(allPluiRequestLoaded) {
+	return {
+		type: actions.PLUI_EVOLUTION_ALL_DISPLAYED,
+		allPluiRequestLoaded: allPluiRequestLoaded
+	};
+}
+
+export function loadPluiForm(pluiRequest, formStatus) {
+	return {
+		type: actions.PLUI_EVOLUTION_LOAD_FORM,
+		pluiRequest: pluiRequest,
+		status: formStatus
 	}
 }
 
-export function clearDrawn() {
+export function loadingPluiCreateForm() {
 	return {
-		type: actions.PLUI_EVOLUTION_CLEAR_DRAWN
-	};
+		type: actions.PLUI_EVOLUTION_LOADING_CREATE_FORM
+	}
+}
+
+export function loadingPluiUpdateForm(pluiRequest) {
+	return {
+		type: actions.PLUI_EVOLUTION_LOADING_UPDATE_FORM,
+		pluiRequest: pluiRequest
+	}
 }
