@@ -22,7 +22,7 @@ import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import LocaleUtils from '@mapstore/utils/LocaleUtils';
 import {status} from '../actions/plui-evolution-action';
 import {GeometryType, PluiRequestType, MAX_NB_CHARACTERS_PLUI_OBJECT} from '../constants/plui-evolution-constants';
-import './plui-evolution.css';
+import {CSS} from './plui-evolution-css';
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -182,10 +182,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 type: "",
                 localisation: ""
             };
-            /*this.state.pluiRequest.object = "";
-            this.state.pluiRequest.subject = "";
-            this.state.pluiRequest.type = "";
-            this.state.pluiRequest.localisation = {};*/
             this.state.attachments = [];
             this.setState(this.state);
             this.props.changeFormStatus(status.CREATE_REQUEST);
@@ -202,6 +198,15 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.setState({...this.initialState, pluiRequest: null, attachments: null});
             this.props.updateAttachments(null);
             this.props.toggleControl();
+        }
+
+        if( this.state.cssInitialized === false ){
+            var script = document.createElement('style');
+            script.innerHTML = CSS.join("\n");
+            var head = document.getElementsByTagName('head')[0];
+            head.appendChild(script);
+            this.state.cssInitialized = true;
+            console.log("pluie css loaded");
         }
     }
 
