@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import Dock from 'react-dock';
 import ContainerDimensions from 'react-container-dimensions';
 import {PropTypes} from 'prop-types';
@@ -20,7 +21,10 @@ import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import {getMessageById} from '@mapstore/utils/LocaleUtils';
-import {status} from '../actions/plui-evolution-action';
+import MapInfoUtils from '@mapstore/utils/MapInfoUtils';
+import {closeIdentify} from '@mapstore/actions/mapInfo';
+import {PluiEvolutionRequestViewer, PLUI_EVOLUTION_REQUEST_VIEWER} from './PluiEvolutionRequestViewer';
+import {openPanel, status} from '../actions/plui-evolution-action';
 import {GeometryType, PluiRequestType, MAX_NB_CHARACTERS_PLUI_OBJECT} from '../constants/plui-evolution-constants';
 import {CSS} from './plui-evolution-css';
 
@@ -52,7 +56,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         user: PropTypes.object,
         currentLayer: PropTypes.object,
         pluiRequest: PropTypes.object,
-        allPluiRequestLoaded: PropTypes.bool,
         attachments: PropTypes.array,
         error: PropTypes.object,
         // redux
@@ -113,7 +116,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         // data
         attachmentConfiguration: null,
         user: null,
-        allPluiRequestLoaded: false,
         attachments: null,
         pluiRequest: null,
         // misc
@@ -153,6 +155,15 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
         console.log('construct component...');
+
+        const Connected = connect((state) => ({
+            // debug
+            state : state
+        }), {
+            openPanel: openPanel,
+            closeIdentify: closeIdentify
+        })(PluiEvolutionRequestViewer);
+        MapInfoUtils.setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, Connected);
     }
 
     componentWillMount() {

@@ -262,13 +262,6 @@ export function displayAllPluiRequest() {
 	};
 }
 
-export function setAllPluiRequestDisplay(allPluiRequestLoaded) {
-	return {
-		type: actions.PLUI_EVOLUTION_ALL_DISPLAYED,
-		allPluiRequestLoaded: allPluiRequestLoaded
-	};
-}
-
 export function loadPluiForm(pluiRequest, formStatus) {
 	return {
 		type: actions.PLUI_EVOLUTION_LOAD_FORM,

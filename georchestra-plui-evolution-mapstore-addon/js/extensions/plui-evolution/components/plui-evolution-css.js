@@ -96,5 +96,34 @@ export const CSS = [
 
     ".plui-evolution-panel fieldset { \
         margin: 0 25px 0 30px; \
-    }"
+    }",
+
+    ".plui-evolution-request-viewer fieldset { \
+       margin: 16px 0; \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation { \
+        display: flex; \
+        justify-content: space-between; \
+        margin-bottom: 18px \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation button { \
+        height: 50px; \
+        width: 50px; \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation button .glyphicon { \
+        font-size: 26px; \
+    }",
+
+    ".plui-evolution-request-viewer .block-valid-form { \
+        display: flex; \
+        justify-content: center; \
+        margin: 12px 0; \
+    }",
+
+    ".plui-evolution-request-viewer .block-valid-form .validation-button { \
+        margin-left: 15px; \
+    }",
 ];

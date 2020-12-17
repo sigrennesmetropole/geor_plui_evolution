@@ -5,8 +5,9 @@ import { saveAs } from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
-import {changeMapInfoState, featureInfoClick, LOAD_FEATURE_INFO, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
+import {changeMapInfoState, featureInfoClick, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
 import { success, error, show } from '@mapstore/actions/notifications';
+import {PLUI_EVOLUTION_REQUEST_VIEWER} from '../components/PluiEvolutionRequestViewer';
 import {
     actions,
     closeRequest,
@@ -20,10 +21,8 @@ import {
     loadingPluiUpdateForm,
     loadPluiForm,
     openingPanel,
-    openPanel,
     pluiRequestSaved,
     setDrawing,
-    setAllPluiRequestDisplay,
     updateAttachments,
     updateLocalisation, status
 } from '../actions/plui-evolution-action';
@@ -256,9 +255,14 @@ export const displayAllPluiRequest = (action$, store) =>
                         format: "image/png",
                         singleTile: false,
                         url: url,
-                        visibility: true
+                        visibility: true,
+                        featureInfo: {
+                            format: "PROPERTIES",
+                            viewer: {
+                                type: PLUI_EVOLUTION_REQUEST_VIEWER
+                            }
+                        }
                     }),
-                    setAllPluiRequestDisplay(true),
                     selectNode(PLUI_EVOLUTION_LAYER_ID,"layer",false)
                 ]);
             })
@@ -444,29 +448,6 @@ export const clickMapEpic = (action$) =>
                 info_format: "application/json"
             };
             return Rx.Observable.of(featureInfoClick(action.point, PLUI_EVOLUTION_LAYER_NAME, [], overrideParams));
-        });
-
-export const loadFeatureInfoEpic = (action$) =>
-    action$.ofType(LOAD_FEATURE_INFO)
-        .filter(action => action.layer && action.layer.id === PLUI_EVOLUTION_LAYER_ID)
-        .switchMap((action) => {
-            if (action.data) {
-                const features = action.data.features;
-                if (features.length === 1) {
-                    const properties = features[0].properties;
-                    console.log('selected point', properties);
-                    return Rx.Observable.from([
-                        getAttachments(properties.uuid),
-                        openPanel(properties),
-                        showMapinfoMarker()
-                    ]);
-                }
-                else if (features.length > 1) {
-                    // TODO: Ouverture panel plusieurs pluiRequest
-                }
-            }
-            // pas de demande request sur la carte sur ce point
-            return Rx.Observable.empty();
         });
 
 const buildAttachmentsRequest = (uuid, attachments) => {
