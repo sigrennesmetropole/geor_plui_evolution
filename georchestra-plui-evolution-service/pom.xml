@@ -134,6 +134,21 @@
 			<artifactId>json</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.taskadapter/redmine-java-api -->
+		<dependency>
+			<groupId>com.taskadapter</groupId>
+			<artifactId>redmine-java-api</artifactId>
+		</dependency>
 	</dependencies>
 
 

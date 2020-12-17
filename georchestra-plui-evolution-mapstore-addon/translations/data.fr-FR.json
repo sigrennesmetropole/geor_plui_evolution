@@ -1,38 +1,117 @@
 {
-    "locale": "fr-FR",
-    "messages": {
-        "pluievolution": {
-            "close": "Fermer",
-			"cancel": "Abandonner",
-			"create": "Créer",
+	"locale": "fr-FR",
+	"messages": {
+		"pluievolution": {
+			"close": "Fermer",
+			"cancel": "Annuler",
+			"open": {
+				"loading": "Chargement en cours..."
+			},
+			"validate": "Valider",
 			"user": "Utilisateur",
 			"login": "Vous aêtes",
 			"organization": "Collectivité",
 			"email": "Votre adresse mail",
-			"description": "Description",			
-			"description.count":"nombre de caracteres restants:",
-			"attachment.add": "Ajouter",
-			"attachment.files": "Piece(s) jointe(s)",
-			"attachment.file": "Piece jointe",
-			"attachment.size": "la taille du fichier est supérieur a : ",
-			"attachment.typeFile": "Vous ne pouvez pas ajouter ce type fichier",
-			"attachment.length": "Vous ne pouvez pas ajouter plus de fichiers",
-			"attachment.error": "le fichier n'a pas été uploadé",
-			"attachment.select": "Sélectionner un document",
-			"attachment.delete": "Supprimer un document",
-			"localization": "Géolocation de l'anomalie",
-			"localization.tips": "Cliquer sur le bouton pour géolocaliser le signalement sur la carte",
-			"localization.drawn": "Signalement géolocalisé",
-			"localization.layer": "La couche n'est pas signalable",
-			"msgBox.title": "PLUi Evolution",
-			"msgBox.info": "Etes-vous sur de vouloir annuler cette demande ?",
-			"msgBox.ok": "Oui",
-			"msgBox.cancel": "Non",
-			"loading": "En cours d'initialisation...",
-			"init.attachmentConfiguration.error": "Impossible de charger la configuration",
-			"init.me.error": "Impossible de charger les données de l'utilisateur",
-			"generic.error": "Une erreur s'est produite",
-			"fileUpload.info": "max. 10 Mo par fichier. Formats autorisés : pdf, doc(x), xls(x), png, jpg, tif, dxf, dwg, kml, geojson"
-        }
-    }
+			"clickHere": "Cliquez ici",
+			"commune": "Votre commune",
+			"displayRequestForm": "Créer une nouvelle demande",
+			"subject": {
+				"title": "Sujet de la demande",
+				"placeholder": "Saisissez le sujet de la demande",
+				"error": "Le sujet de la demande est absent"
+			},
+			"object": {
+				"title": "Objet de la demande",
+				"count": "nombre de caracteres restants:",
+				"placeholder": "Saisissez l'objet de la demande",
+				"error": "L'objet de la demande est absent"
+			},
+			"comment": {
+				"title": "Commentaires des services"
+			},
+			"status": {
+				"title": "Statut de la demande"
+			},
+			"attachment": {
+				"add": "Ajouter",
+				"files": "Piece(s) jointe(s)",
+				"file": "Piece jointe",
+				"size": "la taille du fichier est supérieur à: ",
+				"typeFile": "Vous ne pouvez pas ajouter ce type fichier",
+				"length": "Vous ne pouvez pas ajouter plus de fichiers",
+				"error": {
+					"update": "le fichier {filename} n'a pas été uploadé",
+					"get": "Une erreur s'est produite lors de la récupération des documents de la demande PLUi",
+					"download": "Une erreur s'est produite lors de la récupération du document"
+				},
+				"select": "Sélectionner un document",
+				"delete": "Supprimer un document",
+				"tableName": {
+					"title": "Nom"
+				},
+				"tableAction": {
+					"title": "Action"
+				},
+				"download": {
+					"title": "Fichier téléchargé avec succès"
+				}
+			},
+			"localisation": {
+				"legend": "Géolocalisation de la demande",
+				"title": "Il s'agit d'une demande ...",
+				"tips": "Cliquer sur le bouton pour géolocaliser le signalement sur la carte",
+				"drawn": "Signalement géolocalisé",
+				"layer": "La couche n'est pas signalable",
+				"graphique": "... impactant une règle graphique sur ma commune",
+				"commune": "... impactant plusieurs communes (ex. OAP intercommunale)",
+				"metropolitain": "... impactant le règlement littéral métropolitain",
+				"geolocate": "Géolocaliser",
+				"error": {
+					"geolocate": "La localisation de la demande n'est pas définie",
+					"etablissement": "Erreur lors de la localisation de l'établissement"
+				}
+			},
+			"type": {
+				"title": "Type de la demande",
+				"error": "Le type de la demande n'est pas sélectionné"
+			},
+			"msgBox": {
+				"title": "PLUi-Evolution : demande d'adaptation du PLUi",
+				"info": "Etes-vous sur de vouloir annuler cette demande ?",
+				"manual": "Pour visualiser l'état d'avancement d'une demande, vous devez cliquer sur la demande sur la carte.\nPour effectuer une nouvelle demande, cliquer sur le bouton ci-dessous :",
+				"ok": "Oui",
+				"cancel": "Non",
+				"requestSaved": {
+					"title": "Confirmation d'enregistrement",
+					"message": "Demande PLUi enregistrée avec succès"
+				}
+			},
+			"name": "PLUi Evolution",
+			"loading": "En cours...",
+			"init": {
+				"loading": "En cours d'initialisation...",
+				"attachmentConfiguration.error": "Impossible de charger la configuration",
+				"me": {
+					"error": "Impossible de charger les données de l'utilisateur"
+				}
+			},
+			"generic": {
+				"error": "Une erreur s'est produite"
+			},
+			"create": {
+				"title": "Créer",
+				"error": "Une erreurs s'est produite lors de la création de la demande PLui",
+				"loading": "Enregistrement en cours..."
+			},
+			"fileUpload": {
+				"info": "max. {maxSizeFormatted} par fichier."
+			},
+			"error": {
+				"title": "Erreur"
+			},
+			"success": {
+				"title": "Succès"
+			}
+		}
+	}
 }

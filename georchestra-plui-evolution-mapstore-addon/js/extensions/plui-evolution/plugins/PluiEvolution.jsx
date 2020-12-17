@@ -1,4 +1,4 @@
 import {createPlugin} from '@mapstore/utils/PluginsUtils';
 import PluiEvolutionExtension from './PluiEvolutionExtension';
 
-export default createPlugin("pluievolution", PluiEvolutionExtension);
+export default createPlugin("PluiEvolution", PluiEvolutionExtension);

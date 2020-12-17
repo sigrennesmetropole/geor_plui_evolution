@@ -4,3 +4,8 @@
 /node_installation/
 /.project
 /.settings/
+/georchestra-plui-evolution.iml
+/georchestra-plui-evolution-api/georchestra-plui-evolution-api.iml
+/georchestra-plui-evolution-core/georchestra-plui-evolution-core.iml
+/georchestra-plui-evolution-mapstore-addon/georchestra-plui-evolution-mapstore-addon.iml
+/georchestra-plui-evolution-service/georchestra-plui-evolution-service.iml

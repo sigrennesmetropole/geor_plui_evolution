@@ -26,12 +26,12 @@ public interface DocumentRepositoryService {
 	Attachment getDocument(Long id);
 
 	/**
-	 * Retourne un document par son id
+	 * Retourne un document par son attachmentId
 	 * 
-	 * @param id
-	 * @return
+	 * @param attachmentId identifiant de l'attachement
+	 * @return documentcontent
 	 */
-	DocumentContent getDocumentContent(Long id) throws DocumentRepositoryException;
+	DocumentContent getDocumentContent(Long attachmentId) throws DocumentRepositoryException;
 
 	/**
 	 * Retourne l'enveloppe des documents associé à un Id
