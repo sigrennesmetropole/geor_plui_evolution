@@ -125,7 +125,7 @@
 		<profile>
 			<id>prod</id>
 			<properties>
-				<npmicommand>install</npmicommand>
+				<npmicommand>ci</npmicommand>
 				<npmcommand>build-prod</npmcommand>
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
