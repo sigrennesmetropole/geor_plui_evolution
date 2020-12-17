@@ -125,9 +125,8 @@
 		<profile>
 			<id>prod</id>
 			<properties>
-				<npmicommand>ci</npmicommand>
+				<npmicommand>install</npmicommand>
 				<npmcommand>build-prod</npmcommand>
-				<backurl>gaspar</backurl>
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
 		</profile>
