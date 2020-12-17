@@ -144,7 +144,7 @@
 		"/attachment/configuration": {
 			"get": {
 				"tags": [
-					"administration"
+					"attachment"
 				],
 				"summary": "Lister la configuration liées aux pièces jointes",
 				"description": "Lister la configuration liées aux pièces jointes",
@@ -158,6 +158,46 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/AttachmentConfiguration"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/attachment/{idAttachment}/download": {
+			"get": {
+				"tags": [
+					"attachment"
+				],
+				"summary": "Téléchargement d'une pièce jointe redmimne",
+				"description": "Téléchargement d'une pièce jointe redmimne",
+				"operationId": "downLoadAttachment",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "idAttachment",
+						"description": "Identifiant du fichier dans redmine",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
 						}
 					},
 					"400": {
@@ -209,6 +249,49 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/Attachment"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/{uuid}/attachments": {
+			"get": {
+				"tags": [
+					"request"
+				],
+				"summary": "Récupération de la liste des pièces jointes d'une demande",
+				"description": "",
+				"operationId": "getAttachementsByPluiRequestUuid",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "uuid",
+						"description": "Identifiant de la demande",
+						"required": true,
+						"type": "string",
+						"format": "uuid"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Attachment"
+							}
 						}
 					},
 					"400": {

@@ -12,13 +12,16 @@ import {
     Glyphicon,
     Grid,
     HelpBlock,
+    InputGroup,
+    Radio,
     Row
 } from 'react-bootstrap';
 import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
+import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
+import LocaleUtils from '@mapstore/utils/LocaleUtils';
 import {status} from '../actions/plui-evolution-action';
-import {GeometryType} from '../constants/plui-evolution-constants';
-//import './plui-evolution.css';
+import {GeometryType, PluiRequestType, MAX_NB_CHARACTERS_PLUI_OBJECT} from '../constants/plui-evolution-constants';
 import {CSS} from './plui-evolution-css';
 
 export class PluiEvolutionPanelComponent extends React.Component {
@@ -28,6 +31,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         status: PropTypes.string,
         closing: PropTypes.bool,
         drawing: PropTypes.bool,
+        loading: PropTypes.bool,
+        readOnly: PropTypes.bool,
         // config
         wrap: PropTypes.bool,
         wrapWithPanel: PropTypes.bool,
@@ -46,31 +51,40 @@ export class PluiEvolutionPanelComponent extends React.Component {
         contextThemas: PropTypes.array,
         user: PropTypes.object,
         currentLayer: PropTypes.object,
-        task: PropTypes.object,
-        attachements: PropTypes.array,
+        pluiRequest: PropTypes.object,
+        allPluiRequestLoaded: PropTypes.bool,
+        attachments: PropTypes.array,
         error: PropTypes.object,
         // redux
-		initPluiEvolution: PropTypes.func,
-        initDrawingSupport: PropTypes.func,
-        stopDrawingSupport: PropTypes.func,
+        initPluiEvolution: PropTypes.func,
         startDrawing: PropTypes.func,
         stopDrawing: PropTypes.func,
         clearDrawn: PropTypes.func,
         loadAttachmentConfiguration: PropTypes.func,
-        addAttachment: PropTypes.func,
+        updateAttachments: PropTypes.func,
         removeAttachment: PropTypes.func,
+        getAttachments: PropTypes.func,
+        downloadAttachment: PropTypes.func,
         getMe: PropTypes.func,
+        displayEtablissement: PropTypes.func,
+        savePluiRequest: PropTypes.func,
         requestClosing: PropTypes.func,
         cancelClosing: PropTypes.func,
-        confirmClosing: PropTypes.func
+        confirmClosing: PropTypes.func,
+        closeRequest: PropTypes.func,
+        loadActionError: PropTypes.func,
+        loadingPluiCreateForm: PropTypes.func,
+        changeFormStatus: PropTypes.func,
     };
 
     static defaultProps = {
         id: "plui-evolution-panel",
         active: false,
-        status: status.NO_TASK,
+        status: status.EMPTY,
         closing: false,
         drawing: false,
+        loading: false,
+        readOnly: false,
         // config
         wrap: false,
         modal: true,
@@ -99,39 +113,51 @@ export class PluiEvolutionPanelComponent extends React.Component {
         // data
         attachmentConfiguration: null,
         user: null,
-        attachements: [],
+        allPluiRequestLoaded: false,
+        attachments: null,
+        pluiRequest: null,
         // misc
-		initPluiEvolution: ()=>{},
-        initDrawingSupport: ()=>{},
-        stopDrawingSupport: ()=>{},
+        initPluiEvolution: ()=>{},
         startDrawing: ()=>{},
         stopDrawing: ()=>{},
         clearDrawn: ()=>{},
         loadAttachmentConfiguration: ()=>{},
-        addAttachment: () => {},
+        updateAttachments: () => {},
         removeAttachment: () => {},
+        getAttachments: () => {},
+        downloadAttachment: () => {},
         getMe: ()=>{},
+        displayEtablissement: ()=>{},
+        savePluiRequest: ()=>{},
         requestClosing: ()=>{},
         cancelClosing: ()=>{},
         confirmClosing: ()=>{},
+        closeRequest: ()=>{},
+        loadingPluiCreateForm: ()=>{},
+        changeFormStatus: ()=>{},
+        loadActionError: ()=>{},
         toggleControl: () => {}
+    };
+
+    static contextTypes = {
+        messages: PropTypes.object
+    };
+
+    initialState = {
+        errorAttachment: "",
+        errorFields: {}
     };
 
     constructor(props) {
         super(props);
-        this.state = {
-            errorAttachment: "",
-            errorFields: {}
-        }
-		this.props.initPluiEvolution(this.props.backendurl);
-        //console.log(this.state);
-        //console.log(this.props);
+        this.state = this.initialState;
+        this.props.initPluiEvolution(this.props.backendURL);
+        console.log('construct component...');
     }
 
     componentWillMount() {
-        this.setState({initialized: false, cssInitialized: false, loaded: false, pluirequest: null});
+        this.setState({initialized: false, cssInitialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
-        this.props.initDrawingSupport();
         this.props.getMe();
     }
 
@@ -139,8 +165,42 @@ export class PluiEvolutionPanelComponent extends React.Component {
         console.log("pluie didUpdate...");
         // Tout est-il initialisé ?
         this.state.initialized = this.props.attachmentConfiguration !== null && this.props.user !== null;
+        if (this.props.status === status.LOAD_REQUEST) {
+            this.state.initialized &= this.props.pluiRequest != null && this.props.attachments != null;
+        }
 
-		if( this.state.cssInitialized == false ){
+        if (this.props.pluiRequest != null && this.state.pluiRequest != null) {
+            this.state.pluiRequest.localisation = this.props.pluiRequest.localisation;
+            this.state.pluiRequest.uuid = this.props.pluiRequest.uuid;
+        }
+
+        if (this.props.status === status.INIT_FORM_REQUEST) {
+            console.log('initing form');
+            this.state.pluiRequest = {
+                object: "",
+                subject: "",
+                type: "",
+                localisation: ""
+            };
+            this.state.attachments = [];
+            this.setState(this.state);
+            this.props.changeFormStatus(status.CREATE_REQUEST);
+        }
+
+        if (this.props.status === status.LOAD_REQUEST && !this.state.pluiRequest && this.state.initialized) {
+            this.state.pluiRequest = this.props.pluiRequest;
+            this.state.attachments = this.props.attachments;
+            this.setState(this.state);
+            this.props.getAttachments(this.props.pluiRequest.uuid);
+        }
+
+        if (this.props.status === status.CLEAN_REQUEST) {
+            this.setState({...this.initialState, pluiRequest: null, attachments: null});
+            this.props.updateAttachments(null);
+            this.props.toggleControl();
+        }
+
+        if( this.state.cssInitialized === false ){
             var script = document.createElement('style');
             script.innerHTML = CSS.join("\n");
             var head = document.getElementsByTagName('head')[0];
@@ -148,18 +208,12 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.state.cssInitialized = true;
             console.log("pluie css loaded");
         }
-
-       
-        console.log(this.state);
     }
 
     render() {
         console.log("pluie render");
-        if( this.props.active ){
-            // si le panel est ouvert
-            if( this.state.initialized ){
-            }
-        }
+        console.log('this.props render', this.props);
+        console.log('this.state render', this.state);
         if( this.props.active ){
             // le panel est ouvert
             return (
@@ -174,8 +228,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                     <div className={this.props.panelClassName}>
                                         {this.renderHeader()}
                                         {
-                                            !this.state.initialized || !this.state.loaded ?
-                                                this.renderLoading() :
+                                            !this.state.initialized ?
+                                                this.renderLoading("pluievolution.open.loading") :
                                                 this.renderForm()
                                         }
                                     </div>
@@ -215,25 +269,28 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     /**
-     * Rendition du message de chargement en attendant la nouvelle tâche draft
-     */
-    renderLoading() {
-        return (
-            <div><Message msgId="pluievolution.loading"/></div>
-        );
-    }
-
-    /**
      * La rendition du formulaire
      */
     renderForm() {
         return (
-            <Form model={this.state.task}>
+            <Form model={this.state.pluiRequest}>
                 {this.renderUserInformation()}
-                {this.renderDetail()}
-                {this.renderAttachments()}
-                {this.renderLocalisation()}
+                {this.renderPluiManual()}
+                {this.renderActivationButtonPluiRequestForm()}
+                {this.renderPluiRequestInformations()}
+                {this.props.loading ? this.renderLoading("pluievolution.create.loading") : null}
             </Form>
+        );
+    }
+
+    renderLoading(msgId) {
+        return (
+            <div className="plui-loading-container">
+                <div className="plui-loading">
+                    <LoadingSpinner />
+                    <Message msgId={msgId} />
+                </div>
+            </div>
         );
     }
 
@@ -254,9 +311,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
                         {this.renderMessage()}
                     </Col>
                     <Col xs={2}>
-                        <Button className="square-button no-border" onClick={() => this.create()} >
-                            <Glyphicon glyph={this.props.createGlyph}/>
-                        </Button>
                         <Button className="square-button no-border" onClick={() => this.cancel()} >
                             <Glyphicon glyph={this.props.closeGlyph}/>
                         </Button>
@@ -272,7 +326,10 @@ export class PluiEvolutionPanelComponent extends React.Component {
     renderMessage(){
         if( this.props.error ){
             return (
-                <span className="error"><Message msgId={this.props.error.message}/></span>
+                <span className="error">
+                    <Message msgId={this.props.error.message}
+                             msgParams={this.props.error.messageParams ? this.props.error.messageParams : {}}/>
+                </span>
             );
         } else if( this.props.message ){
             return (
@@ -290,22 +347,61 @@ export class PluiEvolutionPanelComponent extends React.Component {
         return (
             <div>
                 <fieldset>
-                    <legend><Message msgId="pluievolution.user"/></legend>
-                    <FormGroup controlId="pluievolution.user.login">
-                        <ControlLabel><Message msgId="pluievolution.login"/></ControlLabel>
-                        <FormControl type="text" readOnly value={this.props.user !== null ? this.props.user.login : ''}/>
-                    </FormGroup>
                     <FormGroup controlId="pluievolution.user.organization">
-                        <ControlLabel><Message msgId="pluievolution.organization"/></ControlLabel>
-                        <FormControl type="text" readOnly value={this.props.user !== null ? this.props.user.organization : ''}/>
-                    </FormGroup>
-                    <FormGroup controlId="pluievolution.user.email">
-                        <ControlLabel><Message msgId="pluievolution.email"/></ControlLabel>
-                        <FormControl type="text" readOnly value={this.props.user !== null ? this.props.user.email : ''}/>
+                        <InputGroup className="input-group">
+                            <InputGroup.Addon className="addon">
+                                <Message msgId="pluievolution.commune"/>
+                            </InputGroup.Addon>
+                            <FormControl type="text" readOnly value={this.props.user !== null ? this.props.user.organization : ''}/>
+                        </InputGroup>
                     </FormGroup>
                 </fieldset>
             </div>
         );
+    }
+
+    renderPluiManual() {
+        return (
+            <div className="manual">
+                <fieldset>
+                    <Message msgId="pluievolution.msgBox.manual"/>
+                </fieldset>
+            </div>
+        );
+    }
+
+    renderActivationButtonPluiRequestForm() {
+        return (
+            <div className="block-display-plui-request">
+                <fieldset>
+                    <Button bsSize="large" bsStyle="primary" onClick={this.disPlayRequestForm}>
+                        <Message msgId="pluievolution.displayRequestForm"/>
+                    </Button>
+                </fieldset>
+            </div>
+        );
+    }
+
+    disPlayRequestForm = () => {
+        this.state.formRequestIsDisplayed = true;
+        this.setState(this.state);
+        if (this.props.readOnly) {
+            this.props.loadingPluiCreateForm();
+        }
+    }
+
+    renderPluiRequestInformations() {
+        if (this.state.formRequestIsDisplayed || this.props.readOnly) {
+            return (
+                <div >
+                    {this.renderDetail()}
+                    {this.renderAttachments()}
+                    {this.renderLocalisation()}
+                    {this.renderRequestComment()}
+                    {this.renderFormButton()}
+                </div>
+            );
+        }
     }
 
     /**
@@ -315,19 +411,96 @@ export class PluiEvolutionPanelComponent extends React.Component {
         return (
             <div>
                 <fieldset>
-                    <legend><Message msgId="pluievolution.description"/></legend>
-                    <FormGroup controlId="pluievolution.description">
-                        <FormControl componentClass="textarea"
-                                     defaultValue={this.state.pluirequest.description}
-                                     onChange={this.handleDescriptionChange}
-                                     maxLength={1000}
-                        />
-                        <HelpBlock><Message msgId="pluievolution.description.count"/> {1000 - this.state.task.asset.description.length}</HelpBlock>
-                    </FormGroup>
+                    {this.renderStatut()}
+                    {this.renderType()}
+                    {this.renderSubject()}
+                    {this.renderObject()}
                 </fieldset>
             </div>
         );
+    }
 
+    renderStatut() {
+        if (this.props.readOnly) {
+            return (
+                <FormGroup controlId="pluievolution.status">
+                    <InputGroup className="input-group">
+                        <InputGroup.Addon className="addon">
+                            <Message msgId="pluievolution.status.title"/>
+                        </InputGroup.Addon>
+                        <FormControl type="text"
+                                     value={this.state.pluiRequest.status}
+                                     readOnly/>
+                    </InputGroup>
+                </FormGroup>
+            );
+        }
+    }
+
+    renderType() {
+        if (this.props.readOnly) {
+            return (
+                <FormGroup controlId="pluievolution.type">
+                    <InputGroup className="input-group">
+                        <InputGroup.Addon className="addon">
+                            <Message msgId="pluievolution.type.title"/>
+                        </InputGroup.Addon>
+                        <FormControl type="text"
+                                     value={this.state.pluiRequest.type}
+                                     readOnly/>
+                    </InputGroup>
+                </FormGroup>
+            );
+        }
+    }
+
+    renderSubject() {
+        console.log('actual subject', this.state.pluiRequest.subject);
+        return (
+            <FormGroup controlId="pluievolution.subject"
+                       validationState={this.state.errorFields.subject ? "error" : null}>
+                <InputGroup className="input-group">
+                    <InputGroup.Addon className="addon">
+                        <Message msgId="pluievolution.subject.title"/>
+                    </InputGroup.Addon>
+                    <FormControl type="text"
+                                 value={this.state.pluiRequest.subject}
+                                 placeholder={LocaleUtils.getMessageById(this.context.messages, "pluievolution.subject.placeholder")}
+                                 onChange={this.handleSubjectChange}
+                                 maxLength={30}
+                                 readOnly={this.props.readOnly}
+                                 required/>
+                </InputGroup>
+            </FormGroup>
+        );
+    }
+
+    renderObject() {
+        return (
+            <FormGroup controlId="pluievolution.object"
+                       validationState={this.state.errorFields.object ? "error" : null}>
+                <InputGroup className="input-group">
+                    <InputGroup.Addon className="addon">
+                        <Message msgId="pluievolution.object.title"/>
+                    </InputGroup.Addon>
+                    <FormControl componentClass="textarea"
+                                 bsSize="small"
+                                 rows={4}
+                                 value={this.state.pluiRequest.object}
+                                 placeholder={LocaleUtils.getMessageById(this.context.messages, "pluievolution.object.placeholder")}
+                                 onChange={this.handleObjectChange}
+                                 maxLength={300}
+                                 readOnly={this.props.readOnly}
+                                 required/>
+                </InputGroup>
+                <HelpBlock><Message msgId="pluievolution.object.count"/> {this.getNbCharactersLeftForObject()}</HelpBlock>
+            </FormGroup>
+        );
+    }
+
+    getNbCharactersLeftForObject = () => {
+        const actualNbCharacters = this.state.pluiRequest.object ? this.state.pluiRequest.object.length: 0;
+        return MAX_NB_CHARACTERS_PLUI_OBJECT - actualNbCharacters;
     }
 
     /**
@@ -338,10 +511,29 @@ export class PluiEvolutionPanelComponent extends React.Component {
             <div>
                 <fieldset>
                     <legend><Message msgId="pluievolution.attachment.files"/></legend>
+                    {this.renderChooseFilesAttachments()}
+                    <table className="table">
+                        {this.renderHeaderTableAttachments()}
+                        <tbody>
+                        {this.renderTable(this.state.attachments)}
+                        </tbody>
+                    </table>
+                </fieldset>
+            </div>
+        )
+    }
+
+    renderChooseFilesAttachments() {
+        if (!this.props.readOnly) {
+            return (
+                <div>
                     <FormGroup controlId="formControlsFile">
-                        <FormControl type="file" name="file"
+                        <FormControl type="file" name="file" accept={this.getAllowedExtensions()}
                                      onChange={(e) => this.fileAddedHandler(e)} />
-                        <HelpBlock><Message msgId="pluievolution.fileUpload.info"/></HelpBlock>
+                        <HelpBlock>
+                            <Message msgId="pluievolution.fileUpload.info"
+                                     msgParams={{maxSizeFormatted: this.formatBytes(this.props.attachmentConfiguration.maxSize)}}/>
+                        </HelpBlock>
                     </FormGroup>
                     <div className="col-sm-12">
                         <div id="passwordHelp" className="text-danger">
@@ -352,20 +544,41 @@ export class PluiEvolutionPanelComponent extends React.Component {
                             }
                         </div>
                     </div>
-                    <table className="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {this.renderTable(this.props.attachments)}
-                        </tbody>
-                    </table>
-                </fieldset>
-            </div>
-        )
+                </div>
+            );
+        }
+    }
+
+    renderHeaderTableAttachments() {
+        if (this.props.readOnly) {
+            return (
+                <thead>
+                <tr>
+                    <th className="col-sm-12" scope="col">
+                        <Message msgId="pluievolution.attachment.tableName.title" />
+                    </th>
+                </tr>
+                </thead>
+            );
+        }
+        else {
+            return (
+                <thead>
+                <tr>
+                    <th className="col-sm-10" scope="col">
+                        <Message msgId="pluievolution.attachment.tableName.title" />
+                    </th>
+                    <th className="col-sm-2" scope="col">
+                        <Message msgId="pluievolution.attachment.tableAction.title" />
+                    </th>
+                </tr>
+                </thead>
+            );
+        }
+    }
+
+    getAllowedExtensions = () => {
+        return this.props.attachmentConfiguration.mimeTypes.join(",");
     }
 
     /**
@@ -375,16 +588,52 @@ export class PluiEvolutionPanelComponent extends React.Component {
 
         if (attachments) {
             return attachments.map((attachment, index) => {
-                return (
-                    <tr key={index}>
-                        <td>{attachment.name}</td>
-                        <td><Button className="btn btn-sq-xs btn-danger"
-                                    onClick={() => this.fileDeleteHandler(attachment.id, index)}>
-                            <Glyphicon glyph={this.props.deleteGlyph}/>
-                        </Button></td>
-                    </tr>
-                )
-            })
+                if (this.props.readOnly) {
+                    return (
+                        <tr key={index}>
+                            <td className="col-sm-12">
+                                <Button bsStyle="link" onClick={() => this.props.downloadAttachment(attachment)}>{attachment.name}</Button>
+                            </td>
+                        </tr>
+                    );
+                }
+                else {
+                    return (
+                        <tr key={index}>
+                            <td className="col-sm-10">{attachment.name}</td>
+                            <td className="col-sm-2">
+                                <Button className="btn btn-sq-xs btn-danger"
+                                        onClick={() => this.fileDeleteHandler(index)}>
+                                    <Glyphicon glyph={this.props.deleteGlyph}/>
+                                </Button>
+                            </td>
+                        </tr>
+                    );
+                }
+            });
+        }
+    }
+
+    renderRequestComment() {
+        if (this.props.readOnly) {
+            return (
+                <div>
+                    <fieldset>
+                        <FormGroup controlId="pluievolution.comment">
+                            <InputGroup className="input-group">
+                                <InputGroup.Addon className="addon">
+                                    <Message msgId="pluievolution.comment.title"/>
+                                </InputGroup.Addon>
+                                <FormControl componentClass="textarea"
+                                             bsSize="small"
+                                             rows={4}
+                                             readOnly
+                                             value={this.state.pluiRequest.comment ? this.state.pluiRequest.comment : ""}/>
+                            </InputGroup>
+                        </FormGroup>
+                    </fieldset>
+                </div>
+            );
         }
     }
 
@@ -392,20 +641,75 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * La rendition de la saisie de la géométrie
      */
     renderLocalisation() {
-        return (
-            <div>
-                <fieldset>
-                    <legend><Message msgId="pluievolution.localization"/></legend>
-                    <FormGroup controlId="localisation">
-                        { this.renderGeometryDrawButton() }
-                        <label className="col-sm-offset-1">{ this.renderGeometryDrawMessage() }</label>
-                        <HelpBlock>
-                            <Message msgId="pluievolution.localization.tips"/>
-                        </HelpBlock>
-                    </FormGroup>
-                </fieldset>
-            </div>
-        )
+        if (!this.props.readOnly) {
+            return (
+                <div>
+                    <fieldset>
+                        <legend><Message msgId="pluievolution.localisation.legend"/></legend>
+                        <FormGroup controlId="localisation"
+                                   validationState={this.state.errorFields.type ? "error" : null}>
+                            <ControlLabel>
+                                <Message msgId="pluievolution.localisation.title"/>
+                            </ControlLabel>
+                            <div className="radio-block">
+                                <Radio name="radioGroup"
+                                       checked={this.state.pluiRequest.type === PluiRequestType.COMMUNE}
+                                       onChange={() => this.setPluiRequestType(PluiRequestType.COMMUNE)}>
+                                    <Message msgId="pluievolution.localisation.graphique"/>
+                                </Radio>
+                                {this.renderGeometryDrawButton()}
+                            </div>
+                            <div className="radio-block">
+                                <Radio name="radioGroup"
+                                       checked={this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE}
+                                       onChange={() => this.setPluiRequestType(PluiRequestType.INTERCOMMUNE)}>
+                                    <Message msgId="pluievolution.localisation.commune"/>
+                                </Radio>
+                                <Button
+                                    disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
+                                    bsSize="small"
+                                    bsStyle="primary"
+                                    onClick={this.drawTypeIntercommune}>
+                                    <Message msgId="pluievolution.clickHere"/>
+                                </Button>
+                            </div>
+                            <div className="radio-block">
+                                <Radio name="radioGroup"
+                                       checked={this.state.pluiRequest.type === PluiRequestType.METROPOLITAIN}
+                                       onChange={() => this.setPluiRequestType(PluiRequestType.METROPOLITAIN)}>
+                                    <Message msgId="pluievolution.localisation.metropolitain"/>
+                                </Radio>
+                                <Button
+                                    disabled={this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
+                                    bsSize="small"
+                                    bsStyle="primary"
+                                    onClick={this.drawTypeMetropolitain}>
+                                    <Message msgId="pluievolution.clickHere"/>
+                                </Button>
+                            </div>
+                        </FormGroup>
+                    </fieldset>
+                </div>
+            );
+        }
+    }
+
+    setPluiRequestType(pluiRequestType) {
+        this.state.pluiRequest.type = pluiRequestType;
+        this.setState(this.state);
+        this.props.clearDrawn();
+    }
+
+    formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
 
     /**
@@ -413,8 +717,12 @@ export class PluiEvolutionPanelComponent extends React.Component {
      */
     renderGeometryDrawButton = ()=> {
         return (
-            <Button className="square-button" bsStyle={this.props.drawing ? 'primary' : 'default'} onClick={this.onDraw}>
-                <Glyphicon glyph={this.state.task.asset.geographicType.toLowerCase()}/>
+            <Button
+                disabled={this.state.pluiRequest.type !== PluiRequestType.COMMUNE}
+                bsSize="small"
+                bsStyle="primary"
+                onClick={this.drawTypeCommune}>
+                {this.renderGeometryDrawMessage()}
             </Button>
         );
     }
@@ -422,13 +730,13 @@ export class PluiEvolutionPanelComponent extends React.Component {
     /**
      * Action sur le bouton permettant de définir la géométrie d'un plui-evolution (start ou stop du dessin)
      */
-    onDraw = ()=> {
-        const geometryType = GeometryType[this.state.task.asset.geographicType];
+    drawTypeCommune = ()=> {
+        const geometryType = GeometryType.POINT;
         if (this.props.drawing) {
             this.props.stopDrawing(geometryType);
         }
         else {
-            this.props.startDrawing(geometryType, this.props.task.asset.localisation);
+            this.props.startDrawing(geometryType, this.props.pluiRequest ? this.props.pluiRequest.localisation : null);
         }
     }
 
@@ -436,22 +744,81 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * Affichage du message sur le dessin de la geometrie du plui-evolution
      */
     renderGeometryDrawMessage = ()=> {
-        if (this.state.task && this.props.task.asset && this.props.task.asset.localisation && this.props.task.asset.localisation.length > 0) {
+        if (this.props.drawing) {
             return (
-                <Message msgId="pluievolution.localization.drawn"/>
+                <Message msgId="pluievolution.loading"/>
             );
         } else {
-            return null;
+            return (
+                <Message msgId="pluievolution.localisation.geolocate"/>
+            );
+        }
+    }
+
+    drawTypeIntercommune = () => {
+        this.props.displayEtablissement(PluiRequestType.INTERCOMMUNE);
+    }
+
+    drawTypeMetropolitain = () => {
+        this.props.displayEtablissement(PluiRequestType.METROPOLITAIN);
+    }
+
+    renderFormButton = () => {
+        if (!this.props.readOnly) {
+            return (
+                <div>
+                    <fieldset>
+                        <div className="block-valid-form">
+                            <Button bsStyle="warning"
+                                    bsSize="large"
+                                    onClick={this.cancel}>
+                                <Message msgId="pluievolution.cancel"/>
+                            </Button>
+                            <Button className="validation-button"
+                                    bsStyle="primary"
+                                    bsSize="large"
+                                    onClick={this.savePluiRequest}>
+                                <Message msgId="pluievolution.validate"/>
+                            </Button>
+                        </div>
+                    </fieldset>
+                </div>
+            );
+        }
+        else {
+            return (
+                <div>
+                    <fieldset>
+                        <div className="block-valid-form">
+                            <Button bsStyle="default"
+                                    bsSize="large"
+                                    onClick={this.cancel}>
+                                <Message msgId="pluievolution.close"/>
+                            </Button>
+                        </div>
+                    </fieldset>
+                </div>
+            );
         }
     }
 
     /**
-     * Changement de la description
+     * Changement du sujet
      *
      * @param {*} e l'événement
      */
-    handleDescriptionChange = (e) => {
-        this.state.pluirequest.description = e.target.value;
+    handleSubjectChange = (e) => {
+        this.state.pluiRequest.subject = e.target.value;
+        this.setState(this.state);
+    }
+
+    /**
+     * Changement de l'objet
+     *
+     * @param {*} e l'événement
+     */
+    handleObjectChange = (e) => {
+        this.state.pluiRequest.object = e.target.value;
         this.setState(this.state);
     }
 
@@ -462,7 +829,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
      */
     validateAttachment(attachment) {
         let errorAttachment = "";
-        if (attachment.file === undefined || !(attachment.file instanceof File) || this.props.attachmentConfiguration.mimeTypes.includes(attachment.file.type) === false) {
+        if (!attachment.file || !(attachment.file instanceof File) || this.props.attachmentConfiguration.mimeTypes.includes(attachment.file.type) === false) {
             errorAttachment = 'pluievolution.attachment.typeFile';
         }
 
@@ -470,7 +837,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             errorAttachment = `la taille du fichier est supérieur à : ${this.props.attachmentConfiguration.maxSize}`
         }
 
-        if (this.props.attachments.length + 1 > this.props.attachmentConfiguration.maxCount) {
+        if (this.state.attachments.length + 1 > this.props.attachmentConfiguration.maxCount) {
             errorAttachment = `Vous ne pouvez pas ajouter plus de " : ${this.props.attachmentConfiguration.maxCount} fichiers`
         }
 
@@ -487,46 +854,86 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * @param {*} e l'événement
      */
     fileAddedHandler(e) {
-        //les differents test avant d'uploader le fichier (type, taille)
-        var attachment = {file: e.target.files[0], uuid: this.state.task.asset.uuid}
+        console.log('event file', e);
+        //les différents test avant d'uploader le fichier (type, taille)
+        const attachment = {
+            name: e.target.files[0].name,
+            file: e.target.files[0]
+        };
 
         const isValid = this.validateAttachment(attachment);
 
         if (isValid) {
-            this.setState({errorAttachment: ""});
-            // uploader le fichier
-            this.props.addAttachment(attachment);
+            if (!this.state.attachments) {
+                this.state.attachments = [];
+            }
+            this.state.attachments.push(attachment)
+            this.state.errorAttachment = "";
+
+            this.setState(this.state);
         }
 
     }
 
-
     /**
      * Action pour supprimer une pièce jointe
      *
-     * @param {*} e l'événement
+     * @param {number} index l'événement
      */
-    fileDeleteHandler(id, index) {
-        const attachment = {id: id, uuid: this.state.task.asset.uuid, index: index};
-        this.props.removeAttachment(attachment);
+    fileDeleteHandler(index) {
+        this.state.attachments.splice(index, 1);
+        this.setState(this.state);
+    }
+
+    disableFormErrors() {
+        this.state.errorFields = {};
+        this.setState(this.state);
+    }
+
+    checkPluiRequestForm() {
+        this.disableFormErrors();
+        this.props.loadActionError(null);
+        if (!this.state.pluiRequest.subject) {
+            this.state.errorFields.subject = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.subject.error");
+            return false;
+        }
+        if (!this.state.pluiRequest.object) {
+            this.state.errorFields.object = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.object.error");
+            return false;
+        }
+        if (!this.state.pluiRequest.type) {
+            this.state.errorFields.type = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.type.error");
+            return false;
+        }
+        if (!this.state.pluiRequest.localisation || this.state.pluiRequest.localisation.length === 0) {
+            this.state.errorFields.localisation = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.localisation.error.geolocate");
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * L'action d'abandon
      */
-    cancel() {
-        if(  this.state.pluirequest != null && this.state.pluirequest.uuid !== null) {
-            this.props.requestClosing();
-        } else {
-            this.props.toggleControl();
-        }
+    cancel = () => {
+        this.props.closeRequest();
     }
 
     /**
      * L'action de création
      */
-    create() {
-        if( this.state.pluirequest != null &&  this.state.pluirequest.uuid !== null) {
+    savePluiRequest = () => {
+        if(this.checkPluiRequestForm()) {
+            this.props.savePluiRequest(this.state.pluiRequest, this.state.attachments);
         }
     }
-};
+}
