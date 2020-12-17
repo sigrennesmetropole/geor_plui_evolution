@@ -12,11 +12,13 @@ jobs:
     steps:
     - name: "Checking out"
       uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
 
     - name: "Setting up Java"
       uses: actions/setup-java@v1
       with:
-        java-version: '8.x'
+        java-version: '11.x'
 
     - name: "Maven repository caching"
       uses: actions/cache@v1
@@ -42,7 +44,7 @@ jobs:
     - name: "Pushing latest to docker.io"
       if: github.ref == 'refs/heads/master'
       run: |
-        docker tag sigrennesmetropole/geor_plui_evolution:${{ steps.version.outputs.VERSION }} georchestra/cadastrapp:latest
+        docker tag sigrennesmetropole/geor_plui_evolution:${{ steps.version.outputs.VERSION }} sigrennesmetropole/geor_plui_evolution:latest
         docker push sigrennesmetropole/geor_plui_evolution:latest
 
     - name: "Pushing release tag to docker.io"
