@@ -19,7 +19,7 @@ import {
 import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
-import LocaleUtils from '@mapstore/utils/LocaleUtils';
+import {getMessageById} from '@mapstore/utils/LocaleUtils';
 import {status} from '../actions/plui-evolution-action';
 import {GeometryType, PluiRequestType, MAX_NB_CHARACTERS_PLUI_OBJECT} from '../constants/plui-evolution-constants';
 import {CSS} from './plui-evolution-css';
@@ -465,7 +465,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
                     </InputGroup.Addon>
                     <FormControl type="text"
                                  value={this.state.pluiRequest.subject}
-                                 placeholder={LocaleUtils.getMessageById(this.context.messages, "pluievolution.subject.placeholder")}
+                                 placeholder={getMessageById(this.context.messages, "pluievolution.subject.placeholder")}
                                  onChange={this.handleSubjectChange}
                                  maxLength={30}
                                  readOnly={this.props.readOnly}
@@ -487,7 +487,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                  bsSize="small"
                                  rows={4}
                                  value={this.state.pluiRequest.object}
-                                 placeholder={LocaleUtils.getMessageById(this.context.messages, "pluievolution.object.placeholder")}
+                                 placeholder={getMessageById(this.context.messages, "pluievolution.object.placeholder")}
                                  onChange={this.handleObjectChange}
                                  maxLength={300}
                                  readOnly={this.props.readOnly}
