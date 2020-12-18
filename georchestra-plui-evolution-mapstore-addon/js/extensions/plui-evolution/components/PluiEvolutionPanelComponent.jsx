@@ -25,8 +25,14 @@ import MapInfoUtils from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PluiEvolutionRequestViewer, PLUI_EVOLUTION_REQUEST_VIEWER} from './PluiEvolutionRequestViewer';
 import {openPanel, status} from '../actions/plui-evolution-action';
-import {GeometryType, PluiRequestType, MAX_NB_CHARACTERS_PLUI_OBJECT} from '../constants/plui-evolution-constants';
+import {
+    GeometryType,
+    PluiRequestType,
+    MAX_NB_CHARACTERS_PLUI_OBJECT,
+    ORGANIZATION_RENNES_METROPOLE
+} from '../constants/plui-evolution-constants';
 import {CSS} from './plui-evolution-css';
+
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -51,7 +57,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         width: PropTypes.number,
         // data
         attachmentConfiguration: PropTypes.object,
-        contextLayers: PropTypes.array,
+        geographicEtablissements: PropTypes.array,
         contextThemas: PropTypes.array,
         user: PropTypes.object,
         currentLayer: PropTypes.object,
@@ -116,6 +122,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         // data
         attachmentConfiguration: null,
         user: null,
+        geographicEtablissements: null,
         attachments: null,
         pluiRequest: null,
         // misc
@@ -175,7 +182,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         console.log("pluie didUpdate...");
         // Tout est-il initialisé ?
-        this.state.initialized = this.props.attachmentConfiguration !== null && this.props.user !== null;
+        this.state.initialized = this.props.attachmentConfiguration !== null && this.props.user !== null && this.loadGeographicEtablissement(this.props.user);
         if (this.props.status === status.LOAD_REQUEST) {
             this.state.initialized &= this.props.pluiRequest != null && this.props.attachments != null;
         }
@@ -191,6 +198,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 object: "",
                 subject: "",
                 type: "",
+                codeInsee: "",
                 localisation: ""
             };
             this.state.attachments = [];
@@ -369,6 +377,19 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 </fieldset>
             </div>
         );
+    }
+
+    loadGeographicEtablissement(user) {
+        if (this.isAgentRmUser(user)) {
+            return !!this.props.geographicEtablissements;
+        }
+        else {
+            return true;
+        }
+    }
+
+    isAgentRmUser(user) {
+        return user.organization === ORGANIZATION_RENNES_METROPOLE;
     }
 
     renderPluiManual() {
@@ -662,41 +683,48 @@ export class PluiEvolutionPanelComponent extends React.Component {
                             <ControlLabel>
                                 <Message msgId="pluievolution.localisation.title"/>
                             </ControlLabel>
-                            <div className="radio-block">
-                                <Radio name="radioGroup"
-                                       checked={this.state.pluiRequest.type === PluiRequestType.COMMUNE}
-                                       onChange={() => this.setPluiRequestType(PluiRequestType.COMMUNE)}>
-                                    <Message msgId="pluievolution.localisation.graphique"/>
-                                </Radio>
-                                {this.renderGeometryDrawButton()}
+                            <div className="radio-form">
+                                <div className="radio-block">
+                                    <Radio name="radioGroup"
+                                           checked={this.state.pluiRequest.type === PluiRequestType.COMMUNE}
+                                           onChange={() => this.setPluiRequestType(PluiRequestType.COMMUNE)}>
+                                        <Message msgId="pluievolution.localisation.graphique"/>
+                                    </Radio>
+                                    {this.renderGeometryDrawButton()}
+                                </div>
                             </div>
-                            <div className="radio-block">
-                                <Radio name="radioGroup"
-                                       checked={this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE}
-                                       onChange={() => this.setPluiRequestType(PluiRequestType.INTERCOMMUNE)}>
-                                    <Message msgId="pluievolution.localisation.commune"/>
-                                </Radio>
-                                <Button
-                                    disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
-                                    bsSize="small"
-                                    bsStyle="primary"
-                                    onClick={this.drawTypeIntercommune}>
-                                    <Message msgId="pluievolution.clickHere"/>
-                                </Button>
+                            <div className="radio-form">
+                                <div className="radio-block">
+                                    <Radio name="radioGroup"
+                                           checked={this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE}
+                                           onChange={() => this.setPluiRequestType(PluiRequestType.INTERCOMMUNE)}>
+                                        <Message msgId="pluievolution.localisation.commune"/>
+                                    </Radio>
+                                    <Button
+                                        disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
+                                        bsSize="small"
+                                        bsStyle="primary"
+                                        onClick={() => this.drawTypeIntercommune(this.state.etablissementSelected)}>
+                                        <Message msgId="pluievolution.clickHere"/>
+                                    </Button>
+                                </div>
+                                {this.renderGeographicEtablissements()}
                             </div>
-                            <div className="radio-block">
-                                <Radio name="radioGroup"
-                                       checked={this.state.pluiRequest.type === PluiRequestType.METROPOLITAIN}
-                                       onChange={() => this.setPluiRequestType(PluiRequestType.METROPOLITAIN)}>
-                                    <Message msgId="pluievolution.localisation.metropolitain"/>
-                                </Radio>
-                                <Button
-                                    disabled={this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
-                                    bsSize="small"
-                                    bsStyle="primary"
-                                    onClick={this.drawTypeMetropolitain}>
-                                    <Message msgId="pluievolution.clickHere"/>
-                                </Button>
+                            <div className="radio-form">
+                                <div className="radio-block">
+                                    <Radio name="radioGroup"
+                                           checked={this.state.pluiRequest.type === PluiRequestType.METROPOLITAIN}
+                                           onChange={() => this.setPluiRequestType(PluiRequestType.METROPOLITAIN)}>
+                                        <Message msgId="pluievolution.localisation.metropolitain"/>
+                                    </Radio>
+                                    <Button
+                                        disabled={this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
+                                        bsSize="small"
+                                        bsStyle="primary"
+                                        onClick={this.drawTypeMetropolitain}>
+                                        <Message msgId="pluievolution.clickHere"/>
+                                    </Button>
+                                </div>
                             </div>
                         </FormGroup>
                     </fieldset>
@@ -705,9 +733,29 @@ export class PluiEvolutionPanelComponent extends React.Component {
         }
     }
 
+    renderGeographicEtablissements() {
+        if (this.isAgentRmUser(this.props.user)) {
+            return (
+                <FormGroup className="radio-select" validationState={this.state.errorFields.codeInsee ? "error" : null}>
+                    <FormControl componentClass="select"
+                                 disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
+                                 onChange={this.handleEtablissementChange}>
+                        <option key="0" value="">Sélectionnez une mairie</option>
+                        {
+                            this.props.geographicEtablissements.map((geoEtbl, index) => {
+                                return <option key={geoEtbl.codeInsee} value={index}>{geoEtbl.nom}</option>
+                            })
+                        }
+                    </FormControl>
+                </FormGroup>
+            )
+        }
+    }
+
     setPluiRequestType(pluiRequestType) {
         this.state.pluiRequest.type = pluiRequestType;
         this.setState(this.state);
+        this.disableFormErrors();
         this.props.clearDrawn();
     }
 
@@ -766,12 +814,20 @@ export class PluiEvolutionPanelComponent extends React.Component {
         }
     }
 
-    drawTypeIntercommune = () => {
-        this.props.displayEtablissement(PluiRequestType.INTERCOMMUNE);
+    drawTypeIntercommune(geographicEtablissement) {
+        console.log('actual geographicEtablissement', geographicEtablissement);
+        if (this.isAgentRmUser(this.props.user) && !geographicEtablissement) {
+            this.state.errorFields.codeInsee = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.codeInsee.error");
+        }
+        else {
+            this.props.displayEtablissement(PluiRequestType.INTERCOMMUNE, geographicEtablissement);
+        }
     }
 
     drawTypeMetropolitain = () => {
-        this.props.displayEtablissement(PluiRequestType.METROPOLITAIN);
+        this.props.displayEtablissement(PluiRequestType.METROPOLITAIN, null);
     }
 
     renderFormButton = () => {
@@ -830,6 +886,21 @@ export class PluiEvolutionPanelComponent extends React.Component {
      */
     handleObjectChange = (e) => {
         this.state.pluiRequest.object = e.target.value;
+        this.setState(this.state);
+    }
+
+    handleEtablissementChange = (e) => {
+        console.log('handleEtablissementChange e', e);
+        console.log('handleEtablissementChange e value', e.target.value);
+        if (e.target.value !== 0) {
+            this.state.etablissementSelected = this.props.geographicEtablissements[e.target.value];
+            this.state.pluiRequest.codeInsee = this.state.etablissementSelected.codeInsee;
+        }
+        else {
+            this.state.etablissementSelected = {};
+            this.state.pluiRequest.codeInsee = "";
+        }
+
         this.setState(this.state);
     }
 
@@ -920,6 +991,12 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.state.errorFields.type = true;
             this.setState(this.state);
             this.props.loadActionError("pluievolution.type.error");
+            return false;
+        }
+        if (this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE && this.isAgentRmUser(this.props.user) && !this.state.pluiRequest.codeInsee) {
+            this.state.errorFields.codeInsee = true;
+            this.setState(this.state);
+            this.props.loadActionError("pluievolution.codeInsee.error");
             return false;
         }
         if (!this.state.pluiRequest.localisation || this.state.pluiRequest.localisation.length === 0) {

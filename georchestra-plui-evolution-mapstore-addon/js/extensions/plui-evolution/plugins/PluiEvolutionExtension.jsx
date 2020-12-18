@@ -45,6 +45,7 @@ const Connected = connect((state) => ({
     readOnly: !!isReadOnlySelector(state),
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
     user: pluiEvolutionMeSelector(state),
+    geographicEtablissements: state.pluievolution.geographicEtablissements,
     pluiRequest: state.pluievolution.pluiRequest,
     attachments: state.pluievolution.attachments,
     status: state.pluievolution.status,
