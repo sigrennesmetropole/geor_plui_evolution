@@ -5,13 +5,16 @@ import { saveAs } from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
-import {changeMapInfoState, featureInfoClick, LOAD_FEATURE_INFO, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
+import {changeMapInfoState, featureInfoClick, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
 import { success, error, show } from '@mapstore/actions/notifications';
+import {PLUI_EVOLUTION_REQUEST_VIEWER} from '../components/PluiEvolutionRequestViewer';
 import {
     actions,
     closeRequest,
     initPluiEvolutionDone,
     loadedAttachmentConfiguration,
+    getAllGeographicEtablissement,
+    loadedAllGeographicEtablissement,
     getAttachments,
     gotMe,
     initDrawingSupport,
@@ -20,15 +23,14 @@ import {
     loadingPluiUpdateForm,
     loadPluiForm,
     openingPanel,
-    openPanel,
     pluiRequestSaved,
     setDrawing,
-    setAllPluiRequestDisplay,
     updateAttachments,
     updateLocalisation, status
 } from '../actions/plui-evolution-action';
 import {
     CODE_INSEE_RENNES_METROPOLE,
+    ORGANIZATION_RENNES_METROPOLE,
     FeatureProjection,
     GeometryType,
     PluiRequestType,
@@ -97,6 +99,15 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
 
+export const getAllGeographicEtablissementEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL)
+        .switchMap((action) => {
+            const url = backendURLPrefix + "/geographic/etablissements";
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => Rx.Observable.of(loadedAllGeographicEtablissement(response.data)))
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.geographicEtablissement.error", null, e)));
+        });
+
 export const getAttachmentsEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_GET_ATTACHMENTS)
         .switchMap((action) => {
@@ -153,7 +164,12 @@ export const loadMeEpic = (action$) =>
             }
             const url = backendURLPrefix + "/user/me";
             return Rx.Observable.defer(() => axios.get(url))
-                .switchMap((response) => Rx.Observable.of(gotMe(response.data)))
+                .switchMap((response) => Rx.Observable.from(
+                    [gotMe(response.data)]
+                        .concat(response.data.organization === ORGANIZATION_RENNES_METROPOLE
+                            ? [getAllGeographicEtablissement()]
+                            : [])
+                ))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.me.error", null, e)));
         });
 
@@ -256,9 +272,14 @@ export const displayAllPluiRequest = (action$, store) =>
                         format: "image/png",
                         singleTile: false,
                         url: url,
-                        visibility: true
+                        visibility: true,
+                        featureInfo: {
+                            format: "PROPERTIES",
+                            viewer: {
+                                type: PLUI_EVOLUTION_REQUEST_VIEWER
+                            }
+                        }
                     }),
-                    setAllPluiRequestDisplay(true),
                     selectNode(PLUI_EVOLUTION_LAYER_ID,"layer",false)
                 ]);
             })
@@ -303,15 +324,23 @@ export const displayEtablissement = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
 
+            let requestEtablissement = null;
+
             let url = backendURLPrefix;
-            if (action.pluiRequestType === PluiRequestType.INTERCOMMUNE) {
-                url += "/user/etablissement";
+            if (action.pluiRequestType === PluiRequestType.INTERCOMMUNE && !action.geographicEtablissement) {
+                requestEtablissement = axios.get(url + "/user/etablissement");
             }
-            else if (action.pluiRequestType === PluiRequestType.METROPOLITAIN) {
-                url += "/geographic/etablissements/" + CODE_INSEE_RENNES_METROPOLE;
+            else if (action.pluiRequestType === PluiRequestType.INTERCOMMUNE && action.geographicEtablissement) {
+                requestEtablissement = Promise.resolve({
+                    data: action.geographicEtablissement
+                });
             }
 
-            return Rx.Observable.defer(() => axios.get(url))
+            else if (action.pluiRequestType === PluiRequestType.METROPOLITAIN) {
+                requestEtablissement = axios.get(url + "/geographic/etablissements/" + CODE_INSEE_RENNES_METROPOLE);
+            }
+
+            return Rx.Observable.defer(() => requestEtablissement)
                 .switchMap(response => Rx.Observable.of(response.data))
                 .catch(e => Rx.Observable.throw(e))
                 .switchMap((geographicEtablissement) => {
@@ -444,29 +473,6 @@ export const clickMapEpic = (action$) =>
                 info_format: "application/json"
             };
             return Rx.Observable.of(featureInfoClick(action.point, PLUI_EVOLUTION_LAYER_NAME, [], overrideParams));
-        });
-
-export const loadFeatureInfoEpic = (action$) =>
-    action$.ofType(LOAD_FEATURE_INFO)
-        .filter(action => action.layer && action.layer.id === PLUI_EVOLUTION_LAYER_ID)
-        .switchMap((action) => {
-            if (action.data) {
-                const features = action.data.features;
-                if (features.length === 1) {
-                    const properties = features[0].properties;
-                    console.log('selected point', properties);
-                    return Rx.Observable.from([
-                        getAttachments(properties.uuid),
-                        openPanel(properties),
-                        showMapinfoMarker()
-                    ]);
-                }
-                else if (features.length > 1) {
-                    // TODO: Ouverture panel plusieurs pluiRequest
-                }
-            }
-            // pas de demande request sur la carte sur ce point
-            return Rx.Observable.empty();
         });
 
 const buildAttachmentsRequest = (uuid, attachments) => {

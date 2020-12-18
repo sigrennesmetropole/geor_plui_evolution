@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.georchestra.pluievolution.service.common.constant.CommuneParams.ETABLISSEMENT_RM;
 
 @Service
 public class GeographicEtablissementServiceImpl implements GeographicEtablissementService {
@@ -36,7 +39,11 @@ public class GeographicEtablissementServiceImpl implements GeographicEtablisseme
 
     @Override
     public List<GeographicEtablissement> getAllEtablissement() {
-        return geographicEtablissementMapper.entitiesToDto(geographicEtablissementDao.findAll());
+        List<GeographicEtablissementEntity> geographicAreaEntities = geographicEtablissementDao.findAll()
+                .stream()
+                .filter(geographicEtablissementEntity -> !geographicEtablissementEntity.getNom().equalsIgnoreCase(ETABLISSEMENT_RM))
+                .collect(Collectors.toList());
+        return geographicEtablissementMapper.entitiesToDto(geographicAreaEntities);
     }
 
     @Override

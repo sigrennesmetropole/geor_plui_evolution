@@ -6,7 +6,7 @@
 
 	<groupId>org.georchestra</groupId>
 	<artifactId>georchestra-plui-evolution</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>georchestra-plui-evolution</name>
@@ -25,7 +25,7 @@
 		<module>georchestra-plui-evolution-api</module>
 		<module>georchestra-plui-evolution-service</module>
 		<module>georchestra-plui-evolution-core</module>
-		<module>georchestra-plui-evolution-mapstore-addon</module>
+		<!--<module>georchestra-plui-evolution-mapstore-addon</module>-->
 	</modules>
 
 	<!-- Propriétés du projet -->

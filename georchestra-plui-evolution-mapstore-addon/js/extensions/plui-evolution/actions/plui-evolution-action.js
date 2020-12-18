@@ -5,11 +5,12 @@ export const actions = {
 	PLUI_EVOLUTION_INIT_DONE: 'PLUI_EVOLUTION:INIT_DONE',
 	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOAD',
 	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOADED',
+	PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL: 'PLUI_EVOLUTION:GEOGRAPHIC_ETABLISSEMENT:GET_ALL',
+	PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_ALL_LOADED: 'PLUI_EVOLUTION:GEOGRAPHIC_ETABLISSEMENT:ALL_LOADED',
 	PLUI_EVOLUTION_USER_ME_GET: 'PLUI_EVOLUTION:USER:GET',
 	PLUI_EVOLUTION_USER_ME_GOT: 'PLUI_EVOLUTION:USER:GOT',
 	PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT: 'PLUI_EVOLUTION:ETABLISSEMENT:GET',
 	PLUI_EVOLUTION_DISPLAY_ALL: 'PLUI_EVOLUTION:ALL:DISPLAY',
-	PLUI_EVOLUTION_ALL_DISPLAYED: 'PLUI_EVOLUTION:ALL:DISPLAYED',
 	PLUI_EVOLUTION_OPENING_PANEL: 'PLUI_EVOLUTION:PANEL:OPENING',
 	PLUI_EVOLUTION_OPEN_PANEL: 'PLUI_EVOLUTION:PANEL:OPEN',
 	PLUI_EVOLUTION_CLOSE_PANEL: 'PLUI_EVOLUTION:PANEL:CLOSE',
@@ -75,6 +76,19 @@ export function loadedAttachmentConfiguration(attachmentConfiguration) {
 	return {
 		type: actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED,
 		attachmentConfiguration: attachmentConfiguration
+	};
+}
+
+export function getAllGeographicEtablissement() {
+	return {
+		type: actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL
+	};
+}
+
+export function loadedAllGeographicEtablissement(geographicEtablissements) {
+	return {
+		type: actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_ALL_LOADED,
+		geographicEtablissements: geographicEtablissements
 	};
 }
 
@@ -249,23 +263,17 @@ export function updateLocalisation(localisation) {
 	};
 }
 
-export function displayEtablissement(pluiRequestType) {
+export function displayEtablissement(pluiRequestType, geographicEtablissement) {
 	return {
 		type: actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT,
-		pluiRequestType: pluiRequestType
+		pluiRequestType: pluiRequestType,
+		geographicEtablissement: geographicEtablissement
 	};
 }
 
 export function displayAllPluiRequest() {
 	return {
 		type: actions.PLUI_EVOLUTION_DISPLAY_ALL
-	};
-}
-
-export function setAllPluiRequestDisplay(allPluiRequestLoaded) {
-	return {
-		type: actions.PLUI_EVOLUTION_ALL_DISPLAYED,
-		allPluiRequestLoaded: allPluiRequestLoaded
 	};
 }
 

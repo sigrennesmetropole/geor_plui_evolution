@@ -16,17 +16,26 @@ export const CSS = [
         margin: 20px 0; \
     }",
 
-    ".plui-evolution-panel .radio-block { \
-        display: flex; \
-        margin-bottom: 5px; \
+    ".plui-evolution-panel .radio-form { \
         border: 1px solid #d9d9d9; \
         border-radius: 8px; \
+        margin: 5px 0; \
         padding-left: 10px; \
     }",
 
-    ".plui-evolution-panel .radio-block button { \
+    ".plui-evolution-panel .radio-form .radio-block { \
+        display: flex; \
+        margin: 5px; \
+    }",
+
+    ".plui-evolution-panel .radio-form .radio-block button { \
         margin-left: auto; \
         width: 16%; \
+    }",
+
+    ".plui-evolution-panel .radio-form .radio-select { \
+        width: 80%; \
+        margin: 5px; \
     }",
 
     ".plui-evolution-panel .input-group { \
@@ -96,5 +105,34 @@ export const CSS = [
 
     ".plui-evolution-panel fieldset { \
         margin: 0 25px 0 30px; \
-    }"
+    }",
+
+    ".plui-evolution-request-viewer fieldset { \
+       margin: 16px 0; \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation { \
+        display: flex; \
+        justify-content: space-between; \
+        margin-bottom: 18px \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation button { \
+        height: 50px; \
+        width: 50px; \
+    }",
+
+    ".plui-evolution-request-viewer .button-navigation button .glyphicon { \
+        font-size: 26px; \
+    }",
+
+    ".plui-evolution-request-viewer .block-valid-form { \
+        display: flex; \
+        justify-content: center; \
+        margin: 12px 0; \
+    }",
+
+    ".plui-evolution-request-viewer .block-valid-form .validation-button { \
+        margin-left: 15px; \
+    }",
 ];
