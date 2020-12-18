@@ -250,7 +250,7 @@
 								<imageTag>latest</imageTag>
 							</imageTags>
 							<!-- chemin relatif depuis le target du présent projet -->
-							<dockerDirectory>${project.basedir}/../docker/plui-evolution-backend</dockerDirectory>
+							<dockerDirectory>${project.basedir}/../docker/plui-evolution</dockerDirectory>
 
 							<!-- copy the service's jar file from target into the root directory 
 								of the image -->
