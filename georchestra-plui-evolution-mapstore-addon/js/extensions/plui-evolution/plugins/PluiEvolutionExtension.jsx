@@ -46,7 +46,6 @@ const Connected = connect((state) => ({
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
     user: pluiEvolutionMeSelector(state),
     pluiRequest: state.pluievolution.pluiRequest,
-    allPluiRequestLoaded: state.pluievolution.allPluiRequestLoaded,
     attachments: state.pluievolution.attachments,
     status: state.pluievolution.status,
     drawing: state.pluievolution.drawing,
