@@ -22,8 +22,8 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_USER_ME_GOT: {
             return assign({}, state, {user: action.user});
         }
-        case actions.PLUI_EVOLUTION_ALL_DISPLAYED: {
-            return assign({}, state, {allPluiRequestLoaded: action.allPluiRequestLoaded});
+        case actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_ALL_LOADED: {
+            return assign({}, state, {geographicEtablissements: action.geographicEtablissements});
         }
         case actions.PLUI_EVOLUTION_PLUIREQUEST_SAVED: {
             return assign({}, state, {pluiRequest: action.pluiRequest});

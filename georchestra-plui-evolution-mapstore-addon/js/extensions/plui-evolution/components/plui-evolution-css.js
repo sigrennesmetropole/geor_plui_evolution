@@ -16,17 +16,26 @@ export const CSS = [
         margin: 20px 0; \
     }",
 
-    ".plui-evolution-panel .radio-block { \
-        display: flex; \
-        margin-bottom: 5px; \
+    ".plui-evolution-panel .radio-form { \
         border: 1px solid #d9d9d9; \
         border-radius: 8px; \
+        margin: 5px 0; \
         padding-left: 10px; \
     }",
 
-    ".plui-evolution-panel .radio-block button { \
+    ".plui-evolution-panel .radio-form .radio-block { \
+        display: flex; \
+        margin: 5px; \
+    }",
+
+    ".plui-evolution-panel .radio-form .radio-block button { \
         margin-left: auto; \
         width: 16%; \
+    }",
+
+    ".plui-evolution-panel .radio-form .radio-select { \
+        width: 80%; \
+        margin: 5px; \
     }",
 
     ".plui-evolution-panel .input-group { \

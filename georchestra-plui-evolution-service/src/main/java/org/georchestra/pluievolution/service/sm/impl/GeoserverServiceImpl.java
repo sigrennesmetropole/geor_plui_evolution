@@ -39,6 +39,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
+
 @Service
 public class GeoserverServiceImpl implements GeoserverService {
 
@@ -113,7 +115,8 @@ public class GeoserverServiceImpl implements GeoserverService {
             // Concatenation de l'URL geoserver avec les paramètres deja présent dans le requete original
             String wfsUrl = geoserverUrl + "/" + geoserverWorkspace +  "/wfs?" + URLDecoder.decode(queryString, StandardCharsets.UTF_8.displayName());
 
-            if (area != null) {
+            // Filtre si l'utilisateur n'est pas un agent RM
+            if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
                 // filtre sur le code insee
                 wfsContent = addFilterToWFSContent(wfsContent, area.getCodeInsee());
             }
@@ -150,8 +153,8 @@ public class GeoserverServiceImpl implements GeoserverService {
     private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType) throws UnsupportedEncodingException {
         // Concatenation de l'URL geoserver avec les paramètres deja présent dans le requete original
         String urlGet = baseUrl + "?" + URLDecoder.decode(queryString, StandardCharsets.UTF_8.displayName());
-        // filtre sur le code insee
-        if (area != null) {
+        // Filtre sur le code insee si l'utilisateur n'est pas un agent RM
+        if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
             urlGet += String.format("&cql_filter=%s=%s", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
         }
 

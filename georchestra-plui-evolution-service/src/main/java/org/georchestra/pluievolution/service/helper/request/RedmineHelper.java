@@ -17,6 +17,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.List;
 
+import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
+import static org.georchestra.pluievolution.service.common.constant.CommuneParams.FICTIVE_INTERCO_AREA_NAME;
+import static org.georchestra.pluievolution.service.common.constant.RedmineParams.CUSTOM_COLUMN_INITIATEUR;
+
 
 @Component
 public class RedmineHelper {
@@ -26,11 +30,6 @@ public class RedmineHelper {
 
     @Value("${redmine.api.access.key}")
     private String apiAccessKey;
-
-
-    private static final String CUSTOM_COLUMN_INITIATEUR = "initiateur";
-    private static final String FICTIVE_INTERCO_AREA_NAME = "Interco";
-    private static final String CODE_INSEE_RM = "243500139";
 
     @Autowired
     AuthentificationHelper authentificationHelper;
