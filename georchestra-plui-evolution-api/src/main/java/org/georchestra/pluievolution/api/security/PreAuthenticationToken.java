@@ -3,16 +3,14 @@
  */
 package org.georchestra.pluievolution.api.security;
 
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * An authentication that is obtained by reading the credentials from the
@@ -33,13 +31,12 @@ public class PreAuthenticationToken extends AbstractAuthenticationToken {
 	 * @param username
 	 * @param roles
 	 */
-	public PreAuthenticationToken(String username, Set<String> roles) {
+	public PreAuthenticationToken(String username, Object userDetail, Set<String> roles) {
 		super(createGrantedAuthorities(roles));
 		this.principal = username;
 
 		setAuthenticated(true);
-		UserDetails details = new User(username, "", true, true, true, true, super.getAuthorities());
-		setDetails(details);
+		setDetails(userDetail);
 
 	}
 

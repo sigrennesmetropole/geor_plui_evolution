@@ -25,6 +25,14 @@
 		{
 			"name": "request",
 			"description": "Services de gestion des demandes"
+		},
+		{
+			"name": "geographic",
+			"description": "Service de recuperation des geographics"
+		},
+		{
+			"name": "carto",
+			"description": "Service de gestion des requetes cartographiques"
 		}
 	],
 	"schemes": [
@@ -105,10 +113,38 @@
 				}
 			}
 		},
+		"/user/etablissement":{
+			"get": {
+				"tags": [
+					"user"
+				],
+				"summary": "Récupération de l'établissement auquel est asocié le user courant",
+				"operationId": "getCurrentUserEtablissement",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
 		"/attachment/configuration": {
 			"get": {
 				"tags": [
-					"administration"
+					"attachment"
 				],
 				"summary": "Lister la configuration liées aux pièces jointes",
 				"description": "Lister la configuration liées aux pièces jointes",
@@ -122,6 +158,46 @@
 						"description": "OK",
 						"schema": {
 							"$ref": "#/definitions/AttachmentConfiguration"
+						}
+					},
+					"400": {
+						"description": "bad input parameter"
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/attachment/{idAttachment}/download": {
+			"get": {
+				"tags": [
+					"attachment"
+				],
+				"summary": "Téléchargement d'une pièce jointe redmimne",
+				"description": "Téléchargement d'une pièce jointe redmimne",
+				"operationId": "downLoadAttachment",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "idAttachment",
+						"description": "Identifiant du fichier dans redmine",
+						"required": true,
+						"type": "integer",
+						"format": "int64"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
 						}
 					},
 					"400": {
@@ -187,14 +263,14 @@
 				}
 			}
 		},
-		"/request/{uuid}/delete/{attachmentId}": {
-			"delete": {
+		"/request/{uuid}/attachments": {
+			"get": {
 				"tags": [
 					"request"
 				],
-				"summary": "Suppression d'un pièce jointe sur une demande",
+				"summary": "Récupération de la liste des pièces jointes d'une demande",
 				"description": "",
-				"operationId": "deleteDocument",
+				"operationId": "getAttachementsByPluiRequestUuid",
 				"produces": [
 					"application/json"
 				],
@@ -206,19 +282,17 @@
 						"required": true,
 						"type": "string",
 						"format": "uuid"
-					},
-					{
-						"in": "path",
-						"name": "attachmentId",
-						"description": "Identifiant de l'attachement",
-						"required": true,
-						"type": "integer",
-						"format": "int64"
 					}
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Attachment"
+							}
+						}
 					},
 					"400": {
 						"description": "bad input parameter"
@@ -232,14 +306,88 @@
 				}
 			}
 		},
-		"/request/{uuid}/download/{attachmentId}": {
-			"get": {
+		"/request": {
+			"post": {
+				"summary": "Création d'une nouvelle demande",
 				"tags": [
 					"request"
 				],
-				"summary": "Téléchargement d'un pièce attachée à une demande",
-				"description": "",
-				"operationId": "downloadDocument",
+				"description": "Permet de créer une nouvelle demande",
+				"operationId": "createPluiRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "pluiRequest",
+						"description": "Demande à créer",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Demande créée",
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			},
+			"put": {
+				"summary": "Maj d'une demande",
+				"tags": [
+					"request"
+				],
+				"description": "Permet de mettre à jour une demande",
+				"operationId": "updatePluiRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "pluiRequest",
+						"description": "Demande à metre à jour",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Demande mise à jour",
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/request/{uuid}": {
+			"get": {
+				"summary": "Récupération d'une demande spécifique en fonction de son uuid",
+				"tags": [
+					"request"
+				],
+				"description": "Permet d'obtenir une demande à partir de son uuid",
+				"operationId": "getPluiRequestByUuid",
 				"produces": [
 					"application/json"
 				],
@@ -247,29 +395,241 @@
 					{
 						"in": "path",
 						"name": "uuid",
-						"description": "Identifiant de la demande",
+						"description": "Uuid de la demande",
 						"required": true,
 						"type": "string",
 						"format": "uuid"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Demande trouvée",
+						"schema": {
+							"$ref": "#/definitions/PluiRequest"
+						}
 					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			},
+			"delete": {
+				"summary": "Suppression d'une demande",
+				"tags": [
+					"request"
+				],
+				"description": "Permet de supprimer une demande à partir de son uuid",
+				"operationId": "deletePluiRequest",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
 					{
 						"in": "path",
-						"name": "attachmentId",
-						"description": "Identifiant de l'attachement",
+						"name": "uuid",
+						"description": "Uuid de la demande à supprimer",
 						"required": true,
-						"type": "integer",
-						"format": "int64"
+						"type": "string",
+						"format": "uuid"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				}
+			}
+		},
+		"/carto/wmsRequest": {
+			"get": {
+				"summary": "Requete WMS",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
+				"operationId": "getWms",
+				"produces": [
+					"image/png"
+				],
+				"responses": {
+					"200": {
+						"description": "Reponse du geoserver"
+					}
+				}
+			}
+		},
+		"/carto/wfsRequest": {
+			"get": {
+				"summary": "Requete WFS get (essentiellement pour la description des features)",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WFS de récupération des informations sur le service",
+				"operationId": "getWfs",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Reponse du geoserver",
+						"schema": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"post": {
+				"summary": "Requete WFS post (notamment pour les features)",
+				"tags": [
+					"carto"
+				],
+				"description": "Requete WFS de recuperation d'un claque",
+				"operationId": "postWfs",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "body",
+						"name": "wfsContent",
+						"description": "Contenu WFS au format XML",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
 					}
 				],
 				"responses": {
 					"200": {
 						"description": "OK",
 						"schema": {
-							"type": "file"
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/etablissements": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestEtablissements",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des mairies de communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicEtablissement"
+							}
 						}
 					},
-					"400": {
-						"description": "bad input parameter"
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+				"operationId": "getAllPluiRequestAreas",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "Liste des emprises de communes + ville + metropole",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/GeographicArea"
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/areas/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Emprises d'une communes ou ville où métropole à partir de son code Insee",
+				"operationId": "getPluiRequestAreaByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee de la geographique area",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Emprises de commune | ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicArea"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
+		"/geographic/etablissements/{codeInsee}": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Hotel de ville d'une commune (ou Rennes Metropole) par son code insee",
+				"operationId": "getPluiRequestEtablissementByCodeInsee",
+				"produces": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "codeInsee",
+						"description": "Code insee du geographique etablissement",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Hotel de ville | metropole",
+						"schema": {
+							"$ref": "#/definitions/GeographicEtablissement"
+						}
 					},
 					"500": {
 						"description": "Internal server error",
@@ -387,10 +747,10 @@
 		"Point2D":{
 			"type": "array",
 			"maxItems": 2,
-    		"minItems": 2,
-    		"items":{
-    			"type": "number"
-    		}
+			"minItems": 2,
+			"items":{
+				"type": "number"
+			}
 		},
 		"Point": {
 			"type": "object",
@@ -510,7 +870,7 @@
 			]
 		},
 		"GeometryCollection":{
-    		"type": "object",
+			"type": "object",
 			"description": "GeoJSon geometry collection",
 			"properties": {
 				"type": {
@@ -524,9 +884,9 @@
 					}
 				}
 			}
-    	},
-    	"Style": {
-    		"type": "object",
+		},
+		"Style": {
+			"type": "object",
 			"description": "GeoJSon feature style",
 			"properties": {
 				"color": {
@@ -580,9 +940,9 @@
 					"type": "boolean"
 				}
 			}
-    	},
-    	"Feature":{
-    		"type": "object",
+		},
+		"Feature":{
+			"type": "object",
 			"description": "GeoJSon feature",
 			"properties": {
 				"type": {
@@ -606,9 +966,9 @@
 					"type": "object"
 				}
 			}
-    	},
-    	"FeatureCollection":{
-    		"type": "object",
+		},
+		"FeatureCollection":{
+			"type": "object",
 			"description": "GeoJSon feature collection",
 			"properties": {
 				"type": {
@@ -628,68 +988,179 @@
 					}
 				}
 			}
-    	},
-    	"FeatureProperty":{
-    		"type": "object",
-    		"description": "GeoJSon feature property description",
-    		"properties": {
-    			"name":{
-    				"type": "string"
-    			},
-    			"maxOccurs": {
-    				"type": "integer",
-    				"format": "int32"
-    			},
-    			"minOccurs": {
-    				"type": "integer",
-    				"format": "int32"
-    			},
-    			"nillable": {
-    				"type": "boolean"
-    			},
-    			"type": {
-    				"type": "string"
-    			},
-    			"localType": {
-    				"type": "string"
-    			}
-    		}
-    	},
-    	"FeatureType": {
-    		"type": "object",
-    		"description": "GeoJSon feature type",
-    		"properties": {
-    			"typeName":{
-    				"type": "string"
-    			},
-    			"properties":{
-    				"type": "array",
-    				"items": {
-    					"$ref": "#/definitions/FeatureProperty"
-    				}
-    			}
-    		}
-    	},
-    	"FeatureTypeDescription": {	
-    		"type": "object",
-    		"description": "GeoJSon feature type description",
-    		"properties": {
-    			"elementFormDefault":{
-    				"type": "string"
-    			},
-    			"targetNamespace": {
-    				"type": "string"
-    			},
-    			"targetPrefix": {
-    				"type": "string"
-    			},
+		},
+		"FeatureProperty":{
+			"type": "object",
+			"description": "GeoJSon feature property description",
+			"properties": {
+				"name":{
+					"type": "string"
+				},
+				"maxOccurs": {
+					"type": "integer",
+					"format": "int32"
+				},
+				"minOccurs": {
+					"type": "integer",
+					"format": "int32"
+				},
+				"nillable": {
+					"type": "boolean"
+				},
+				"type": {
+					"type": "string"
+				},
+				"localType": {
+					"type": "string"
+				}
+			}
+		},
+		"FeatureType": {
+			"type": "object",
+			"description": "GeoJSon feature type",
+			"properties": {
+				"typeName":{
+					"type": "string"
+				},
+				"properties":{
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/FeatureProperty"
+					}
+				}
+			}
+		},
+		"FeatureTypeDescription": {
+			"type": "object",
+			"description": "GeoJSon feature type description",
+			"properties": {
+				"elementFormDefault":{
+					"type": "string"
+				},
+				"targetNamespace": {
+					"type": "string"
+				},
+				"targetPrefix": {
+					"type": "string"
+				},
 				"featureTypes": {
 					"type": "array",
 					"items": {
-    					"$ref": "#/definitions/FeatureType"
-    				}
+						"$ref": "#/definitions/FeatureType"
+					}
 				}
-    		}
-    	}
+			}
+		},
+		"PluiRequest": {
+			"type": "object",
+			"description": "Il s'agit de la representation d'une demande",
+			"properties": {
+				"uuid": {
+					"type": "string",
+					"format": "uuid"
+				},
+				"subject": {
+					"type": "string"
+				},
+				"object": {
+					"type": "string"
+				},
+				"comment": {
+					"type": "string"
+				},
+				"initiator": {
+					"type": "string"
+				},
+				"creationDate": {
+					"type": "string",
+					"format": "date"
+				},
+				"localisation": {
+					"description": "Il s'agit de la localisation de la demande qui est un point",
+					"$ref": "#/definitions/Point"
+				},
+				"status": {
+					"description": "Statut de la demande",
+					"$ref": "#/definitions/PluiRequestStatus"
+				},
+				"type": {
+					"description": "Type de demande",
+					"$ref": "#/definitions/PluiRequestType"
+				},
+				"codeInsee": {
+					"type": "string"
+				}
+			}
+		},
+		"Geographic": {
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "integer",
+					"format": "int64"
+				},
+				"nom": {
+					"type": "string"
+				},
+				"codeInsee": {
+					"type": "string"
+				}
+			}
+		},
+		"GeographicEtablissement": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Point"
+						}
+					}
+				}
+			]
+		},
+		"GeographicArea": {
+			"type": "object",
+			"allOf": [
+				{
+					"$ref": "#/definitions/Geographic"
+				},
+				{
+					"type": "object",
+					"properties": {
+						"localisation": {
+							"$ref": "#/definitions/Polygon"
+						},
+						"identifiantRedmine": {
+							"type": "string"
+						}
+					}
+				}
+			]
+		},
+		"PluiRequestStatus": {
+			"type": "string",
+			"enum": [
+				"STATUT_NOUVEAU",
+				"STATUT_ANALYSE_EN_COURS",
+				"STATUT_PRODUCTION_EN_COURS",
+				"STATUT_EN_ATTENTE_VALIDATION_COMMUNE",
+				"STATUT_VALIDE_COMMUNE",
+				"STATUT_DEMANDE_NON_RECEVABLE",
+				"STATUT_DEMANDE_REFORMULEE"
+			]
+		},
+		"PluiRequestType": {
+			"type": "string",
+			"enum": [
+				"TYPE_COMMUNE",
+				"TYPE_INTERCOMMUNE",
+				"TYPE_METROPOLITAIN"
+			]
+		}
 	}
 }
