@@ -127,7 +127,6 @@
 			<properties>
 				<npmicommand>ci</npmicommand>
 				<npmcommand>build-prod</npmcommand>
-				<backurl>gaspar</backurl>
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
 		</profile>
