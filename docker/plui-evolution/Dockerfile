@@ -1,4 +1,4 @@
-FROM jetty:9.3-jre8
+FROM jetty:11.0.0-jre11
 MAINTAINER tbrule@open-groupe.com
 ENV TZ=Europe/Paris
 
