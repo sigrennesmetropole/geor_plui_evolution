@@ -1,4 +1,4 @@
-FROM jetty:9.3-jre8
+FROM jetty:9.4.31-jdk11
 USER root
 MAINTAINER fni18300@open-groupe.com
 ENV TZ=Europe/Paris
