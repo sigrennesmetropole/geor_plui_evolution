@@ -106,8 +106,8 @@ pluievolutionapi:deploy:
     refs:
       - open/develop
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip $CI_PROJECT_DIR/ansible/dockerize/files/plui-evolution.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
@@ -125,8 +125,8 @@ pluievolutionapi:deploy:master:
     refs:
       - open/master
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/plui-evolution.zip $CI_PROJECT_DIR/ansible/dockerize/files/plui-evolution.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
