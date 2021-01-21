@@ -1,47 +1,46 @@
+// this file contains configurations for dev proxy
+
 const DEV_PROTOCOL = "http";
 const DEV_HOST = "localhost:8080";
+
 module.exports = {
-    "/rest": {
-        target: `${DEV_PROTOCOL}://${DEV_HOST}/mapstore`,
+    '/rest': {
+        target: "https://dev.mapstore.geo-solutions.it/mapstore",
         secure: false,
         headers: {
-            host: `${DEV_HOST}`
+            host: "dev.mapstore.geo-solutions.it"
         }
     },
-    "/pdf": {
-        target: `${DEV_PROTOCOL}://${DEV_HOST}/mapstore`,
+    '/pdf': {
+        target: "https://dev.mapstore.geo-solutions.it/mapstore",
         secure: false,
         headers: {
-            host: `${DEV_HOST}`
+            host: "dev.mapstore.geo-solutions.it"
         }
     },
-    "/mapstore/pdf": {
-        target: `${DEV_PROTOCOL}://${DEV_HOST}`,
+    '/mapstore/pdf': {
+        target: "https://dev.mapstore.geo-solutions.it",
         secure: false,
         headers: {
-            host: `${DEV_HOST}`
+            host: "dev.mapstore.geo-solutions.it"
         }
     },
-    "/proxy": {
-        // proxy of GeOrchestra is already configured
-        target: `${DEV_PROTOCOL}://${DEV_HOST}/mapstore`,
+    '/proxy': {
+        target: "http://localhost:8082/",
         secure: false,
         headers: {
-            host: `${DEV_HOST}`
+            host: "dev.mapstore.geo-solutions.it"
         }
     },
-    "/geonetwork": {
-        target: `${DEV_PROTOCOL}://${DEV_HOST}/geonetwork`,
-        secure: false,
-        headers: {
-            host: `${DEV_HOST}`
-        }
+    '/docs': {
+        target: "http://localhost:8081",
+        pathRewrite: {'/docs': '/mapstore/docs'}
     },
-    "/header": {
-        target: `${DEV_PROTOCOL}://${DEV_HOST}`,
-        secure: false,
+    '/pluievolution': {
+        target: "http://localhost:8082",
+        pathRewrite: {'/pluievolution': '/'},
         headers: {
-            host: `${DEV_HOST}`
-        }
+            host: "localhost"
+        }   
     }
-}
+};

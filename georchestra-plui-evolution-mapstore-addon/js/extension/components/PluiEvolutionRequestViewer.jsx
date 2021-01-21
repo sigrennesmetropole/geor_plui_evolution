@@ -2,7 +2,6 @@ import React from 'react';
 import {PropTypes} from 'prop-types';
 import {Button, Col, ControlLabel, Form, FormControl, FormGroup, Glyphicon} from "react-bootstrap";
 import Message from '@mapstore/components/I18N/Message';
-import {CSS} from './plui-evolution-css';
 
 export const PLUI_EVOLUTION_REQUEST_VIEWER = "PluiEvolutionRequestViewer";
 
@@ -31,14 +30,7 @@ export class PluiEvolutionRequestViewer extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        if( this.state.cssInitialized === false ) {
-            var script = document.createElement('style');
-            script.innerHTML = CSS.join("\n");
-            var head = document.getElementsByTagName('head')[0];
-            head.appendChild(script);
-            this.state.cssInitialized = true;
-            console.log("pluie css loaded");
-        }
+        
     }
 
     render() {

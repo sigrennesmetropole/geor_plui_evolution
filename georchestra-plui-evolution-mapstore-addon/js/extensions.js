@@ -7,10 +7,9 @@
  */
 
 import { createPlugin } from "@mapstore/utils/PluginsUtils";
+import Extension from './extension/plugins/PluiEvolutionExtension';
+import { name } from '../config';
 
 export default {
-    pluievolution: createPlugin('pluievolution', {
-        lazy: true,
-        loader: () => import(/* webpackChunkName: "extensions/plui-evolution" */`./extensions/plui-evolution/plugins/PluiEvolutionExtension`)
-    })
+    [name]: createPlugin(name, Extension)
 };
