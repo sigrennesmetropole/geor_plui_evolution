@@ -4,6 +4,7 @@ import {connect} from 'react-redux';
 import {createControlEnabledSelector} from '@mapstore/selectors/controls';
 import Message from '@mapstore/components/I18N/Message';
 import {injectIntl} from 'react-intl';
+import { name } from '../../../config';
 import {PluiEvolutionPanelComponent} from '../components/PluiEvolutionPanelComponent';
 import * as epics from '../epics/plui-evolution-epic';
 import pluiEvolutionReducer from '../reducers/plui-evolution-reducer';
@@ -36,10 +37,11 @@ import {
     pluiEvolutionAttachmentConfigurationSelector,
     pluiEvolutionMeSelector,
 } from '../selectors/plui-evolution-selector';
+import '../assets/plui-evolution.css';
 
 const isEnabled = createControlEnabledSelector('pluievolution');
 
-const Connected = connect((state) => ({
+const PluiEvolutionPanelComponentConnected = connect((state) => ({
     active: !!isOpen(state),
     loading: !!isLoadingSelector(state),
     readOnly: !!isReadOnlySelector(state),
@@ -76,8 +78,8 @@ const Connected = connect((state) => ({
 })(PluiEvolutionPanelComponent);
 
 export default {
-    name: "pluievolution",
-    component: injectIntl(Connected),
+    name,
+    component: injectIntl(PluiEvolutionPanelComponentConnected),
     epics,
     reducers: {
         pluievolution: pluiEvolutionReducer

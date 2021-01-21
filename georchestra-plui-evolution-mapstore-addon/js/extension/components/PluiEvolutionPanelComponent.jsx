@@ -21,7 +21,7 @@ import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import {getMessageById} from '@mapstore/utils/LocaleUtils';
-import MapInfoUtils from '@mapstore/utils/MapInfoUtils';
+import { setViewer } from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PluiEvolutionRequestViewer, PLUI_EVOLUTION_REQUEST_VIEWER} from './PluiEvolutionRequestViewer';
 import {openPanel, status} from '../actions/plui-evolution-action';
@@ -31,7 +31,6 @@ import {
     MAX_NB_CHARACTERS_PLUI_OBJECT,
     ORGANIZATION_RENNES_METROPOLE
 } from '../constants/plui-evolution-constants';
-import {CSS} from './plui-evolution-css';
 
 
 export class PluiEvolutionPanelComponent extends React.Component {
@@ -163,18 +162,18 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.props.initPluiEvolution(this.props.backendURL);
         console.log('construct component...');
 
-        const Connected = connect((state) => ({
+        const PluiEvolutionRequestViewerConnected = connect((state) => ({
             // debug
             state : state
         }), {
             openPanel: openPanel,
             closeIdentify: closeIdentify
         })(PluiEvolutionRequestViewer);
-        MapInfoUtils.setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, Connected);
+        setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
     }
 
     componentWillMount() {
-        this.setState({initialized: false, cssInitialized: false, loaded: false});
+        this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
         this.props.getMe();
     }
@@ -219,14 +218,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.props.toggleControl();
         }
 
-        if( this.state.cssInitialized === false ){
-            var script = document.createElement('style');
-            script.innerHTML = CSS.join("\n");
-            var head = document.getElementsByTagName('head')[0];
-            head.appendChild(script);
-            this.state.cssInitialized = true;
-            console.log("pluie css loaded");
-        }
     }
 
     render() {
