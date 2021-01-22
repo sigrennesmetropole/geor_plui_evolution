@@ -37,6 +37,9 @@
 				<configuration>
 					<workingDirectory>${addon.project.location}</workingDirectory>
 					<installDirectory>${addon.project.nodeinstallation}</installDirectory>
+					<environmentVariables>
+						<NODE_OPTIONS>--max-old-space-size=8192</NODE_OPTIONS>
+					</environmentVariables>
 				</configuration>
 				<executions>
 					<!-- It will install nodejs and npm -->
@@ -73,6 +76,9 @@
 				<configuration>
 					<workingDirectory>${addon.project.location}</workingDirectory>
 					<installDirectory>${addon.project.nodeinstallation}</installDirectory>
+					<environmentVariables>
+						<NODE_OPTIONS>--max-old-space-size=8192</NODE_OPTIONS>
+					</environmentVariables>
 				</configuration>
 				<executions>
 
