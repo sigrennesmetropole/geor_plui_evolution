@@ -3,6 +3,7 @@ variables:
   MAVEN_CLI_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=.m2/repository --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
   GIT_SUBMODULE_STRATEGY: recursive
   NODE_OPTIONS: "--max-old-space-size=8192"
+  
 
 # Cache policy - Share target folders between jobs - Note that key is related to a commit and is purged automatically after pipeline execution
 cache:
@@ -13,6 +14,7 @@ cache:
 
 default:
   image: maven:3.6.0-jdk-11
+  
   before_script:
     - apt update && apt install -y gettext-base build-essential
     - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
@@ -26,7 +28,7 @@ stages:
 # Build job with maven plugin execution policies define in parent pom
 pluievolutionapi:build:
   script:
-    - sh ./mvnw $MAVEN_CLI_OPTS -U package
+    - sh ./mvnw $MAVEN_CLI_OPTS -U package -Pprod
   stage: build
   except:
     refs:
@@ -42,7 +44,7 @@ pluievolutionapi:build:
       
 pluievolutionapi:build:master:
   script:
-    - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests
+    - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests -Pprod 
   stage: build
   tags: 
    - cdp-rennes
