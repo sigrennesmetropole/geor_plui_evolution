@@ -89,7 +89,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>run build:ext</arguments>
+							<arguments>run ext:build</arguments>
 						</configuration>
 					</execution>
 
