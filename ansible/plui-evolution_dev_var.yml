@@ -1,7 +1,7 @@
 db_host: database
 db_name: georchestra
-db_user: plui-evolution
-db_password: plui-evolution
+db_user: pluievolution
+db_password: pluievolution
 db_port: 5432
 
 server_expose_port: 8082
@@ -18,7 +18,9 @@ ldap_port: 389
 ldap_username: cn=admin,dc=georchestra,dc=org
 ldap_password: secret
 
-backend_url: https://georchestra.open-dev.com/plui-evolution/
+backend_url: https://georchestra.open-dev.com/pluievolution/
+
+domain_name: georchestra.open-dev.com
 
 
 

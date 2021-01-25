@@ -4,13 +4,13 @@ proxy:
     - "8080:8080"
   links:
     - mapfishapp
-    - plui-evolution
+    - pluievolution
     - header
   environment:
     - XMX=512M
 
-plui-evolution:
-  build: plui-evolution
+pluievolution:
+  build: pluievolution
   environment:
     - ADD_JAVA_OPTS=-Dgeorchestra.datadir=/etc/georchestra
 
