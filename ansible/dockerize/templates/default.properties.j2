@@ -20,7 +20,7 @@ scheme=https
 # - cas/cas.properties
 # - ...
 # or replace all the strings with `sed` (see README.md)
-domainName=georchestra.open-dev.com
+domainName={{domain_name}}
 
 # Name of this geOrchestra instance
 instanceName=geOrchestra
@@ -48,15 +48,15 @@ administratorEmail=georchestra@georchestra.open-dev.com
 
 # PostgreSQL server domain name
 # Domain name, or IP address, of the PostgreSQL server
-pgsqlHost={{plui-evolution_db_host}}
+pgsqlHost={{pluievolution_db_host}}
 
 # PostgreSQL server port
 # Listening port of the PostgreSQL server
-pgsqlPort={{plui-evolution_db_port}}
+pgsqlPort={{pluievolution_db_port}}
 
 # PostgreSQL database name
 # Default common PostgreSQL database for all geOrchestra modules
-pgsqlDatabase={{plui-evolution_db_name}}
+pgsqlDatabase={{pluievolution_db_name}}
 
 # User to connect to PostgreSQL server
 # Default common PostgreSQL user for all geOrchestra modules
@@ -70,11 +70,11 @@ pgsqlPassword=georchestra
 
 # LDAP server domain name
 # Domain name, or IP address, of the LDAP server
-ldapHost={{plui-evolution_ldap_host}}
+ldapHost={{pluievolution_ldap_host}}
 
 # LDAP server port
 # Listening port of the LDAP server
-ldapPort={{plui-evolution_ldap_port}}
+ldapPort={{pluievolution_ldap_port}}
 
 # LDAP Scheme
 # ldap or ldaps
@@ -87,11 +87,11 @@ ldapBaseDn=dc=georchestra,dc=org
 
 # Administrator DN
 # Distinguished name of the administrator user that connects to the LDAP server
-ldapAdminDn={{plui-evolution_ldap_username}}
+ldapAdminDn={{pluievolution_ldap_username}}
 
 # Administrator password
 # Password of the administrator user that connects to the LDAP server
-ldapAdminPassword={{plui-evolution_ldap_password}}
+ldapAdminPassword={{pluievolution_ldap_password}}
 
 # Users RDN
 # Relative distinguished name of the "users" LDAP organization unit. E.g. if the
@@ -112,8 +112,8 @@ ldapOrgsRdn=ou=orgs
 
 # SMTP server domain name
 # Domain name, or IP address, of the SMTP server
-smtpHost={{plui-evolution_smtp_host}}
+smtpHost={{pluievolution_smtp_host}}
 
 # SMTP server domain name
 # Listening port of the SMTP server
-smtpPort={{plui-evolution_smtp_port}}
+smtpPort={{pluievolution_smtp_port}}

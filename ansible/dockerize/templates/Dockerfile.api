@@ -2,11 +2,11 @@ FROM jetty:9.4.31-jdk11
 USER root
 MAINTAINER fni18300@open-groupe.com
 ENV TZ=Europe/Paris
-EXPOSE {{plui-evolution_server_port}}
+EXPOSE {{pluievolution_server_port}}
 
-RUN mkdir -p /opt/plui-evolution/data/models
+RUN mkdir -p /opt/pluievolution/data/models
 
-ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
+ADD pluievolution.war /var/lib/jetty/webapps/pluievolution.war
 #ADD jetty-logging.properties /usr/local/jetty/resources/jetty-logging.properties
 
 CMD [ "sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty -Dgeorchestra.datadir=/etc/georchestra \

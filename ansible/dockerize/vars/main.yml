@@ -1,35 +1,33 @@
 ---
-# vars file for plui-evolution
+# vars file for pluievolution
 
 # database 
-plui-evolution_db_host: database
-plui-evolution_db_name: georchestra
-plui-evolution_db_port: 5432
-plui-evolution_db_user: plui-evolution
-plui-evolution_db_password: plui-evolution
+pluievolution_db_host: database
+pluievolution_db_name: georchestra
+pluievolution_db_port: 5432
+pluievolution_db_user: pluievolution
+pluievolution_db_password: pluievolution
 
 # installation
-plui-evolution_image_directory: /opt/images/plui-evolution
-plui-evolution_war_name: georchestra-plui-evolution-api.war
-plui-evolution_addon_name: georchestra-plui-evolution-api-addon.zip
-plui-evolution_docker_directory: /opt/georchestra/docker
-plui-evolution_config_directory: '{{plui-evolution_docker_directory}}/config/'
-plui-evolution_addon_directory: '{{plui-evolution_docker_directory}}/config/mapfishapp/addons'
-plui-evolution_server_port: 8080
-plui-evolution_server_expose_port: 8082
-#plui-evolution_backend_url: http://plui-evolution:{{plui-evolution_server_port}}/plui-evolution/
+pluievolution_image_directory: /opt/images/pluievolution
+pluievolution_war_name: georchestra-plui-evolution-api.war
+pluievolution_docker_directory: /opt/georchestra/docker
+pluievolution_config_directory: '{{pluievolution_docker_directory}}/config/'
+pluievolution_server_port: 8080
+pluievolution_server_expose_port: 8084
+#pluievolution_backend_url: http://pluievolution:{{pluievolution_server_port}}/pluievolution/
 
-plui-evolution_admin_password: 4dM1nApp!
+pluievolution_admin_password: 4dM1nApp!
 
-plui-evolution_smtp_host: 10.50.1.113
-plui-evolution_smtp_port: 1025
-plui-evolution_smtp_username:
-plui-evolution_smtp_password:
+pluievolution_smtp_host: 10.50.1.113
+pluievolution_smtp_port: 1025
+pluievolution_smtp_username:
+pluievolution_smtp_password:
 
-plui-evolution_ldap_host: ldap
-plui-evolution_ldap_port: 389
-plui-evolution_ldap_username: cn=admin,dc=georchestra,dc=org
-plui-evolution_ldap_password: secret
+pluievolution_ldap_host: ldap
+pluievolution_ldap_port: 389
+pluievolution_ldap_username: cn=admin,dc=georchestra,dc=org
+pluievolution_ldap_password: secret
 
 
 
