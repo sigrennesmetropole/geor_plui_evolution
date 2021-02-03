@@ -89,18 +89,10 @@ public class PreAuthenticationFilter implements Filter {
 			roles = Arrays.asList(rolesString.split(";"));
 			rolesSet.addAll(roles);
 		}
-		User user = userService.loadUserByUsername(username);
-		if (user == null) {
-			user = new User();
-			user.setLogin(username);
-			assignUserData(user, httpServletRequest, roles);
-			user = userService.createUser(user);
-		} else {
-			boolean updated = assignUserData(user, httpServletRequest, roles);
-			if (updated) {
-				user = userService.updateUser(user);
-			}
-		}
+		User user = new User();
+		user.setLogin(username);
+		assignUserData(user, httpServletRequest, roles);
+
 		return new org.georchestra.pluievolution.api.security.PreAuthenticationToken(username, user, rolesSet);
 	}
 
@@ -135,6 +127,7 @@ public class PreAuthenticationFilter implements Filter {
 
 	/**
 	 * Permet d'encoder un string en utf8
+	 * 
 	 * @param toEncode
 	 * @return
 	 */
