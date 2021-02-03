@@ -486,11 +486,13 @@ export class PluiEvolutionPanelComponent extends React.Component {
                     <InputGroup.Addon className="addon">
                         <Message msgId="pluievolution.subject.title"/>
                     </InputGroup.Addon>
-                    <FormControl type="text"
+                    <FormControl componentClass="textarea"
+                                 bsSize="small"
+                                 rows={2}
                                  value={this.state.pluiRequest.subject}
                                  placeholder={getMessageById(this.context.messages, "pluievolution.subject.placeholder")}
                                  onChange={this.handleSubjectChange}
-                                 maxLength={30}
+                                 maxLength={130}
                                  readOnly={this.props.readOnly}
                                  required/>
                 </InputGroup>
