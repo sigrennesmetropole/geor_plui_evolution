@@ -7,4 +7,5 @@ import lombok.NoArgsConstructor;
 public class RedmineParams {
 
     public static final String CUSTOM_COLUMN_INITIATEUR = "initiateur";
+    public static final String CUSTOM_COLUMN_COMMUNE_DEMANDEUSE = "commune demandeuse";
 }
