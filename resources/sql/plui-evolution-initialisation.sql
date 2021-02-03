@@ -161,6 +161,12 @@ CREATE TABLE pluievolution.plui_request
 ALTER TABLE pluievolution.plui_request
     OWNER to pluievolution;
 
+-- Mise à jour du champ subject de plui_request à 130 caractères
+-- Suppression de la vue, modification de la colonne et re-creation de la vue
+DROP VIEW IF EXISTS pluievolution.detailed_plui_request;
+ALTER TABLE pluievolution.plui_request ALTER COLUMN subject TYPE varchar(130);
+
+
 
 -- View: pluievolution.detailed_plui_request
 
@@ -185,4 +191,6 @@ FROM plui_request pr
 
 ALTER TABLE pluievolution.detailed_plui_request
     OWNER TO pluievolution;
+
+
 
