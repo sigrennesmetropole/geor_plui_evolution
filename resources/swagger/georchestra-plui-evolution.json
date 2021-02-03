@@ -93,7 +93,7 @@
 				"description": "",
 				"operationId": "getMe",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 				],
@@ -121,7 +121,7 @@
 				"summary": "Récupération de l'établissement auquel est asocié le user courant",
 				"operationId": "getCurrentUserEtablissement",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 				],
@@ -150,7 +150,7 @@
 				"description": "Lister la configuration liées aux pièces jointes",
 				"operationId": "getAttachmentConfiguration",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [],
 				"responses": {
@@ -221,7 +221,7 @@
 				"description": "",
 				"operationId": "uploadDocument",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -272,7 +272,7 @@
 				"description": "",
 				"operationId": "getAttachementsByPluiRequestUuid",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -315,7 +315,7 @@
 				"description": "Permet de créer une nouvelle demande",
 				"operationId": "createPluiRequest",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -351,7 +351,7 @@
 				"description": "Permet de mettre à jour une demande",
 				"operationId": "updatePluiRequest",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -389,7 +389,7 @@
 				"description": "Permet d'obtenir une demande à partir de son uuid",
 				"operationId": "getPluiRequestByUuid",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -424,7 +424,7 @@
 				"description": "Permet de supprimer une demande à partir de son uuid",
 				"operationId": "deletePluiRequest",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -520,7 +520,7 @@
 				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
 				"operationId": "getAllPluiRequestEtablissements",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"responses": {
 					"200": {
@@ -549,7 +549,7 @@
 				"summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
 				"operationId": "getAllPluiRequestAreas",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"responses": {
 					"200": {
@@ -578,7 +578,7 @@
 				"summary": "Emprises d'une communes ou ville où métropole à partir de son code Insee",
 				"operationId": "getPluiRequestAreaByCodeInsee",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
@@ -613,7 +613,7 @@
 				"summary": "Hotel de ville d'une commune (ou Rennes Metropole) par son code insee",
 				"operationId": "getPluiRequestEtablissementByCodeInsee",
 				"produces": [
-					"application/json"
+					"application/json;charset=utf-8"
 				],
 				"parameters": [
 					{
