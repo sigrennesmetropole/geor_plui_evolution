@@ -86,8 +86,11 @@ export class PluiEvolutionRequestViewer extends React.Component {
                             <Message msgId="pluievolution.subject.title"/>
                         </ControlLabel>
                         <Col sm={8} >
-                            <FormControl type="text"
+                            <FormControl componentClass="textarea"
+                                         type="text"
                                          value={pluiRequest.subject}
+                                         bsSize="small"
+                                         rows={2}
                                          readOnly/>
                         </Col>
                     </FormGroup>
