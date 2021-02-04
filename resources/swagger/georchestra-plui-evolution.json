@@ -1089,6 +1089,10 @@
 				},
 				"codeInsee": {
 					"type": "string"
+				},
+				"redmineId": {
+					"type": "integer",
+					"format": "int32"
 				}
 			}
 		},
