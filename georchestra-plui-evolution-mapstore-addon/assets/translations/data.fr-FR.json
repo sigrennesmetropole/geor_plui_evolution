@@ -15,6 +15,9 @@
 			"clickHere": "Cliquez ici",
 			"commune": "Votre commune",
 			"displayRequestForm": "Créer une nouvelle demande",
+			"reference": {
+				"title": "Référence de la demande"
+			},
 			"subject": {
 				"title": "Sujet de la demande",
 				"placeholder": "Saisissez le sujet de la demande",
@@ -30,7 +33,14 @@
 				"title": "Commentaires des services"
 			},
 			"status": {
-				"title": "Statut de la demande"
+				"title": "Statut de la demande",
+				"NOUVEAU": "Nouveau",
+				"ANALYSE_EN_COURS":  "Analyse en cours",
+				"PRODUCTION_EN_COURS":  "Production en cours",
+				"EN_ATTENTE_VALIDATION_COMMUNE":  "En attente de validation par la commune",
+				"VALIDE_COMMUNE":  "Validé par la commune",
+				"DEMANDE_NON_RECEVABLE":  "Demande non recevable",
+				"DEMANDE_REFORMULEE": "Demande reformulée"
 			},
 			"attachment": {
 				"add": "Ajouter",
@@ -73,7 +83,10 @@
 			},
 			"type": {
 				"title": "Type de la demande",
-				"error": "Le type de la demande n'est pas sélectionné"
+				"error": "Le type de la demande n'est pas sélectionné",
+				"COMMUNE": "Communale",
+				"INTERCOMMUNE": "Intercommunale",
+				"METROPOLITAIN": "Métropolitaine"
 			},
 			"msgBox": {
 				"title": "PLUi-Evolution : demande d'adaptation du PLUi",
