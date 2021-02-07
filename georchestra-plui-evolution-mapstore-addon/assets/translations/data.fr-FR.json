@@ -104,6 +104,7 @@
 			"init": {
 				"loading": "En cours d'initialisation...",
 				"attachmentConfiguration.error": "Impossible de charger la configuration",
+				"layerConfiguration.error": "Impossible de charger la configuration du layer",
 				"me": {
 					"error": "Impossible de charger les données de l'utilisateur"
 				}

@@ -15,6 +15,7 @@ import {
     closeRequest,
     downloadAttachment,
     loadAttachmentConfiguration,
+    loadLayerConfiguration,
     closePanel,
     getAttachments,
     getMe,
@@ -35,6 +36,7 @@ import {
     isLoadingSelector,
     isReadOnlySelector,
     pluiEvolutionAttachmentConfigurationSelector,
+    pluiEvolutionLayerConfigurationSelector,
     pluiEvolutionMeSelector,
 } from '../selectors/plui-evolution-selector';
 import '../assets/plui-evolution.css';
@@ -46,6 +48,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     loading: !!isLoadingSelector(state),
     readOnly: !!isReadOnlySelector(state),
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
+    layerConfiguration: pluiEvolutionLayerConfigurationSelector(state),
     user: pluiEvolutionMeSelector(state),
     geographicEtablissements: state.pluievolution.geographicEtablissements,
     pluiRequest: state.pluievolution.pluiRequest,
@@ -61,6 +64,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     stopDrawing: stopDrawing,
     clearDrawn: clearDrawn,
     loadAttachmentConfiguration: loadAttachmentConfiguration,
+    loadLayerConfiguration: loadLayerConfiguration,
     updateAttachments: updateAttachments,
     getAttachments: getAttachments,
     downloadAttachment: downloadAttachment,

@@ -13,6 +13,7 @@ import {
     closeRequest,
     initPluiEvolutionDone,
     loadedAttachmentConfiguration,
+    loadedLayerConfiguration,
     getAllGeographicEtablissement,
     loadedAllGeographicEtablissement,
     getAttachments,
@@ -34,8 +35,6 @@ import {
     FeatureProjection,
     GeometryType,
     PluiRequestType,
-    PLUI_EVOLUTION_LAYER_ID,
-    PLUI_EVOLUTION_LAYER_NAME,
     PLUI_EVOLUTION_LAYER_TITLE
 } from "../constants/plui-evolution-constants";
 import {SET_CURRENT_BACKGROUND_LAYER} from "@mapstore/actions/backgroundselector";
@@ -43,6 +42,8 @@ import {SET_CONTROL_PROPERTY} from "@mapstore/actions/controls";
 
 
 let backendURLPrefix = "/pluievolution";
+let pluiEvolutionLayerId;
+let pluiEvolutionLayerName;
 
 export const openPanelEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_OPEN_PANEL)
@@ -97,6 +98,22 @@ export const loadAttachmentConfigurationEpic = (action$) =>
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.of(loadedAttachmentConfiguration(response.data)))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
+        });
+export const loadLayerConfigurationEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
+        .switchMap((action) => {
+            if (action.layerConfiguration) {
+                return Rx.Observable.of(loadedLayerConfiguration(action.layerConfiguration)).delay(0);
+            }
+            const url = backendURLPrefix + "/carto/layerConfiguration";
+            pluiEvolutionLayerId = 5;
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => {
+                    pluiEvolutionLayerId = response.data.layerWorkspace;
+                    pluiEvolutionLayerName = response.data.layerName;
+                    Rx.Observable.of(loadedLayerConfiguration(response.data)
+                )})
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.layerConfiguration.error", null, e)));
         });
 
 export const getAllGeographicEtablissementEpic = (action$) =>
@@ -205,7 +222,7 @@ export const savePluiRequest = (action$) =>
                         autoDismiss: 5
                     }),
                     closeRequest(),
-                    refreshLayerVersion(PLUI_EVOLUTION_LAYER_ID)
+                    refreshLayerVersion(pluiEvolutionLayerId)
                 ]))
                 .catch(e => {
                     // Erreur lors de l'enregistrement de la requete plui
@@ -245,7 +262,7 @@ export const initDrawingSupportEpic = action$ =>
 export const displayAllPluiRequest = (action$, store) =>
     action$.ofType(SET_CURRENT_BACKGROUND_LAYER)
         .filter(() => {
-            return head(store.getState().layers.flat.filter(l => l.id === PLUI_EVOLUTION_LAYER_ID)) === null;
+            return head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId)) === null;
         })
         .merge(action$.ofType(SET_CONTROL_PROPERTY)
             .filter((action) => {
@@ -258,8 +275,8 @@ export const displayAllPluiRequest = (action$, store) =>
                     addLayer({
                         handleClickOnLayer: true,
                         hideLoading: true,
-                        id: PLUI_EVOLUTION_LAYER_ID,
-                        name: PLUI_EVOLUTION_LAYER_NAME,
+                        id: pluiEvolutionLayerId,
+                        name: pluiEvolutionLayerName,
                         title: PLUI_EVOLUTION_LAYER_TITLE,
                         type: "wms",
                         search: {
@@ -280,7 +297,7 @@ export const displayAllPluiRequest = (action$, store) =>
                             }
                         }
                     }),
-                    selectNode(PLUI_EVOLUTION_LAYER_ID,"layer",false)
+                    selectNode(pluiEvolutionLayerId,"layer",false)
                 ]);
             })
         );
@@ -469,10 +486,10 @@ export const clickMapEpic = (action$) =>
     action$.ofType(CLICK_ON_MAP)
         .switchMap((action) => {
             const overrideParams = {};
-            overrideParams[PLUI_EVOLUTION_LAYER_NAME] = {
+            overrideParams[pluiEvolutionLayerName] = {
                 info_format: "application/json"
             };
-            return Rx.Observable.of(featureInfoClick(action.point, PLUI_EVOLUTION_LAYER_NAME, [], overrideParams));
+            return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams));
         });
 
 const buildAttachmentsRequest = (uuid, attachments) => {

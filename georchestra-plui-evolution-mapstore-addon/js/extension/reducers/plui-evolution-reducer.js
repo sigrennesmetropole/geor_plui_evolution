@@ -4,7 +4,8 @@ import {actions, status} from '../actions/plui-evolution-action';
 const initialState = {
     user: null,
     attachments: null,
-    attachmentConfiguration: {}
+    attachmentConfiguration: {},
+    layerConfiguration: {}
 }
 
 export default (state = initialState, action) => {
@@ -18,6 +19,9 @@ export default (state = initialState, action) => {
         }
         case actions.PLUI_EVOLUTION_ATTACHMENTS_UPDATED: {
             return assign({}, state, {error: null, attachments: action.attachments});
+        }
+        case actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOADED: {
+            return assign({}, state, {layerConfiguration: action.layerConfiguration});
         }
         case actions.PLUI_EVOLUTION_USER_ME_GOT: {
             return assign({}, state, {user: action.user});
