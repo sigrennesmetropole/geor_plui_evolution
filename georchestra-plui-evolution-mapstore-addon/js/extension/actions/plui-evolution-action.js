@@ -5,6 +5,8 @@ export const actions = {
 	PLUI_EVOLUTION_INIT_DONE: 'PLUI_EVOLUTION:INIT_DONE',
 	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOAD',
 	PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED: 'PLUI_EVOLUTION:ATTACHMENT_CONFIGURATION:LOADED',
+	PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD: 'PLUI_EVOLUTION:LAYER_CONFIGURATION:LOAD',
+	PLUI_EVOLUTION_LAYER_CONFIGURATION_LOADED: 'PLUI_EVOLUTION:LAYER_CONFIGURATION:LOADED',
 	PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL: 'PLUI_EVOLUTION:GEOGRAPHIC_ETABLISSEMENT:GET_ALL',
 	PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_ALL_LOADED: 'PLUI_EVOLUTION:GEOGRAPHIC_ETABLISSEMENT:ALL_LOADED',
 	PLUI_EVOLUTION_USER_ME_GET: 'PLUI_EVOLUTION:USER:GET',
@@ -76,6 +78,19 @@ export function loadedAttachmentConfiguration(attachmentConfiguration) {
 	return {
 		type: actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED,
 		attachmentConfiguration: attachmentConfiguration
+	};
+}
+
+export function loadLayerConfiguration() {
+	return {
+		type: actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD
+	};
+}
+
+export function loadedLayerConfiguration(layerConfiguration) {
+	return {
+		type: actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOADED,
+		layerConfiguration: layerConfiguration
 	};
 }
 
@@ -273,7 +288,8 @@ export function displayEtablissement(pluiRequestType, geographicEtablissement) {
 
 export function displayAllPluiRequest() {
 	return {
-		type: actions.PLUI_EVOLUTION_DISPLAY_ALL
+		type: actions.PLUI_EVOLUTION_DISPLAY_ALL,
+		layerConfiguration: layerConfiguration
 	};
 }
 
