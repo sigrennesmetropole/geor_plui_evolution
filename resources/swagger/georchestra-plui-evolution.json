@@ -512,6 +512,33 @@
 				}
 			}
 		},
+		"/carto/layerConfiguration": {
+			"get": {
+				"tags": [
+					"carto"
+				],
+				"summary": "Configurations du layer geoserver",
+				"operationId": "getLayerConfigurations",
+				"produces": [
+					"application/json;charset=utf-8"
+				],
+				"parameters": [],
+				"responses": {
+					"200": {
+						"description": "Configuration du layer",
+						"schema": {
+							"$ref": "#/definitions/LayerConfiguration"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
 		"/geographic/etablissements": {
 			"get": {
 				"tags": [
@@ -692,6 +719,17 @@
 					"items": {
 						"type": "string"
 					}
+				}
+			}
+		},
+		"LayerConfiguration": {
+			"type": "object",
+			"properties": {
+				"layerWorkspace": {
+					"type": "string"
+				},
+				"layerName": {
+					"type": "string"
 				}
 			}
 		},
