@@ -20,8 +20,6 @@ import java.util.List;
 
 import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
 import static org.georchestra.pluievolution.service.common.constant.CommuneParams.FICTIVE_INTERCO_AREA_NAME;
-import static org.georchestra.pluievolution.service.common.constant.RedmineParams.CUSTOM_COLUMN_COMMUNE_DEMANDEUSE;
-import static org.georchestra.pluievolution.service.common.constant.RedmineParams.CUSTOM_COLUMN_INITIATEUR;
 
 
 @Component
@@ -32,6 +30,12 @@ public class RedmineHelper {
 
     @Value("${redmine.api.access.key}")
     private String apiAccessKey;
+
+    @Value("${redmine.custom.column.initiateur}")
+    private String customColumnInitiateur;
+
+    @Value("${redmine.custom.column.communeDemandeuse}")
+    private String customColumnCommuneDemandeuse;
 
     @Autowired
     AuthentificationHelper authentificationHelper;
@@ -78,7 +82,7 @@ public class RedmineHelper {
 
         // Ajout des valeurs des champs customs
         // Ajout de l'initiateur de la demande
-        CustomFieldDefinition cfd = getCustomFieldByName(CUSTOM_COLUMN_INITIATEUR);
+        CustomFieldDefinition cfd = getCustomFieldByName(customColumnInitiateur);
         if ( cfd != null ) {
             issue.addCustomField(CustomFieldFactory.create(cfd.getId(), cfd.getName(), pluiRequest.getInitiator()));
         }
@@ -86,7 +90,7 @@ public class RedmineHelper {
         // si demande de type intercommune ou de type metropolitaine
         // Ajout du champ commune demandeuse
         if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE || pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
-            cfd = getCustomFieldByName(CUSTOM_COLUMN_COMMUNE_DEMANDEUSE);
+            cfd = getCustomFieldByName(customColumnCommuneDemandeuse);
             if (cfd != null) {
                 // On recupere la commune de l'initiateur de la demande
                 GeographicArea communeDemandeuse = geographicAreaService.getCurrentUserArea();
