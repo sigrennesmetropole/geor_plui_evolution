@@ -3,20 +3,28 @@
  */
 package org.georchestra.pluievolution.api.security;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringUtils;
 import org.georchestra.pluievolution.core.dto.User;
-import org.georchestra.pluievolution.service.sm.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 /**
  * This filter is inspired from georchestra geowebcache project
@@ -38,11 +46,8 @@ public class PreAuthenticationFilter implements Filter {
 	public static final String SEC_LASTNAME = "sec-lastname";
 	public static final String SEC_FIRSTNAME = "sec-firstname";
 
-	private UserService userService;
-
-	public PreAuthenticationFilter(UserService userService) {
+	public PreAuthenticationFilter() {
 		super();
-		this.userService = userService;
 	}
 
 	@Override
