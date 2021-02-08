@@ -24,9 +24,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-	@Autowired
-	private UserService userService;
-
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().authorizeRequests().antMatchers("/", "/*.js", "/*.css", "/*.ico").permitAll()
@@ -43,7 +40,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.addFilterAfter(createPreAuthenticationFilter(), BasicAuthenticationFilter.class).sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().csrf().disable();
 	}
-
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
@@ -70,9 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private AuthenticationProvider createPreAuthenticationProvider() {
 		return new PreAuthenticationProvider();
 	}
-	
 
 	private Filter createPreAuthenticationFilter() {
-		return new PreAuthenticationFilter(userService);
+		return new PreAuthenticationFilter();
 	}
 }
