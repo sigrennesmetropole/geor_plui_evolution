@@ -81,13 +81,46 @@ export class PluiEvolutionRequestViewer extends React.Component {
         return (
             <div>
                 <fieldset>
+                    <FormGroup controlId="pluievolution.reference">
+                        <ControlLabel className="col-sm-4">
+                            <Message msgId="pluievolution.reference.title"/>
+                        </ControlLabel>
+                        <Col sm={8} >
+                            {pluiRequest.redmine_id}
+                        </Col>
+                    </FormGroup>
+                </fieldset>
+                <fieldset>
+                    <FormGroup controlId="pluievolution.status">
+                        <ControlLabel className="col-sm-4">
+                            <Message msgId="pluievolution.status.title"/>
+                        </ControlLabel>
+                        <Col sm={8} >
+                            <b><Message msgId={"pluievolution.status."+pluiRequest.status}/></b>
+                        </Col>
+                    </FormGroup>
+                </fieldset>
+                <fieldset>
+                    <FormGroup controlId="pluievolution.type">
+                        <ControlLabel className="col-sm-4">
+                            <Message msgId="pluievolution.type.title"/>
+                        </ControlLabel>
+                        <Col sm={8} >
+                            <Message msgId={"pluievolution.type."+pluiRequest.type}/>
+                        </Col>
+                    </FormGroup>
+                </fieldset>
+                <fieldset>
                     <FormGroup controlId="pluievolution.subject">
                         <ControlLabel className="col-sm-4">
                             <Message msgId="pluievolution.subject.title"/>
                         </ControlLabel>
                         <Col sm={8} >
-                            <FormControl type="text"
+                            <FormControl componentClass="textarea"
+                                         type="text"
                                          value={pluiRequest.subject}
+                                         bsSize="small"
+                                         rows={2}
                                          readOnly/>
                         </Col>
                     </FormGroup>
@@ -103,18 +136,6 @@ export class PluiEvolutionRequestViewer extends React.Component {
                                          value={pluiRequest.object}
                                          bsSize="small"
                                          rows={4}
-                                         readOnly/>
-                        </Col>
-                    </FormGroup>
-                </fieldset>
-                <fieldset>
-                    <FormGroup controlId="pluievolution.type">
-                        <ControlLabel className="col-sm-4">
-                            <Message msgId="pluievolution.type.title"/>
-                        </ControlLabel>
-                        <Col sm={8} >
-                            <FormControl type="text"
-                                         value={pluiRequest.type}
                                          readOnly/>
                         </Col>
                     </FormGroup>

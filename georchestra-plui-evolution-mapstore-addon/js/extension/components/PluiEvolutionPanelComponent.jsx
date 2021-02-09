@@ -56,6 +56,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         width: PropTypes.number,
         // data
         attachmentConfiguration: PropTypes.object,
+        layerConfiguration: PropTypes.object,
         geographicEtablissements: PropTypes.array,
         contextThemas: PropTypes.array,
         user: PropTypes.object,
@@ -73,6 +74,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         removeAttachment: PropTypes.func,
         getAttachments: PropTypes.func,
         downloadAttachment: PropTypes.func,
+        loadLayerConfiguration: PropTypes.func,
         getMe: PropTypes.func,
         displayEtablissement: PropTypes.func,
         savePluiRequest: PropTypes.func,
@@ -124,6 +126,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         geographicEtablissements: null,
         attachments: null,
         pluiRequest: null,
+        layerConfiguration: null,
         // misc
         initPluiEvolution: ()=>{},
         startDrawing: ()=>{},
@@ -134,6 +137,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         removeAttachment: () => {},
         getAttachments: () => {},
         downloadAttachment: () => {},
+        loadLayerConfiguration: ()=>{},
         getMe: ()=>{},
         displayEtablissement: ()=>{},
         savePluiRequest: ()=>{},
@@ -175,6 +179,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     componentWillMount() {
         this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
+        this.props.loadLayerConfiguration();
         this.props.getMe();
     }
 
@@ -486,11 +491,13 @@ export class PluiEvolutionPanelComponent extends React.Component {
                     <InputGroup.Addon className="addon">
                         <Message msgId="pluievolution.subject.title"/>
                     </InputGroup.Addon>
-                    <FormControl type="text"
+                    <FormControl componentClass="textarea"
+                                 bsSize="small"
+                                 rows={2}
                                  value={this.state.pluiRequest.subject}
                                  placeholder={getMessageById(this.context.messages, "pluievolution.subject.placeholder")}
                                  onChange={this.handleSubjectChange}
-                                 maxLength={30}
+                                 maxLength={130}
                                  readOnly={this.props.readOnly}
                                  required/>
                 </InputGroup>

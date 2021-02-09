@@ -3,9 +3,12 @@ package org.georchestra.pluievolution.api.controller;
 import io.swagger.annotations.Api;
 import org.apache.commons.io.IOUtils;
 import org.georchestra.pluievolution.api.CartoApi;
+import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
+import org.georchestra.pluievolution.service.sm.ConfigurationService;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -33,6 +36,9 @@ public class CartoController implements CartoApi {
     @Autowired
     GeoserverService geoserverService;
 
+    @Autowired
+    ConfigurationService configurationService;
+
     @Override
     public ResponseEntity<Void> getWms() throws Exception {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -59,6 +65,11 @@ public class CartoController implements CartoApi {
         }
         out.close();
         return null;
+    }
+
+    @Override
+    public ResponseEntity<LayerConfiguration> getLayerConfigurations() throws Exception {
+        return new ResponseEntity<>(configurationService.getLayerConfigurations(), HttpStatus.OK);
     }
 
     @Override

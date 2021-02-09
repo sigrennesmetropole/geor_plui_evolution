@@ -17,4 +17,6 @@ export const isReadOnlySelector = (state) => get(state, "pluievolution.status") 
 
 export const pluiEvolutionAttachmentConfigurationSelector = (state) => get(state, "pluievolution.attachmentConfiguration");
 
+export const pluiEvolutionLayerConfigurationSelector = (state) => get(state, "pluievolution.layerConfiguration");
+
 export const pluiEvolutionMeSelector = (state) => get(state, "pluievolution.user");
