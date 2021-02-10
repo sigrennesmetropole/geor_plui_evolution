@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -37,6 +37,9 @@
 				<configuration>
 					<workingDirectory>${addon.project.location}</workingDirectory>
 					<installDirectory>${addon.project.nodeinstallation}</installDirectory>
+					<environmentVariables>
+						<NODE_OPTIONS>--max-old-space-size=8192</NODE_OPTIONS>
+					</environmentVariables>
 				</configuration>
 				<executions>
 					<!-- It will install nodejs and npm -->
@@ -62,19 +65,6 @@
 						<configuration>
 							<arguments>${npmicommand}</arguments>
 						</configuration>
-					</execution>					
-
-					<!-- It will execute command "npm install" in mapstore2-georchestra dir -->
-					<execution>
-						<phase>generate-resources</phase>
-						<id>npm install mapstore2-georchestra</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>install</arguments>
-							<workingDirectory>${addon.georchestra.location}</workingDirectory>
-						</configuration>
 					</execution>
 					
 				</executions>
@@ -86,6 +76,9 @@
 				<configuration>
 					<workingDirectory>${addon.project.location}</workingDirectory>
 					<installDirectory>${addon.project.nodeinstallation}</installDirectory>
+					<environmentVariables>
+						<NODE_OPTIONS>--max-old-space-size=8192</NODE_OPTIONS>
+					</environmentVariables>
 				</configuration>
 				<executions>
 
@@ -96,7 +89,7 @@
 							<goal>npm</goal>
 						</goals>
 						<configuration>
-							<arguments>run compile</arguments>
+							<arguments>run ext:build</arguments>
 						</configuration>
 					</execution>
 

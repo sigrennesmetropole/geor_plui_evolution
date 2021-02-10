@@ -1,7 +1,7 @@
 {
     "plugins": [
         {
-            "name": "pluievolution",
+            "name": "PluiEvolutionExtension",
             "description": "PLUI Evolution Extension",
             "dependencies": [
                 "BurgerMenu"

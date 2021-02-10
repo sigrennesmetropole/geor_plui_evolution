@@ -32,6 +32,11 @@ public class ListToStringConverter implements AttributeConverter<List<String>, S
 		}
 
 		String[] data = dbData.split(SEPARATOR);
-		return new ArrayList<>(Arrays.asList(data));
+		// attention pas d'utilisation de Arrays.asList car sinon on a une liste non modifiable
+		List<String> result = new ArrayList<>();
+		if( data != null) {
+			result.addAll(Arrays.asList(data));
+		}
+		return result;
 	}
 }

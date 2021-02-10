@@ -5,6 +5,5 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RedmineParams {
-
-    public static final String CUSTOM_COLUMN_INITIATEUR = "initiateur";
+    // No Params now
 }

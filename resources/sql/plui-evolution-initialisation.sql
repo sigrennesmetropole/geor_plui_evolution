@@ -143,7 +143,7 @@ CREATE TABLE pluievolution.plui_request
     object character varying(300) COLLATE pg_catalog."default" NOT NULL,
     redmine_id integer,
     status character varying(50) COLLATE pg_catalog."default",
-    subject character varying(30) COLLATE pg_catalog."default" NOT NULL,
+    subject character varying(130) COLLATE pg_catalog."default" NOT NULL,
     type character varying(20) COLLATE pg_catalog."default",
     uuid uuid NOT NULL,
     area_id bigint,
@@ -160,6 +160,12 @@ CREATE TABLE pluievolution.plui_request
 
 ALTER TABLE pluievolution.plui_request
     OWNER to pluievolution;
+
+-- Mise à jour du champ subject de plui_request à 130 caractères
+-- Suppression de la vue, modification de la colonne et re-creation de la vue
+DROP VIEW IF EXISTS pluievolution.detailed_plui_request;
+ALTER TABLE pluievolution.plui_request ALTER COLUMN subject TYPE varchar(130);
+
 
 
 -- View: pluievolution.detailed_plui_request
@@ -179,10 +185,13 @@ SELECT pr.id,
        pr.type,
        pr.uuid,
        ga.codeinsee,
-       ga.nom AS nom_area
+       ga.nom AS nom_area,
+       pr.redmine_id
 FROM plui_request pr
          LEFT JOIN geographic_area ga ON pr.area_id = ga.id;
 
 ALTER TABLE pluievolution.detailed_plui_request
     OWNER TO pluievolution;
+
+
 
