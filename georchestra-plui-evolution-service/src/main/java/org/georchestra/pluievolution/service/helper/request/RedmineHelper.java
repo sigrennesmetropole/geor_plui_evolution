@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.georchestra.pluievolution.core.common.DocumentContent;
+import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
@@ -19,7 +20,6 @@ import java.util.List;
 
 import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
 import static org.georchestra.pluievolution.service.common.constant.CommuneParams.FICTIVE_INTERCO_AREA_NAME;
-import static org.georchestra.pluievolution.service.common.constant.RedmineParams.CUSTOM_COLUMN_INITIATEUR;
 
 
 @Component
@@ -30,6 +30,12 @@ public class RedmineHelper {
 
     @Value("${redmine.api.access.key}")
     private String apiAccessKey;
+
+    @Value("${redmine.custom.column.initiateur}")
+    private String customColumnInitiateur;
+
+    @Value("${redmine.custom.column.communeDemandeuse}")
+    private String customColumnCommuneDemandeuse;
 
     @Autowired
     AuthentificationHelper authentificationHelper;
@@ -76,9 +82,20 @@ public class RedmineHelper {
 
         // Ajout des valeurs des champs customs
         // Ajout de l'initiateur de la demande
-        CustomFieldDefinition cfd = getCustomFieldByName(CUSTOM_COLUMN_INITIATEUR);
+        CustomFieldDefinition cfd = getCustomFieldByName(customColumnInitiateur);
         if ( cfd != null ) {
             issue.addCustomField(CustomFieldFactory.create(cfd.getId(), cfd.getName(), pluiRequest.getInitiator()));
+        }
+
+        // si demande de type intercommune ou de type metropolitaine
+        // Ajout du champ commune demandeuse
+        if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE || pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
+            cfd = getCustomFieldByName(customColumnCommuneDemandeuse);
+            if (cfd != null) {
+                // On recupere la commune de l'initiateur de la demande
+                GeographicArea communeDemandeuse = geographicAreaService.getCurrentUserArea();
+                issue.addCustomField(CustomFieldFactory.create(cfd.getId(), cfd.getName(), communeDemandeuse.getNom()));
+            }
         }
 
         // Creation de l'issue dans redmine

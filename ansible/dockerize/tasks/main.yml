@@ -6,73 +6,57 @@
     mode: 0775
     path: "{{ item }}"
   with_items:
-    - "{{plui-evolution_image_directory}}/"
-    - "{{plui-evolution_image_directory}}/plui-evolution"
-    - "{{plui-evolution_config_directory}}/plui-evolution"
-        
-# copy addon
-- name: Copy addon to mapfishapp
-  unarchive:
-    src: "{{ plui-evolution_addon_name }}"
-    dest: "{{plui-evolution_addon_directory}}"
-    remote_src: no
-    mode: 0775
-   
-- name: Set backend url
-  replace:
-    destfile: "{{plui-evolution_addon_directory}}/plui-evolution/manifest.json"
-    regexp: '\"http://.*\"'
-    replace: '"{{plui-evolution_backend_url}}"'
-    backup: yes  
+    - "{{pluievolution_image_directory}}/"
+    - "{{pluievolution_config_directory}}/plui-evolution"
 
 # update security proxy
-- name: Check whether targets-mapping.properties contains plui-evolution
-  command: grep -Fcq "plui-evolution" "{{ plui-evolution_config_directory }}/security-proxy/targets-mapping.properties"
-  register: checksecurityplui-evolution
+- name: Check whether targets-mapping.properties contains pluievolution
+  command: grep -Fcq "pluievolution" "{{ pluievolution_config_directory }}/security-proxy/targets-mapping.properties"
+  register: checksecuritypluievolution
   check_mode: no
   ignore_errors: yes
   changed_when: no
 
 - name: Update targets-mapping.properties if needed
-  when: checksecurityplui-evolution.rc == 1
+  when: checksecuritypluievolution.rc == 1
   shell:
-    cmd: echo "plui-evolution=http://plui-evolution:{{plui-evolution_server_port}}/plui-evolution" >> "{{ plui-evolution_config_directory }}/security-proxy/targets-mapping.properties"    
+    cmd: echo "pluievolution=http://pluievolution:{{pluievolution_server_port}}/pluievolution" >> "{{ pluievolution_config_directory }}/security-proxy/targets-mapping.properties"    
 
 # copy images 
-- name: Copy plui-evolution api Dockerfile
+- name: Copy pluievolution api Dockerfile
   template:
     src: Dockerfile.api
-    dest: "{{ plui-evolution_image_directory }}/Dockerfile"
+    dest: "{{ pluievolution_image_directory }}/Dockerfile"
     mode: 0770
     
-- name: Copy plui-evolution war
+- name: Copy pluievolution war
   copy:
-    src: "{{ plui-evolution_war_name }}"
-    dest: "{{ plui-evolution_image_directory }}/plui-evolution.war"
+    src: "{{ pluievolution_war_name }}"
+    dest: "{{ pluievolution_image_directory }}/pluievolution.war"
     mode: 0770 
    
-- name: Copy plui-evolution api properties file
+- name: Copy pluievolution api properties file
   template:
     src: plui-evolution.properties.j2
-    dest: "{{ plui-evolution_config_directory }}/plui-evolution/plui-evolution.properties"
+    dest: "{{ pluievolution_config_directory }}/plui-evolution/plui-evolution.properties"
     mode: 0770
 
 - name: Copy default api properties file
   template:
     src: default.properties.j2
-    dest: "{{ plui-evolution_config_directory }}/default.properties"
+    dest: "{{ pluievolution_config_directory }}/default.properties"
     mode: 0770
         
 #- name: Copy tomcat lib jar
 #  copy:
 #    src: "tomcat-juli.jar"
-#    dest: "{{ plui-evolution_image_directory }}/plui-evolution/WEB-INF/lib/tomcat-juli.jar"
+#    dest: "{{ pluievolution_image_directory }}/pluievolution/WEB-INF/lib/tomcat-juli.jar"
 #    mode: 0770
   
-- name: Build plui-evolution api image
+- name: Build pluievolution api image
   shell: 
-    cmd: docker build -t plui-evolution-image {{plui-evolution_image_directory}}
-    chdir: "{{plui-evolution_image_directory}}"  
+    cmd: docker build -t plui-evolution-image {{pluievolution_image_directory}}
+    chdir: "{{pluievolution_image_directory}}"  
     
 # install yaml-merge
 - name: Clone yaml-merge
@@ -92,7 +76,7 @@
     cmd: cd yaml-merge ;  mvn -Drelease package
 
 # update docker compose file
-- name: Copy plui-evolution docker compose file
+- name: Copy pluievolution docker compose file
   template:
     src: docker-compose.yml.j2
     dest: "/tmp/yaml-merge/docker-plui-evolution.yml"
@@ -100,7 +84,7 @@
     
 - name: Copy original docker compose file
   copy:
-    src: "{{plui-evolution_docker_directory}}/docker-compose.yml"
+    src: "{{pluievolution_docker_directory}}/docker-compose.yml"
     dest: "/tmp/yaml-merge/docker-compose.yml"
     remote_src: true
     mode: 0664    
@@ -108,14 +92,14 @@
 - name: Merge docker compose file
   shell:
     chdir: "/tmp/yaml-merge"
-    cmd: bin/yaml-merge.sh "docker-compose.yml" "docker-plui-evolution.yml" > "{{plui-evolution_docker_directory}}/docker-compose.yml"
+    cmd: bin/yaml-merge.sh "docker-compose.yml" "docker-plui-evolution.yml" > "{{pluievolution_docker_directory}}/docker-compose.yml"
     
 #- name: Stop docker compose
 #  shell:
 #    cmd: docker-compose down
-#    chdir: "{{plui-evolution_docker_directory}}"
+#    chdir: "{{pluievolution_docker_directory}}"
     
 - name: Restart docker compose
   shell:
     cmd: docker-compose up -d --build
-    chdir: "{{plui-evolution_docker_directory}}"    
+    chdir: "{{pluievolution_docker_directory}}"    

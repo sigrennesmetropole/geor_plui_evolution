@@ -1,6 +1,7 @@
 package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.core.dto.ConfigurationData;
+import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 
 /**
  * Interface du service de configuration.
@@ -13,4 +14,10 @@ public interface ConfigurationService {
      * @return version
      */
 	ConfigurationData getApplicationVersion();
+
+    /**
+     * Permet d'obtenir les informations relatives à la couche des pluirequest dans le geoserver
+     * @return
+     */
+	LayerConfiguration getLayerConfigurations();
 }

@@ -38,7 +38,7 @@ public class PluiRequestEntity implements LongId {
 	@Column(name = "redmine_id")
 	private Integer redmineId;
 
-	@Column(name = "subject", length = 30, nullable = false)
+	@Column(name = "subject", length = 130, nullable = false)
 	private String subject;
 
 	@Column(name = "object", length = 300, nullable = false)
