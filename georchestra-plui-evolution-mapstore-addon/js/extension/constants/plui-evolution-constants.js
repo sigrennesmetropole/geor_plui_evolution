@@ -4,7 +4,7 @@ export const GeometryType = {
     POLYGON: "Polygon"
 };
 
-export const FeatureProjection = "EPSG:4326";
+export const DEFAULT_PROJECTION = "EPSG:4326";
 
 export const PluiRequestType = {
     COMMUNE: "TYPE_COMMUNE",

@@ -21,6 +21,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Value("${pluievolution.geoserver.layerName}")
     private String layerName;
 
+    @Value("${pluievolution.geoserver.layerSRID}")
+    private int layerSRID;
+
     @Autowired
     ConfigurationMapper configMapper;
 
@@ -34,6 +37,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         LayerConfiguration layerConfiguration = new LayerConfiguration();
         layerConfiguration.setLayerName(layerName);
         layerConfiguration.setLayerWorkspace(layerWorkspace);
+        layerConfiguration.setLayerProjection("EPSG:" + layerSRID);
         return layerConfiguration;
     }
 }
