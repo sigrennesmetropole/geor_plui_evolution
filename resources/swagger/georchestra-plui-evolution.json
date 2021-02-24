@@ -730,6 +730,9 @@
 				},
 				"layerName": {
 					"type": "string"
+				},
+				"layerProjection": {
+					"type": "string"
 				}
 			}
 		},

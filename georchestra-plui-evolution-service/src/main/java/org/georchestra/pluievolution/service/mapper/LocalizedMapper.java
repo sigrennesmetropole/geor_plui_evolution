@@ -7,13 +7,17 @@ import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.dto.Point2D;
 import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface LocalizedMapper {
+public abstract class LocalizedMapper {
 
-    default Geometry  dtoToEntity(Point point) {
+    @Value("${pluievolution.geoserver.layerSRID}")
+    private int layerSRID;
+
+    public Geometry  dtoToEntity(Point point) {
         if (point == null) {
             return null;
         }
@@ -21,11 +25,11 @@ public interface LocalizedMapper {
         Coordinate coordinate = new Coordinate(point.getCoordinates().get(0).doubleValue(),
                 point.getCoordinates().get(1).doubleValue());
         com.vividsolutions.jts.geom.Point pointGeom = gf.createPoint(coordinate);
-        pointGeom.setSRID(4326);
+        pointGeom.setSRID(layerSRID);
         return pointGeom;
     }
 
-    default Point entityToDto(Geometry geometry) {
+    public Point entityToDto(Geometry geometry) {
         if (geometry == null) {
             return null;
         }
@@ -38,7 +42,7 @@ public interface LocalizedMapper {
         return point;
     }
 
-    default Geometry toEntity(Point s, @MappingTarget Geometry entity) {
+    public Geometry toEntity(Point s, @MappingTarget Geometry entity) {
         if (s != null) {
             return dtoToEntity(s);
         }
