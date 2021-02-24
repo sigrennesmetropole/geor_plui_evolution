@@ -262,7 +262,7 @@ export const initDrawingSupportEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_INIT_SUPPORT_DRAWING)
         .switchMap(() => Rx.Observable.of(changeMapInfoState(false)));
 
-/*export const displayAllPluiRequest = (action$, store) =>
+export const displayAllPluiRequest = (action$, store) =>
     action$.ofType(UPDATE_LAYER)
         .filter(action => action.layer.group === "background")
         .skipWhile(() => !store.getState().pluievolution || !store.getState().pluievolution.layerConfiguration)
@@ -300,7 +300,7 @@ export const initDrawingSupportEpic = action$ =>
                         selectNode(pluiEvolutionLayerId,"layer",false)
                     ]
             );
-        });*/
+        });
 
 export const displayEtablissement = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
