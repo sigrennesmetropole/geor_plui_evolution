@@ -174,7 +174,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
             closeIdentify: closeIdentify
         })(PluiEvolutionRequestViewer);
         setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
-        console.log('plui constructor');
     }
 
     componentWillMount() {
@@ -182,7 +181,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.props.loadAttachmentConfiguration();
         this.props.loadLayerConfiguration();
         this.props.getMe();
-        console.log('plui componentWillMount');
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -224,7 +222,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.props.updateAttachments(null);
             this.props.toggleControl();
         }
-        console.log('plui componentDidUpdate');
 
     }
 
