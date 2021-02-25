@@ -267,7 +267,7 @@ export const displayAllPluiRequest = (action$, store) =>
             const pluiLayer = head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId));
             return Rx.Observable.from(
                 pluiLayer
-                    ? refreshLayerVersion(pluiEvolutionLayerId)
+                    ? [refreshLayerVersion(pluiEvolutionLayerId)]
                     : [addLayer({
                         handleClickOnLayer: true,
                         hideLoading: true,
