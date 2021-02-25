@@ -146,7 +146,7 @@ export function openingPanel(pluiRequest, requestStatus) {
 		type: actions.PLUI_EVOLUTION_OPENING_PANEL,
 		status: requestStatus,
 		pluiRequest: pluiRequest
-	}
+	};
 }
 
 export function openPanel(pluiRequest) {
