@@ -77,6 +77,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadLayerConfiguration: PropTypes.func,
         getMe: PropTypes.func,
         displayEtablissement: PropTypes.func,
+        displayAllPluiRequest: PropTypes.func,
         savePluiRequest: PropTypes.func,
         requestClosing: PropTypes.func,
         cancelClosing: PropTypes.func,
@@ -140,6 +141,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadLayerConfiguration: ()=>{},
         getMe: ()=>{},
         displayEtablissement: ()=>{},
+        displayAllPluiRequest: ()=>{},
         savePluiRequest: ()=>{},
         requestClosing: ()=>{},
         cancelClosing: ()=>{},
@@ -186,7 +188,11 @@ export class PluiEvolutionPanelComponent extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         console.log("pluie didUpdate...");
         // Tout est-il initialisé ?
-        this.state.initialized = this.props.attachmentConfiguration !== null && this.props.user !== null && this.loadGeographicEtablissement(this.props.user);
+        this.state.initialized = this.props.attachmentConfiguration !== null
+            && this.props.user !== null
+            && this.loadGeographicEtablissement(this.props.user)
+            && this.props.layerConfiguration;
+
         if (this.props.status === status.LOAD_REQUEST) {
             this.state.initialized &= this.props.pluiRequest != null && this.props.attachments != null;
         }
@@ -197,7 +203,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         }
 
         if (this.props.status === status.INIT_FORM_REQUEST) {
-            console.log('initing form');
             this.state.pluiRequest = {
                 object: "",
                 subject: "",
@@ -208,6 +213,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.state.attachments = [];
             this.setState(this.state);
             this.props.changeFormStatus(status.CREATE_REQUEST);
+
+            this.props.displayAllPluiRequest();
         }
 
         if (this.props.status === status.LOAD_REQUEST && !this.state.pluiRequest && this.state.initialized) {

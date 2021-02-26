@@ -39,9 +39,6 @@ import {
     PLUI_EVOLUTION_LAYER_TITLE,
     PluiRequestType
 } from "../constants/plui-evolution-constants";
-import {SET_CURRENT_BACKGROUND_LAYER} from "@mapstore/actions/backgroundselector";
-import {SET_CONTROL_PROPERTY} from "@mapstore/actions/controls";
-
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
@@ -102,6 +99,7 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .switchMap((response) => Rx.Observable.of(loadedAttachmentConfiguration(response.data)))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
+
 export const loadLayerConfigurationEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
         .switchMap((action) => {
@@ -115,8 +113,8 @@ export const loadLayerConfigurationEpic = (action$) =>
                     pluiEvolutionLayerId = response.data.layerWorkspace;
                     pluiEvolutionLayerName = response.data.layerName;
                     pluiEvolutionLayerProjection = response.data.layerProjection ? response.data.layerProjection : DEFAULT_PROJECTION;
-                    Rx.Observable.of(loadedLayerConfiguration(response.data)
-                    )})
+                    return Rx.Observable.of(loadedLayerConfiguration(response.data));
+                })
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.layerConfiguration.error", null, e)));
         });
 
@@ -264,19 +262,13 @@ export const initDrawingSupportEpic = action$ =>
         .switchMap(() => Rx.Observable.of(changeMapInfoState(false)));
 
 export const displayAllPluiRequest = (action$, store) =>
-    action$.ofType(SET_CURRENT_BACKGROUND_LAYER)
-        .filter(() => {
-            return head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId)) === null;
-        })
-        .merge(action$.ofType(SET_CONTROL_PROPERTY)
-            .filter((action) => {
-                return action.control === 'backgroundSelector';
-            })
-            .take(1)
-            .switchMap((action) => {
-                const url = backendURLPrefix + "/carto/wmsRequest";
-                return Rx.Observable.from([
-                    addLayer({
+    action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ALL)
+        .switchMap(() => {
+            const pluiLayer = head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId));
+            return Rx.Observable.from(
+                pluiLayer
+                    ? [refreshLayerVersion(pluiEvolutionLayerId)]
+                    : [addLayer({
                         handleClickOnLayer: true,
                         hideLoading: true,
                         id: pluiEvolutionLayerId,
@@ -290,9 +282,10 @@ export const displayAllPluiRequest = (action$, store) =>
                         params: {
                             exceptions: 'application/vnd.ogc.se_xml'
                         },
+                        allowedSRS: pluiEvolutionLayerProjection,
                         format: "image/png",
                         singleTile: false,
-                        url: url,
+                        url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
                         featureInfo: {
                             format: "PROPERTIES",
@@ -301,44 +294,9 @@ export const displayAllPluiRequest = (action$, store) =>
                             }
                         }
                     }),
-                    selectNode(pluiEvolutionLayerId,"layer",false)
-                ]);
-            })
-        );
-
-
-export const startDrawingEpic = action$ =>
-    action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
-        .switchMap((action) => {
-            const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
-            let coordinates = Array(0);
-            if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
-                coordinates = action.localisation.coordinates;
-            }
-
-            const feature = {
-                geometry: {
-                    type: action.geometryType,
-                    coordinates: coordinates
-                },
-                newFeature: !existingLocalisation,
-                type: "Feature",
-            };
-
-            const drawOptions = {
-                drawEnabled: true,
-                editEnabled: false,
-                featureProjection: pluiEvolutionLayerProjection,
-                selectEnabled: false,
-                stopAfterDrawing: true,
-                transformToFeatureCollection: false,
-                translateEnabled: false,
-                useSelectedStyle: false
-            };
-            return Rx.Observable.from([
-                changeDrawingStatus("drawOrEdit", action.geometryType, "pluievolution", [feature], drawOptions),
-                setDrawing(true)
-            ]);
+                        selectNode(pluiEvolutionLayerId,"layer",false)
+                    ]
+            );
         });
 
 export const displayEtablissement = action$ =>
@@ -404,6 +362,40 @@ export const displayEtablissement = action$ =>
                         autoDismiss: 4
                     }, 'warning')
                 ));
+        });
+
+export const startDrawingEpic = action$ =>
+    action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
+        .switchMap((action) => {
+            const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
+            let coordinates = Array(0);
+            if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
+                coordinates = action.localisation.coordinates;
+            }
+
+            const feature = {
+                geometry: {
+                    type: action.geometryType,
+                    coordinates: coordinates
+                },
+                newFeature: !existingLocalisation,
+                type: "Feature",
+            };
+
+            const drawOptions = {
+                drawEnabled: true,
+                editEnabled: false,
+                featureProjection: pluiEvolutionLayerProjection,
+                selectEnabled: false,
+                stopAfterDrawing: true,
+                transformToFeatureCollection: false,
+                translateEnabled: false,
+                useSelectedStyle: false
+            };
+            return Rx.Observable.from([
+                changeDrawingStatus("drawOrEdit", action.geometryType, "pluievolution", [feature], drawOptions),
+                setDrawing(true)
+            ]);
         });
 
 export const geometryChangeEpic = action$ =>

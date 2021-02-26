@@ -146,7 +146,7 @@ export function openingPanel(pluiRequest, requestStatus) {
 		type: actions.PLUI_EVOLUTION_OPENING_PANEL,
 		status: requestStatus,
 		pluiRequest: pluiRequest
-	}
+	};
 }
 
 export function openPanel(pluiRequest) {
@@ -288,8 +288,7 @@ export function displayEtablissement(pluiRequestType, geographicEtablissement) {
 
 export function displayAllPluiRequest() {
 	return {
-		type: actions.PLUI_EVOLUTION_DISPLAY_ALL,
-		layerConfiguration: layerConfiguration
+		type: actions.PLUI_EVOLUTION_DISPLAY_ALL
 	};
 }
 
