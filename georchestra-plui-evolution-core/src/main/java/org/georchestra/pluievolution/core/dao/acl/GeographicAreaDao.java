@@ -1,8 +1,9 @@
 package org.georchestra.pluievolution.core.dao.acl;
 
-import com.vividsolutions.jts.geom.Geometry;
+
 import org.georchestra.pluievolution.core.dao.QueryDslDao;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
+import org.locationtech.jts.geom.Geometry;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;

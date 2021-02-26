@@ -349,9 +349,20 @@ export const displayEtablissement = action$ =>
                         type: "Feature",
                     };
 
+                    const options = {
+                        drawEnabled: false,
+                        editEnabled: false,
+                        featureProjection: pluiEvolutionLayerProjection,
+                        selectEnabled: false,
+                        stopAfterDrawing: true,
+                        transformToFeatureCollection: false,
+                        translateEnabled: false,
+                        useSelectedStyle: false
+                    };
+
                     return Rx.Observable.from([
-                        changeDrawingStatus("replace", GeometryType.POINT, "pluievolution", [feature], {}),
-                        updateLocalisation(geographicEtablissement.localisation),
+                        changeDrawingStatus("drawOrEdit", GeometryType.POINT, "pluievolution", [feature], options),
+                        updateLocalisation(geographicEtablissement.localisation)
                     ]);
                 }).catch(() => Rx.Observable.of(
                     show({

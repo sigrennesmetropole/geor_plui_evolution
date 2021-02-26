@@ -1,11 +1,11 @@
 package org.georchestra.pluievolution.service.mapper;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.dto.Point2D;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -17,14 +17,14 @@ public abstract class LocalizedMapper {
     @Value("${pluievolution.geoserver.layerSRID}")
     private int layerSRID;
 
-    public Geometry  dtoToEntity(Point point) {
+    public Geometry dtoToEntity(Point point) {
         if (point == null) {
             return null;
         }
         GeometryFactory gf = new GeometryFactory();
         Coordinate coordinate = new Coordinate(point.getCoordinates().get(0).doubleValue(),
                 point.getCoordinates().get(1).doubleValue());
-        com.vividsolutions.jts.geom.Point pointGeom = gf.createPoint(coordinate);
+        org.locationtech.jts.geom.Point pointGeom = gf.createPoint(coordinate);
         pointGeom.setSRID(layerSRID);
         return pointGeom;
     }
