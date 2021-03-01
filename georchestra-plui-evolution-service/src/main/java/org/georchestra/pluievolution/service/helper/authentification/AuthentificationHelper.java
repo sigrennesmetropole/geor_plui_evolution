@@ -21,6 +21,18 @@ public class AuthentificationHelper {
 	public static final String ADMINISTRATOR_ROLE = "ADMINISTRATOR";
 
 	/**
+	 * @return Retourne l'utilisateur connecté
+	 */
+	public User getConnectedUser() {
+		User user = null;
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.getPrincipal() != null) {
+			user = (User) authentication.getDetails();
+		}
+		return user;
+	}
+
+	/**
 	 * 
 	 * @return l'username de la personne authentifiée
 	 */
