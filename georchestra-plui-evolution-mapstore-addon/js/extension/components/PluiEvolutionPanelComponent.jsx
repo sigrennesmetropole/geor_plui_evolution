@@ -28,7 +28,6 @@ import {openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
-    ORGANIZATION_RENNES_METROPOLE,
     PluiRequestType
 } from '../constants/plui-evolution-constants';
 
@@ -57,6 +56,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         // data
         attachmentConfiguration: PropTypes.object,
         layerConfiguration: PropTypes.object,
+        etablissementConfiguration: PropTypes.object,
         geographicEtablissements: PropTypes.array,
         contextThemas: PropTypes.array,
         user: PropTypes.object,
@@ -78,6 +78,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         getMe: PropTypes.func,
         displayEtablissement: PropTypes.func,
         displayAllPluiRequest: PropTypes.func,
+        loadEtablissementConfiguration: PropTypes.func,
         savePluiRequest: PropTypes.func,
         requestClosing: PropTypes.func,
         cancelClosing: PropTypes.func,
@@ -125,6 +126,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         attachmentConfiguration: null,
         user: null,
         geographicEtablissements: null,
+        etablissementConfiguration: null,
         attachments: null,
         pluiRequest: null,
         layerConfiguration: null,
@@ -142,6 +144,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         getMe: ()=>{},
         displayEtablissement: ()=>{},
         displayAllPluiRequest: ()=>{},
+        loadEtablissementConfiguration: ()=>{},
         savePluiRequest: ()=>{},
         requestClosing: ()=>{},
         cancelClosing: ()=>{},
@@ -182,7 +185,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
         this.props.loadLayerConfiguration();
-        this.props.getMe();
+        this.props.loadEtablissementConfiguration();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -191,7 +194,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.state.initialized = this.props.attachmentConfiguration !== null
             && this.props.user !== null
             && this.loadGeographicEtablissement(this.props.user)
-            && this.props.layerConfiguration != null;
+            && this.props.layerConfiguration != null
+            && this.props.etablissementConfiguration != null;
 
         if (this.props.status === status.LOAD_REQUEST) {
             this.state.initialized &= this.props.pluiRequest != null && this.props.attachments != null;
@@ -392,7 +396,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     isAgentRmUser(user) {
-        return user.organization === ORGANIZATION_RENNES_METROPOLE;
+        return user.organization === this.props.etablissementConfiguration.organisationRm;
     }
 
     renderPluiManual() {

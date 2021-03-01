@@ -14,12 +14,14 @@ import {
     closeRequest,
     getAllGeographicEtablissement,
     getAttachments,
+    getMe,
     gotMe,
     initDrawingSupport,
     initPluiEvolutionDone,
     loadActionError,
     loadedAllGeographicEtablissement,
     loadedAttachmentConfiguration,
+    loadedEtablissementConfiguration,
     loadedLayerConfiguration,
     loadingPluiCreateForm,
     loadingPluiUpdateForm,
@@ -32,13 +34,12 @@ import {
     updateLocalisation
 } from '../actions/plui-evolution-action';
 import {
-    CODE_INSEE_RENNES_METROPOLE,
     DEFAULT_PROJECTION,
     GeometryType,
-    ORGANIZATION_RENNES_METROPOLE,
     PLUI_EVOLUTION_LAYER_TITLE,
     PluiRequestType
 } from "../constants/plui-evolution-constants";
+import {pluiEvolutionEtablissementConfigurationSelector,} from '../selectors/plui-evolution-selector';
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
@@ -118,6 +119,17 @@ export const loadLayerConfigurationEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.layerConfiguration.error", null, e)));
         });
 
+export const loadEtablissementConfigurationEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_ETABLISSEMENT_CONFIGURATION_LOAD)
+        .switchMap((action) => {
+            const url = backendURLPrefix + "/geographic/configuration";
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => {
+                    return Rx.Observable.from([loadedEtablissementConfiguration(response.data), getMe()]);
+                })
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.etablissementConfiguration.error", null, e)));
+        });
+
 export const getAllGeographicEtablissementEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL)
         .switchMap((action) => {
@@ -175,17 +187,18 @@ export const downloadAttachmentEpic = (action$) =>
                 ));
         });
 
-export const loadMeEpic = (action$) =>
+export const loadMeEpic = (action$,store) =>
     action$.ofType(actions.PLUI_EVOLUTION_USER_ME_GET)
         .switchMap((action) => {
             if (action.user) {
                 return Rx.Observable.of(gotMe(action.user)).delay(0);
             }
+            const state = store.getState();
             const url = backendURLPrefix + "/user/me";
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.from(
                     [gotMe(response.data)]
-                        .concat(response.data.organization === ORGANIZATION_RENNES_METROPOLE
+                        .concat(response.data.organization === pluiEvolutionEtablissementConfigurationSelector(state).organisationRm
                             ? [getAllGeographicEtablissement()]
                             : [])
                 ))
@@ -299,10 +312,10 @@ export const displayAllPluiRequest = (action$, store) =>
             );
         });
 
-export const displayEtablissement = action$ =>
+export const displayEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
-
+            const state = store.getState();
             let requestEtablissement = null;
 
             let url = backendURLPrefix;
@@ -316,7 +329,7 @@ export const displayEtablissement = action$ =>
             }
 
             else if (action.pluiRequestType === PluiRequestType.METROPOLITAIN) {
-                requestEtablissement = axios.get(url + "/geographic/etablissements/" + CODE_INSEE_RENNES_METROPOLE);
+                requestEtablissement = axios.get(url + "/geographic/etablissements/" + pluiEvolutionEtablissementConfigurationSelector(state).codeInseeRm);
             }
 
             return Rx.Observable.defer(() => requestEtablissement)
