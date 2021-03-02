@@ -63,11 +63,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>net.minidev</groupId>
-			<artifactId>json-smart</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
 		</dependency>
