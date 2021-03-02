@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional(readOnly = true)
 	public User getMe() {
-		return loadUserByUsername(authentificationHelper.getUsername());
+		return authentificationHelper.getConnectedUser();
 	}
 
 	@Override
