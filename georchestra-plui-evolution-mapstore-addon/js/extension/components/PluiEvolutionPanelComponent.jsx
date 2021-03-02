@@ -21,15 +21,14 @@ import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import {getMessageById} from '@mapstore/utils/LocaleUtils';
-import { setViewer } from '@mapstore/utils/MapInfoUtils';
+import {setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
-import {PluiEvolutionRequestViewer, PLUI_EVOLUTION_REQUEST_VIEWER} from './PluiEvolutionRequestViewer';
+import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
 import {openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
-    PluiRequestType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
-    ORGANIZATION_RENNES_METROPOLE
+    PluiRequestType
 } from '../constants/plui-evolution-constants';
 
 
@@ -57,6 +56,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         // data
         attachmentConfiguration: PropTypes.object,
         layerConfiguration: PropTypes.object,
+        etablissementConfiguration: PropTypes.object,
         geographicEtablissements: PropTypes.array,
         contextThemas: PropTypes.array,
         user: PropTypes.object,
@@ -78,6 +78,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         getMe: PropTypes.func,
         displayEtablissement: PropTypes.func,
         displayAllPluiRequest: PropTypes.func,
+        loadEtablissementConfiguration: PropTypes.func,
         savePluiRequest: PropTypes.func,
         requestClosing: PropTypes.func,
         cancelClosing: PropTypes.func,
@@ -125,6 +126,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         attachmentConfiguration: null,
         user: null,
         geographicEtablissements: null,
+        etablissementConfiguration: null,
         attachments: null,
         pluiRequest: null,
         layerConfiguration: null,
@@ -142,6 +144,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         getMe: ()=>{},
         displayEtablissement: ()=>{},
         displayAllPluiRequest: ()=>{},
+        loadEtablissementConfiguration: ()=>{},
         savePluiRequest: ()=>{},
         requestClosing: ()=>{},
         cancelClosing: ()=>{},
@@ -182,7 +185,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
         this.props.loadLayerConfiguration();
-        this.props.getMe();
+        this.props.loadEtablissementConfiguration();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -191,7 +194,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.state.initialized = this.props.attachmentConfiguration !== null
             && this.props.user !== null
             && this.loadGeographicEtablissement(this.props.user)
-            && this.props.layerConfiguration;
+            && this.props.layerConfiguration != null
+            && this.props.etablissementConfiguration != null;
 
         if (this.props.status === status.LOAD_REQUEST) {
             this.state.initialized &= this.props.pluiRequest != null && this.props.attachments != null;
@@ -392,7 +396,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     isAgentRmUser(user) {
-        return user.organization === ORGANIZATION_RENNES_METROPOLE;
+        return user.organization === this.props.etablissementConfiguration.organisationRm;
     }
 
     renderPluiManual() {
@@ -695,7 +699,13 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                            onChange={() => this.setPluiRequestType(PluiRequestType.COMMUNE)}>
                                         <Message msgId="pluievolution.localisation.graphique"/>
                                     </Radio>
-                                    {this.renderGeometryDrawButton()}
+                                    <Button
+                                        disabled={this.state.pluiRequest.type !== PluiRequestType.COMMUNE}
+                                        bsSize="small"
+                                        bsStyle="primary"
+                                        onClick={this.drawTypeCommune}>
+                                        {this.renderGeometryDrawMessage()}
+                                    </Button>
                                 </div>
                             </div>
                             <div className="radio-form">
@@ -705,15 +715,16 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                            onChange={() => this.setPluiRequestType(PluiRequestType.INTERCOMMUNE)}>
                                         <Message msgId="pluievolution.localisation.commune"/>
                                     </Radio>
+                                    {!this.isAgentRmUser(this.props.user) &&
                                     <Button
                                         disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
                                         bsSize="small"
                                         bsStyle="primary"
-                                        onClick={() => this.drawTypeIntercommune(this.state.etablissementSelected)}>
+                                        onClick={() => this.drawEtablissement()}>
                                         <Message msgId="pluievolution.clickHere"/>
                                     </Button>
+                                    }
                                 </div>
-                                {this.renderGeographicEtablissements()}
                             </div>
                             <div className="radio-form">
                                 <div className="radio-block">
@@ -722,16 +733,19 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                            onChange={() => this.setPluiRequestType(PluiRequestType.METROPOLITAIN)}>
                                         <Message msgId="pluievolution.localisation.metropolitain"/>
                                     </Radio>
+                                    {!this.isAgentRmUser(this.props.user) &&
                                     <Button
                                         disabled={this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
                                         bsSize="small"
                                         bsStyle="primary"
-                                        onClick={this.drawTypeMetropolitain}>
+                                        onClick={() => this.drawEtablissement()}>
                                         <Message msgId="pluievolution.clickHere"/>
                                     </Button>
+                                    }
                                 </div>
                             </div>
                         </FormGroup>
+                        {this.renderGeographicEtablissements()}
                     </fieldset>
                 </div>
             );
@@ -741,19 +755,34 @@ export class PluiEvolutionPanelComponent extends React.Component {
     renderGeographicEtablissements() {
         if (this.isAgentRmUser(this.props.user)) {
             return (
-                <FormGroup className="radio-select" validationState={this.state.errorFields.codeInsee ? "error" : null}>
-                    <FormControl componentClass="select"
-                                 disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE}
-                                 onChange={this.handleEtablissementChange}>
-                        <option key="0" value="">Sélectionnez une mairie</option>
-                        {
-                            this.props.geographicEtablissements.map((geoEtbl, index) => {
-                                return <option key={geoEtbl.codeInsee} value={index}>{geoEtbl.nom}</option>
-                            })
-                        }
-                    </FormControl>
+                <FormGroup controlId="mairie"
+                           validationState={this.state.errorFields.codeInsee ? "error" : null}>
+                    <InputGroup className="input-group">
+                        <InputGroup.Addon className="addon">
+                            <Message msgId="pluievolution.localisation.cityHall.title"/>
+                        </InputGroup.Addon>
+                        <FormControl componentClass="select"
+                                     disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE && this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
+                                     onChange={this.handleEtablissementChange}>
+                            <option key="0" value="">Sélectionnez une mairie</option>
+                            {
+                                this.props.geographicEtablissements.map((geoEtbl, index) => {
+                                    return <option key={geoEtbl.codeInsee} value={index}>{geoEtbl.nom}</option>
+                                })
+                            }
+                        </FormControl>
+                        <InputGroup.Button>
+                            <Button
+                                disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE && this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
+                                bsSize="small"
+                                bsStyle="primary"
+                                onClick={() => this.drawEtablissement(this.state.etablissementSelected)}>
+                                <Message msgId="pluievolution.clickHere"/>
+                            </Button>
+                        </InputGroup.Button>
+                    </InputGroup>
                 </FormGroup>
-            )
+            );
         }
     }
 
@@ -774,21 +803,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
 
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
-
-    /**
-     * Affichage du bouton permettant de définir la géométrie d'un plui-evolution
-     */
-    renderGeometryDrawButton = ()=> {
-        return (
-            <Button
-                disabled={this.state.pluiRequest.type !== PluiRequestType.COMMUNE}
-                bsSize="small"
-                bsStyle="primary"
-                onClick={this.drawTypeCommune}>
-                {this.renderGeometryDrawMessage()}
-            </Button>
-        );
     }
 
     /**
@@ -819,20 +833,15 @@ export class PluiEvolutionPanelComponent extends React.Component {
         }
     }
 
-    drawTypeIntercommune(geographicEtablissement) {
-        console.log('actual geographicEtablissement', geographicEtablissement);
+    drawEtablissement(geographicEtablissement) {
         if (this.isAgentRmUser(this.props.user) && !geographicEtablissement) {
             this.state.errorFields.codeInsee = true;
             this.setState(this.state);
             this.props.loadActionError("pluievolution.codeInsee.error");
         }
         else {
-            this.props.displayEtablissement(PluiRequestType.INTERCOMMUNE, geographicEtablissement);
+            this.props.displayEtablissement(this.state.pluiRequest.type, geographicEtablissement);
         }
-    }
-
-    drawTypeMetropolitain = () => {
-        this.props.displayEtablissement(PluiRequestType.METROPOLITAIN, null);
     }
 
     renderFormButton = () => {
@@ -998,10 +1007,12 @@ export class PluiEvolutionPanelComponent extends React.Component {
             this.props.loadActionError("pluievolution.type.error");
             return false;
         }
-        if (this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE && this.isAgentRmUser(this.props.user) && !this.state.pluiRequest.codeInsee) {
+        if ((this.state.pluiRequest.type === PluiRequestType.INTERCOMMUNE || this.state.pluiRequest.type === PluiRequestType.METROPOLITAIN)
+            && this.isAgentRmUser(this.props.user)
+            && !this.state.pluiRequest.codeInsee) {
             this.state.errorFields.codeInsee = true;
             this.setState(this.state);
-            this.props.loadActionError("pluievolution.codeInsee.error");
+            this.props.loadActionError("pluievolution.localisation.error.cityHall");
             return false;
         }
         if (!this.state.pluiRequest.localisation || this.state.pluiRequest.localisation.length === 0) {

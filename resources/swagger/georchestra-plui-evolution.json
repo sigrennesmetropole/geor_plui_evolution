@@ -568,6 +568,32 @@
 				}
 			}
 		},
+		"/geographic/configuration": {
+			"get": {
+				"tags": [
+					"geographic"
+				],
+				"summary": "Configuration des établissements",
+				"operationId": "getEtablissementConfiguration",
+				"produces": [
+					"application/json;charset=utf-8"
+				],
+				"responses": {
+					"200": {
+						"description": "Configuration des établissements",
+						"schema": {
+							"$ref": "#/definitions/EtablissementConfiguration"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					}
+				}
+			}
+		},
 		"/geographic/areas": {
 			"get": {
 				"tags": [
@@ -732,6 +758,17 @@
 					"type": "string"
 				},
 				"layerProjection": {
+					"type": "string"
+				}
+			}
+		},
+		"EtablissementConfiguration": {
+			"type": "object",
+			"properties": {
+				"organisationRm": {
+					"type": "string"
+				},
+				"codeInseeRm": {
 					"type": "string"
 				}
 			}

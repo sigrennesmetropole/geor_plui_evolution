@@ -1,9 +1,10 @@
 package org.georchestra.pluievolution.service.acl;
 
-import com.vividsolutions.jts.geom.Geometry;
+
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+import org.locationtech.jts.geom.Geometry;
 
 import java.util.List;
 

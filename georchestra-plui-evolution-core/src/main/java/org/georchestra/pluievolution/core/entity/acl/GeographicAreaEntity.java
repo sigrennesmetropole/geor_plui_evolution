@@ -1,11 +1,17 @@
 package org.georchestra.pluievolution.core.entity.acl;
 
-import com.vividsolutions.jts.geom.Geometry;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.georchestra.pluievolution.core.common.LongId;
+import org.locationtech.jts.geom.Geometry;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @author NCA20245

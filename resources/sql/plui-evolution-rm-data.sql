@@ -140,6 +140,10 @@ INSERT INTO pluievolution.geographic_area (id, codeinsee, nom, identifiant_redmi
 INSERT INTO pluievolution.geographic_area (id, nom, identifiant_redmine) VALUES
 (45, 'Interco', 'demandes-interco');
 
+-- Reprojection des géométries vers EPSG:3948
+UPDATE pluievolution.geographic_etablissement SET geometry = ST_Transform(geometry, 3948);
+UPDATE pluievolution.geographic_area SET geometry = ST_Transform(geometry, 3948);
+
 CREATE OR REPLACE FUNCTION updategeographicarea()
     RETURNS void AS
 $BODY$DECLARE
