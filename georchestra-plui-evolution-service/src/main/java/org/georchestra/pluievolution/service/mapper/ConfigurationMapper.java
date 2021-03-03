@@ -1,8 +1,8 @@
 package org.georchestra.pluievolution.service.mapper;
 
 
-import org.georchestra.pluievolution.service.bean.Configuration;
 import org.georchestra.pluievolution.core.dto.ConfigurationData;
+import org.georchestra.pluievolution.service.bean.Configuration;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

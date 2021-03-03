@@ -1,10 +1,13 @@
 package org.georchestra.pluievolution.service.mapper;
 
 import org.georchestra.pluievolution.core.dto.GeographicEtablissement;
-import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.entity.acl.GeographicEtablissementEntity;
-import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
-import org.mapstruct.*;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
+import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = LocalizedMapper.class)
 public interface GeographicEtablissementMapper extends AbstractMapper<GeographicEtablissementEntity, GeographicEtablissement> {
