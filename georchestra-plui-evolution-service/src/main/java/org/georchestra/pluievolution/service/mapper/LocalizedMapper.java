@@ -41,11 +41,4 @@ public abstract class LocalizedMapper {
         point.setType(GeometryType.POINT);
         return point;
     }
-
-    public Geometry toEntity(Point s, @MappingTarget Geometry entity) {
-        if (s != null) {
-            return dtoToEntity(s);
-        }
-        return entity;
-    }
 }

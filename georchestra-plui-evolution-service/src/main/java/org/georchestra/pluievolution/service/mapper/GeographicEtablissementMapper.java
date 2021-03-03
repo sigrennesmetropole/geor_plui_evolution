@@ -11,7 +11,7 @@ public interface GeographicEtablissementMapper extends AbstractMapper<Geographic
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "geographicEtablissementEntity.geometry", target = "localisation")
+                    @Mapping(source = "geometry", target = "localisation")
             }
     )
     GeographicEtablissement entityToDto(GeographicEtablissementEntity geographicEtablissementEntity);
@@ -20,20 +20,16 @@ public interface GeographicEtablissementMapper extends AbstractMapper<Geographic
     @InheritInverseConfiguration
     @Mappings(
             value = {
-                    @Mapping(source = "geographicEtablissement.localisation", target = "geometry")
+                    @Mapping(source = "localisation", target = "geometry")
             }
     )
     GeographicEtablissementEntity dtoToEntity(GeographicEtablissement geographicEtablissement);
 
     @Override
-    GeographicEtablissementEntity toEntity(GeographicEtablissement s, @MappingTarget GeographicEtablissementEntity entity);
-
-    @AfterMapping
-    default void afterMapping(PluiRequest s, @MappingTarget PluiRequestEntity entity) {
-        if (entity.getGeometry() == null && s.getLocalisation() != null) {
-            entity.setGeometry(new LocalizedMapperImpl().dtoToEntity(s.getLocalisation()));
-        }
-    }
-
-
+    @Mappings(
+            value = {
+                    @Mapping(source = "localisation", target = "geometry")
+            }
+    )
+    void toEntity(GeographicEtablissement s, @MappingTarget GeographicEtablissementEntity entity);
 }
