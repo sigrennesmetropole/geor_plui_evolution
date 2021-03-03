@@ -247,8 +247,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${compiler.plugin.version}</version>
 					<configuration>
-						<source>${java.source.version}</source>
-						<target>${java.target.version}</target>
+						<source>${maven.compiler.source}</source>
+						<target>${maven.compiler.target}</target>
 						<showDeprecation>true</showDeprecation>
 						<showWarnings>true</showWarnings>
 						<encoding>${project.build.sourceEncoding}</encoding>
