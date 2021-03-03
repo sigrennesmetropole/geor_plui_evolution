@@ -8,7 +8,6 @@ import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
-import org.georchestra.pluievolution.service.mapper.LocalizedMapper;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,9 +22,6 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 
     @Autowired
     GeographicAreaMapper geographicAreaMapper;
-
-    @Autowired
-    LocalizedMapper localizedMapper;
 
     @Autowired
     AuthentificationHelper authentificationHelper;
