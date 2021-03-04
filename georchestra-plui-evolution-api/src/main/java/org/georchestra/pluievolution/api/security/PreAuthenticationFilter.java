@@ -58,7 +58,8 @@ public class PreAuthenticationFilter implements Filter {
 			if (LOGGER.isInfoEnabled()) {
 				Enumeration<String> names = httpServletRequest.getHeaderNames();
 				while (names.hasMoreElements()) {
-					LOGGER.info("header:{}", names.nextElement());
+					String headerName = names.nextElement();
+					LOGGER.info("header:{} : {}", headerName, httpServletRequest.getHeader(headerName));
 				}
 			}
 			final String username = encodeStringToUtf8(httpServletRequest.getHeader(SEC_USERNAME));
