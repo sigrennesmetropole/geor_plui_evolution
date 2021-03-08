@@ -185,6 +185,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
         this.props.loadLayerConfiguration();
+        this.props.loadLayerConfiguration();
         this.props.loadEtablissementConfiguration();
     }
 

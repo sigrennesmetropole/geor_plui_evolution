@@ -756,6 +756,17 @@
 				},
 				"layerName": {
 					"type": "string"
+				}
+			}
+		},
+		"LayerConfiguration": {
+			"type": "object",
+			"properties": {
+				"layerWorkspace": {
+					"type": "string"
+				},
+				"layerName": {
+					"type": "string"
 				},
 				"layerProjection": {
 					"type": "string"

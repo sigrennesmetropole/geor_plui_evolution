@@ -100,6 +100,22 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .switchMap((response) => Rx.Observable.of(loadedAttachmentConfiguration(response.data)))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
+export const loadLayerConfigurationEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
+        .switchMap((action) => {
+            if (action.layerConfiguration) {
+                return Rx.Observable.of(loadedLayerConfiguration(action.layerConfiguration)).delay(0);
+            }
+            const url = backendURLPrefix + "/carto/layerConfiguration";
+            pluiEvolutionLayerId = 5;
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => {
+                    pluiEvolutionLayerId = response.data.layerWorkspace;
+                    pluiEvolutionLayerName = response.data.layerName;
+                    Rx.Observable.of(loadedLayerConfiguration(response.data)
+                )})
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.layerConfiguration.error", null, e)));
+        });
 
 export const loadLayerConfigurationEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
