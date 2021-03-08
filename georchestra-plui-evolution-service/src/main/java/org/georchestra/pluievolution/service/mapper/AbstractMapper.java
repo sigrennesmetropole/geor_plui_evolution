@@ -26,9 +26,8 @@ public interface AbstractMapper<E, D> {
      * Permet de mettre à jour une entité à partir du dto
      * @param s
      * @param entity
-     * @return
      */
-    E toEntity(D s, @MappingTarget E entity);
+    void toEntity(D s, @MappingTarget E entity);
 
     /**
      * Permet de convertir une liste de entities à dto

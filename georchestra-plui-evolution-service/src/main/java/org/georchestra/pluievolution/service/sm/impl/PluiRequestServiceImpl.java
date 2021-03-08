@@ -5,7 +5,6 @@ package org.georchestra.pluievolution.service.sm.impl;
 
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.vividsolutions.jts.geom.Geometry;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.Attachment;
@@ -26,6 +25,7 @@ import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.georchestra.pluievolution.service.mapper.GeographicEtablissementMapper;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
+import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -240,6 +240,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		if (geographic == null) {
 			throw new ApiServiceException("Organisation inconnue", "404");
 		}
+
 		return geographic.getGeometry();
 	}
 

@@ -1,49 +1,50 @@
 import * as Rx from 'rxjs';
 import axios from 'axios';
 import {head} from 'lodash';
-import { saveAs } from 'file-saver';
+import {saveAs} from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
+import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
-import {changeMapInfoState, featureInfoClick, showMapinfoMarker, hideMapinfoMarker} from "@mapstore/actions/mapInfo";
-import { success, error, show } from '@mapstore/actions/notifications';
+import {changeMapInfoState, featureInfoClick, hideMapinfoMarker, showMapinfoMarker} from "@mapstore/actions/mapInfo";
+import {error, show, success} from '@mapstore/actions/notifications';
 import {PLUI_EVOLUTION_REQUEST_VIEWER} from '../components/PluiEvolutionRequestViewer';
 import {
     actions,
     closeRequest,
-    initPluiEvolutionDone,
-    loadedAttachmentConfiguration,
-    loadedLayerConfiguration,
     getAllGeographicEtablissement,
-    loadedAllGeographicEtablissement,
     getAttachments,
+    getMe,
     gotMe,
     initDrawingSupport,
+    initPluiEvolutionDone,
     loadActionError,
+    loadedAllGeographicEtablissement,
+    loadedAttachmentConfiguration,
+    loadedEtablissementConfiguration,
+    loadedLayerConfiguration,
     loadingPluiCreateForm,
     loadingPluiUpdateForm,
     loadPluiForm,
     openingPanel,
     pluiRequestSaved,
     setDrawing,
+    status,
     updateAttachments,
-    updateLocalisation, status
+    updateLocalisation
 } from '../actions/plui-evolution-action';
 import {
-    CODE_INSEE_RENNES_METROPOLE,
-    ORGANIZATION_RENNES_METROPOLE,
-    FeatureProjection,
+    DEFAULT_PROJECTION,
     GeometryType,
-    PluiRequestType,
-    PLUI_EVOLUTION_LAYER_TITLE
+    PLUI_EVOLUTION_LAYER_TITLE,
+    PluiRequestType
 } from "../constants/plui-evolution-constants";
-import {SET_CURRENT_BACKGROUND_LAYER} from "@mapstore/actions/backgroundselector";
-import {SET_CONTROL_PROPERTY} from "@mapstore/actions/controls";
-
+import {pluiEvolutionEtablissementConfigurationSelector,} from '../selectors/plui-evolution-selector';
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
 let pluiEvolutionLayerName;
+let pluiEvolutionLayerProjection;
 
 export const openPanelEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_OPEN_PANEL)
@@ -99,6 +100,7 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .switchMap((response) => Rx.Observable.of(loadedAttachmentConfiguration(response.data)))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
+
 export const loadLayerConfigurationEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
         .switchMap((action) => {
@@ -111,9 +113,21 @@ export const loadLayerConfigurationEpic = (action$) =>
                 .switchMap((response) => {
                     pluiEvolutionLayerId = response.data.layerWorkspace;
                     pluiEvolutionLayerName = response.data.layerName;
-                    Rx.Observable.of(loadedLayerConfiguration(response.data)
-                )})
+                    pluiEvolutionLayerProjection = response.data.layerProjection ? response.data.layerProjection : DEFAULT_PROJECTION;
+                    return Rx.Observable.of(loadedLayerConfiguration(response.data));
+                })
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.layerConfiguration.error", null, e)));
+        });
+
+export const loadEtablissementConfigurationEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_ETABLISSEMENT_CONFIGURATION_LOAD)
+        .switchMap((action) => {
+            const url = backendURLPrefix + "/geographic/configuration";
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => {
+                    return Rx.Observable.from([loadedEtablissementConfiguration(response.data), getMe()]);
+                })
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.etablissementConfiguration.error", null, e)));
         });
 
 export const getAllGeographicEtablissementEpic = (action$) =>
@@ -173,17 +187,18 @@ export const downloadAttachmentEpic = (action$) =>
                 ));
         });
 
-export const loadMeEpic = (action$) =>
+export const loadMeEpic = (action$,store) =>
     action$.ofType(actions.PLUI_EVOLUTION_USER_ME_GET)
         .switchMap((action) => {
             if (action.user) {
                 return Rx.Observable.of(gotMe(action.user)).delay(0);
             }
+            const state = store.getState();
             const url = backendURLPrefix + "/user/me";
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.from(
                     [gotMe(response.data)]
-                        .concat(response.data.organization === ORGANIZATION_RENNES_METROPOLE
+                        .concat(response.data.organization === pluiEvolutionEtablissementConfigurationSelector(state).organisationRm
                             ? [getAllGeographicEtablissement()]
                             : [])
                 ))
@@ -260,19 +275,13 @@ export const initDrawingSupportEpic = action$ =>
         .switchMap(() => Rx.Observable.of(changeMapInfoState(false)));
 
 export const displayAllPluiRequest = (action$, store) =>
-    action$.ofType(SET_CURRENT_BACKGROUND_LAYER)
-        .filter(() => {
-            return head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId)) === null;
-        })
-        .merge(action$.ofType(SET_CONTROL_PROPERTY)
-            .filter((action) => {
-                return action.control === 'backgroundSelector';
-            })
-            .take(1)
-            .switchMap((action) => {
-                const url = backendURLPrefix + "/carto/wmsRequest";
-                return Rx.Observable.from([
-                    addLayer({
+    action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ALL)
+        .switchMap(() => {
+            const pluiLayer = head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId));
+            return Rx.Observable.from(
+                pluiLayer
+                    ? [refreshLayerVersion(pluiEvolutionLayerId)]
+                    : [addLayer({
                         handleClickOnLayer: true,
                         hideLoading: true,
                         id: pluiEvolutionLayerId,
@@ -286,9 +295,10 @@ export const displayAllPluiRequest = (action$, store) =>
                         params: {
                             exceptions: 'application/vnd.ogc.se_xml'
                         },
+                        allowedSRS: pluiEvolutionLayerProjection,
                         format: "image/png",
                         singleTile: false,
-                        url: url,
+                        url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
                         featureInfo: {
                             format: "PROPERTIES",
@@ -297,50 +307,15 @@ export const displayAllPluiRequest = (action$, store) =>
                             }
                         }
                     }),
-                    selectNode(pluiEvolutionLayerId,"layer",false)
-                ]);
-            })
-        );
-
-
-export const startDrawingEpic = action$ =>
-    action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
-        .switchMap((action) => {
-            const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
-            let coordinates = Array(0);
-            if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
-                coordinates = action.localisation.coordinates;
-            }
-
-            const feature = {
-                geometry: {
-                    type: action.geometryType,
-                    coordinates: coordinates
-                },
-                newFeature: !existingLocalisation,
-                type: "Feature",
-            };
-
-            const drawOptions = {
-                drawEnabled: true,
-                editEnabled: false,
-                featureProjection: FeatureProjection,
-                selectEnabled: false,
-                stopAfterDrawing: true,
-                transformToFeatureCollection: false,
-                translateEnabled: false,
-                useSelectedStyle: false
-            };
-            return Rx.Observable.from([
-                changeDrawingStatus("drawOrEdit", action.geometryType, "pluievolution", [feature], drawOptions),
-                setDrawing(true)
-            ]);
+                        selectNode(pluiEvolutionLayerId,"layer",false)
+                    ]
+            );
         });
 
-export const displayEtablissement = action$ =>
+export const displayEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
-
+            const state = store.getState();
             let requestEtablissement = null;
 
             let url = backendURLPrefix;
@@ -354,7 +329,7 @@ export const displayEtablissement = action$ =>
             }
 
             else if (action.pluiRequestType === PluiRequestType.METROPOLITAIN) {
-                requestEtablissement = axios.get(url + "/geographic/etablissements/" + CODE_INSEE_RENNES_METROPOLE);
+                requestEtablissement = axios.get(url + "/geographic/etablissements/" + pluiEvolutionEtablissementConfigurationSelector(state).codeInseeRm);
             }
 
             return Rx.Observable.defer(() => requestEtablissement)
@@ -387,9 +362,20 @@ export const displayEtablissement = action$ =>
                         type: "Feature",
                     };
 
+                    const options = {
+                        drawEnabled: false,
+                        editEnabled: false,
+                        featureProjection: pluiEvolutionLayerProjection,
+                        selectEnabled: false,
+                        stopAfterDrawing: true,
+                        transformToFeatureCollection: false,
+                        translateEnabled: false,
+                        useSelectedStyle: false
+                    };
+
                     return Rx.Observable.from([
-                        changeDrawingStatus("replace", GeometryType.POINT, "pluievolution", [feature], {}),
-                        updateLocalisation(geographicEtablissement.localisation),
+                        changeDrawingStatus("drawOrEdit", GeometryType.POINT, "pluievolution", [feature], options),
+                        updateLocalisation(geographicEtablissement.localisation)
                     ]);
                 }).catch(() => Rx.Observable.of(
                     show({
@@ -402,6 +388,40 @@ export const displayEtablissement = action$ =>
                 ));
         });
 
+export const startDrawingEpic = action$ =>
+    action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
+        .switchMap((action) => {
+            const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
+            let coordinates = Array(0);
+            if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
+                coordinates = action.localisation.coordinates;
+            }
+
+            const feature = {
+                geometry: {
+                    type: action.geometryType,
+                    coordinates: coordinates
+                },
+                newFeature: !existingLocalisation,
+                type: "Feature",
+            };
+
+            const drawOptions = {
+                drawEnabled: true,
+                editEnabled: false,
+                featureProjection: pluiEvolutionLayerProjection,
+                selectEnabled: false,
+                stopAfterDrawing: true,
+                transformToFeatureCollection: false,
+                translateEnabled: false,
+                useSelectedStyle: false
+            };
+            return Rx.Observable.from([
+                changeDrawingStatus("drawOrEdit", action.geometryType, "pluievolution", [feature], drawOptions),
+                setDrawing(true)
+            ]);
+        });
+
 export const geometryChangeEpic = action$ =>
     action$.ofType(GEOMETRY_CHANGED)
         .filter(action => action.owner === 'pluievolution')
@@ -410,11 +430,12 @@ export const geometryChangeEpic = action$ =>
             if (action.features && action.features.length > 0) {
                 const geometryType = action.features[0].geometry.type;
                 const coordinates = action.features[0].geometry.coordinates;
+                const normalizedCoordinates = reproject(coordinates, DEFAULT_PROJECTION, "EPSG:3948");
 
                 if (GeometryType.POINT === geometryType) {
                     localisation = {
                         type: GeometryType.POINT,
-                        coordinates: coordinates
+                        coordinates: [normalizedCoordinates.x, normalizedCoordinates.y]
                     };
                 }
             }
@@ -445,7 +466,7 @@ export const stopDrawingEpic = (action$, store) =>
             const drawOptions = {
                 drawEnabled: false,
                 editEnabled: false,
-                featureProjection: FeatureProjection,
+                featureProjection: pluiEvolutionLayerProjection,
                 selectEnabled: false,
                 drawing: false,
                 stopAfterDrawing: true,

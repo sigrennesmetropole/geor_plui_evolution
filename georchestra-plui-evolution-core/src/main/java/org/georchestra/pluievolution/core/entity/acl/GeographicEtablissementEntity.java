@@ -3,12 +3,18 @@
  */
 package org.georchestra.pluievolution.core.entity.acl;
 
-import javax.persistence.*;
-
-import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
 import lombok.Setter;
 import org.georchestra.pluievolution.core.common.LongId;
+import org.locationtech.jts.geom.Geometry;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 
 /**
  * Représente un ensemble de point pour désigner les communes et le centre de RM

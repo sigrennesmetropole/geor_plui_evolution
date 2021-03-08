@@ -1,6 +1,6 @@
 package org.georchestra.pluievolution.service.acl.impl;
 
-import com.vividsolutions.jts.geom.Geometry;
+
 import org.georchestra.pluievolution.core.dao.acl.GeographicAreaDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
@@ -8,9 +8,10 @@ import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
-import org.georchestra.pluievolution.service.mapper.LocalizedMapper;
+import org.locationtech.jts.geom.Geometry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -21,9 +22,6 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 
     @Autowired
     GeographicAreaMapper geographicAreaMapper;
-
-    @Autowired
-    LocalizedMapper localizedMapper;
 
     @Autowired
     AuthentificationHelper authentificationHelper;

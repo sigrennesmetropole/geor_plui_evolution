@@ -76,9 +76,13 @@
 				"commune": "... impactant plusieurs communes (ex. OAP intercommunale)",
 				"metropolitain": "... impactant le règlement littéral métropolitain",
 				"geolocate": "Géolocaliser",
+				"cityHall": {
+					"title": "Mairie concernée"
+				},
 				"error": {
 					"geolocate": "La localisation de la demande n'est pas définie",
-					"etablissement": "Erreur lors de la localisation de l'établissement"
+					"etablissement": "Erreur lors de la localisation de l'établissement",
+					"cityHall": "La mairie n'a pas été sélectionnée"
 				}
 			},
 			"type": {
@@ -103,8 +107,15 @@
 			"loading": "En cours...",
 			"init": {
 				"loading": "En cours d'initialisation...",
-				"attachmentConfiguration.error": "Impossible de charger la configuration",
-				"layerConfiguration.error": "Impossible de charger la configuration du layer",
+				"attachmentConfiguration":  {
+					"error": "Impossible de charger la configuration"
+				},
+				"layerConfiguration": {
+					"error": "Impossible de charger la configuration du layer"
+				},
+				"etablissementConfiguration": {
+					"error": "Impossible de charger la configuration des établissements"
+				},
 				"me": {
 					"error": "Impossible de charger les données de l'utilisateur"
 				}
