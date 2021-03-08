@@ -303,8 +303,7 @@ export function displayEtablissement(pluiRequestType, geographicEtablissement) {
 
 export function displayAllPluiRequest() {
 	return {
-		type: actions.PLUI_EVOLUTION_DISPLAY_ALL,
-		layerConfiguration: layerConfiguration
+		type: actions.PLUI_EVOLUTION_DISPLAY_ALL
 	};
 }
 
