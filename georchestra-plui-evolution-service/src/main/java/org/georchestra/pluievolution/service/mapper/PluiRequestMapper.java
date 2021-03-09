@@ -1,8 +1,14 @@
 package org.georchestra.pluievolution.service.mapper;
 
-import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
-import org.mapstruct.*;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
+import org.mapstruct.NullValueCheckStrategy;
+import org.mapstruct.ReportingPolicy;
 
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {LocalizedMapper.class}, nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
@@ -12,7 +18,7 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
     @InheritInverseConfiguration
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequest.localisation", target = "geometry")
+                    @Mapping(source = "localisation", target = "geometry")
             }
     )
     PluiRequestEntity dtoToEntity(PluiRequest pluiRequest);
@@ -20,18 +26,16 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "pluiRequestEntity.geometry", target = "localisation")
+                    @Mapping(source = "geometry", target = "localisation")
             }
     )
     PluiRequest entityToDto(PluiRequestEntity pluiRequestEntity);
 
     @Override
-    PluiRequestEntity toEntity(PluiRequest s, @MappingTarget PluiRequestEntity entity);
-
-    @AfterMapping
-    default void afterMapping(PluiRequest s, @MappingTarget PluiRequestEntity entity) {
-        if (entity.getGeometry() == null && s.getLocalisation() != null) {
-            entity.setGeometry(new LocalizedMapperImpl().dtoToEntity(s.getLocalisation()));
-        }
-    }
+    @Mappings(
+            value = {
+                    @Mapping(source = "localisation", target = "geometry")
+            }
+    )
+    void toEntity(PluiRequest s, @MappingTarget PluiRequestEntity entity);
 }

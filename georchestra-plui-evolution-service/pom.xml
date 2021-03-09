@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.0.1</version>
+		<version>1.1.1</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -28,11 +28,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 
 		<dependency>
@@ -68,22 +63,6 @@
 			<artifactId>jsoup</artifactId>
 		</dependency>
 
-		<!-- Swagger UI dependency -->
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-		</dependency>
-		<!-- Swagger 2 doc dependency -->
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -103,7 +82,7 @@
 		<!-- mapper -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct-jdk8</artifactId>
+			<artifactId>mapstruct</artifactId>
 		</dependency>
 
 		<dependency>
@@ -135,13 +114,13 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geometry</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.taskadapter/redmine-java-api -->

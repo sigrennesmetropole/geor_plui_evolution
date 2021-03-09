@@ -2,7 +2,11 @@ package org.georchestra.pluievolution.service.mapper;
 
 import org.georchestra.pluievolution.core.dto.User;
 import org.georchestra.pluievolution.core.entity.acl.UserEntity;
-import org.mapstruct.*;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.IterableMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.Collection;
 import java.util.List;

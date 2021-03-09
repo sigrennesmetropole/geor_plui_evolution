@@ -1,5 +1,5 @@
-import { createSelector } from 'reselect';
-import { get } from "lodash";
+import {createSelector} from 'reselect';
+import {get} from "lodash";
 import {status} from "../actions/plui-evolution-action"
 
 export const getPluiEvolution = state => get(state, "pluievolution");
@@ -18,5 +18,7 @@ export const isReadOnlySelector = (state) => get(state, "pluievolution.status") 
 export const pluiEvolutionAttachmentConfigurationSelector = (state) => get(state, "pluievolution.attachmentConfiguration");
 
 export const pluiEvolutionLayerConfigurationSelector = (state) => get(state, "pluievolution.layerConfiguration");
+
+export const pluiEvolutionEtablissementConfigurationSelector = (state) => get(state, "pluievolution.etablissementConfiguration");
 
 export const pluiEvolutionMeSelector = (state) => get(state, "pluievolution.user");

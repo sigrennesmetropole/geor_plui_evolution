@@ -1,5 +1,6 @@
 package org.georchestra.pluievolution.service.sm.impl;
 
+import org.georchestra.pluievolution.core.dto.EtablissementConfiguration;
 import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 import org.georchestra.pluievolution.service.bean.Configuration;
 import org.georchestra.pluievolution.core.dto.ConfigurationData;
@@ -21,6 +22,15 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Value("${pluievolution.geoserver.layerName}")
     private String layerName;
 
+    @Value("${pluievolution.geoserver.layerSRID}")
+    private int layerSRID;
+
+    @Value("${etablissement.rm.nom}")
+    private String organisationRm;
+
+    @Value("${etablissement.rm.codeinsee}")
+    private String codeInseeRm;
+
     @Autowired
     ConfigurationMapper configMapper;
 
@@ -34,6 +44,12 @@ public class ConfigurationServiceImpl implements ConfigurationService {
         LayerConfiguration layerConfiguration = new LayerConfiguration();
         layerConfiguration.setLayerName(layerName);
         layerConfiguration.setLayerWorkspace(layerWorkspace);
+        layerConfiguration.setLayerProjection("EPSG:" + layerSRID);
         return layerConfiguration;
+    }
+
+    @Override
+    public EtablissementConfiguration getEtablissementConfiguration() {
+        return new EtablissementConfiguration().organisationRm(organisationRm).codeInseeRm(codeInseeRm);
     }
 }
