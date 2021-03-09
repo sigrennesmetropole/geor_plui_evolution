@@ -4,7 +4,10 @@ import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
-import org.mapstruct.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.math.BigDecimal;
 import java.util.Arrays;

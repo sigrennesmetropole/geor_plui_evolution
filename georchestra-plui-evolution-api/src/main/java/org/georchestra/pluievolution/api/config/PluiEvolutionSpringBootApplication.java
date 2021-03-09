@@ -17,9 +17,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 		"org.georchestra.pluievolution.core" })
 @EntityScan(basePackages = "org.georchestra.pluievolution.core.entity")
 @EnableJpaRepositories(basePackages = "org.georchestra.pluievolution.core.dao")
-@PropertySource(value = { "file:${georchestra.datadir}/default.properties" }, ignoreResourceNotFound = false)
-@PropertySource(value = { "file:${georchestra.datadir}/plui-evolution/plui-evolution.properties" }, ignoreResourceNotFound = false)
-@PropertySource(value = { "classpath:plui-evolution-common.properties" }, ignoreResourceNotFound = false)
+@PropertySource(value = { "file:${georchestra.datadir}/default.properties" }, ignoreResourceNotFound = false, encoding = "UTF-8")
+@PropertySource(value = { "file:${georchestra.datadir}/plui-evolution/plui-evolution.properties" }, ignoreResourceNotFound = false, encoding = "UTF-8")
+@PropertySource(value = { "classpath:plui-evolution-common.properties" }, ignoreResourceNotFound = false, encoding = "UTF-8")
 public class PluiEvolutionSpringBootApplication extends SpringBootServletInitializer {
 
 	public static void main(final String[] args) {

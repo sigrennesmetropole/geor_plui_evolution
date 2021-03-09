@@ -29,6 +29,9 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_ALL_LOADED: {
             return assign({}, state, {geographicEtablissements: action.geographicEtablissements});
         }
+        case actions.PLUI_EVOLUTION_ETABLISSEMENT_CONFIGURATION_LOADED: {
+            return assign({}, state, {etablissementConfiguration: action.etablissementConfiguration});
+        }
         case actions.PLUI_EVOLUTION_PLUIREQUEST_SAVED: {
             return assign({}, state, {pluiRequest: action.pluiRequest});
         }

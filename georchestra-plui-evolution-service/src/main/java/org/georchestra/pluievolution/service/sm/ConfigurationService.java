@@ -1,6 +1,7 @@
 package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.core.dto.ConfigurationData;
+import org.georchestra.pluievolution.core.dto.EtablissementConfiguration;
 import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 
 /**
@@ -20,4 +21,9 @@ public interface ConfigurationService {
      * @return
      */
 	LayerConfiguration getLayerConfigurations();
+
+    /**
+     * @return Configuration des établissements
+     */
+	EtablissementConfiguration getEtablissementConfiguration();
 }
