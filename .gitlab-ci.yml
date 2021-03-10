@@ -28,9 +28,10 @@ stages:
 
 # Build job with maven plugin execution policies define in parent pom
 pluievolutionapi:build:
-  script:
+  before_script:
     - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
     - echo $PROJET_VERSION
+  script:
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -Pprod
   stage: build
   except:
@@ -46,9 +47,10 @@ pluievolutionapi:build:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
       
 pluievolutionapi:build:master:
-  script:
+  before_script:
     - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
     - echo $PROJET_VERSION
+  script:
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests -Pprod 
   stage: build
   tags: 

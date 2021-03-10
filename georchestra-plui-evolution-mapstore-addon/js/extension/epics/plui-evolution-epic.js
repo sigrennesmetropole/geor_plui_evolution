@@ -430,7 +430,10 @@ export const geometryChangeEpic = action$ =>
             if (action.features && action.features.length > 0) {
                 const geometryType = action.features[0].geometry.type;
                 const coordinates = action.features[0].geometry.coordinates;
-                const normalizedCoordinates = reproject(coordinates, DEFAULT_PROJECTION, "EPSG:3948");
+                const normalizedCoordinates = reproject(coordinates, DEFAULT_PROJECTION, pluiEvolutionLayerProjection);
+
+                console.log('actual coordinates in ' + DEFAULT_PROJECTION, coordinates);
+                console.log('reprojected coordinates in ' + pluiEvolutionLayerProjection, normalizedCoordinates);
 
                 if (GeometryType.POINT === geometryType) {
                     localisation = {
