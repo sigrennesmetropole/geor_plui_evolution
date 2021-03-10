@@ -20,6 +20,7 @@ default:
     - apt update && apt install -y gettext-base build-essential
     - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
     - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo $PROJET_VERSION
 
 # Stages definition
 stages:
