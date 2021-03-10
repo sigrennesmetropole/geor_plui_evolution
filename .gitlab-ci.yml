@@ -1,6 +1,7 @@
 # Pipeline variables
 variables:
   MAVEN_CLI_OPTS: "-s .m2/settings.xml -Dmaven.repo.local=.m2/repository --batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
+  MAVEN_CLI_OPTS_VERSION: "help:evaluate -Dexpression=project.version -q -DforceStdout"
   GIT_SUBMODULE_STRATEGY: recursive
   NODE_OPTIONS: "--max-old-space-size=8192"
   
@@ -18,6 +19,7 @@ default:
   before_script:
     - apt update && apt install -y gettext-base build-essential
     - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
+    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
 
 # Stages definition
 stages:
@@ -108,8 +110,8 @@ pluievolutionapi:deploy:
     refs:
       - open/develop
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip $CI_PROJECT_DIR/ansible/dockerize/files/PluiEvolutionExtension.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
@@ -127,8 +129,8 @@ pluievolutionapi:deploy:master:
     refs:
       - open/master
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war 
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip $CI_PROJECT_DIR/ansible/dockerize/files/PluiEvolutionExtension.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
