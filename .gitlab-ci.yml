@@ -19,8 +19,6 @@ default:
   before_script:
     - apt update && apt install -y gettext-base build-essential
     - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
-    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
-    - echo $PROJET_VERSION
 
 # Stages definition
 stages:
@@ -31,6 +29,8 @@ stages:
 # Build job with maven plugin execution policies define in parent pom
 pluievolutionapi:build:
   script:
+    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo $PROJET_VERSION
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -Pprod
   stage: build
   except:
@@ -41,12 +41,14 @@ pluievolutionapi:build:
    - cdp-rennes  
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war
       - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
       
 pluievolutionapi:build:master:
   script:
+    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo $PROJET_VERSION
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests -Pprod 
   stage: build
   tags: 
@@ -57,8 +59,8 @@ pluievolutionapi:build:master:
       - open/master   
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war
       - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
 
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
@@ -111,8 +113,8 @@ pluievolutionapi:deploy:
     refs:
       - open/develop
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip $CI_PROJECT_DIR/ansible/dockerize/files/PluiEvolutionExtension.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
@@ -130,8 +132,8 @@ pluievolutionapi:deploy:master:
     refs:
       - open/master
   script:
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip $CI_PROJECT_DIR/ansible/dockerize/files/PluiEvolutionExtension.zip
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
