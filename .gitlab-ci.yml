@@ -42,8 +42,8 @@ pluievolutionapi:build:
    - cdp-rennes  
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-${PROJET_VERSION}.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-${PROJET_VERSION}.war
       - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
       
 pluievolutionapi:build:master:
@@ -61,8 +61,8 @@ pluievolutionapi:build:master:
       - open/master   
   artifacts:
     paths:
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar
-      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-${PROJET_VERSION}.jar
+      - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-${PROJET_VERSION}.war
       - $CI_PROJECT_DIR/georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
 
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
