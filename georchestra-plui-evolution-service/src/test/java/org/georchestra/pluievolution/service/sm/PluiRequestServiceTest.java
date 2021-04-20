@@ -2,6 +2,7 @@ package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.StarterSpringBootTestApplication;
 import org.georchestra.pluievolution.core.dto.*;
+import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -55,8 +56,10 @@ public class PluiRequestServiceTest {
 
     @Test
     public void mappingPluiRequest() {
-        pluiRequest1 = pluiRequestMapper.entityToDto(
-                pluiRequestMapper.dtoToEntity(pluiRequest));
+        PluiRequestEntity pluiRequestEntity = pluiRequestMapper.dtoToEntity(pluiRequest);
+        Assert.assertNull("La date de creation doit etre nulle", pluiRequestEntity.getCreationDate());
+        pluiRequestEntity.setCreationDate(new Date());
+        pluiRequest1 = pluiRequestMapper.entityToDto(pluiRequestEntity);
         Assert.assertNotNull("Le uuid ne doit être nul", pluiRequest1.getUuid());
         Assert.assertNotNull("La localisation ne doit etre nulle", pluiRequest1.getLocalisation());
         Assert.assertEquals("La localisation doit etre la meme que celle rensignee", pluiRequest.getLocalisation().hashCode(), pluiRequest1.getLocalisation().hashCode());
