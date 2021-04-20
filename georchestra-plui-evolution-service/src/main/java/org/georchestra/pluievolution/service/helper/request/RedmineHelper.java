@@ -37,6 +37,15 @@ public class RedmineHelper {
     @Value("${redmine.custom.column.communeDemandeuse}")
     private String customColumnCommuneDemandeuse;
 
+    @Value("${redmine.tracker.communal}")
+    private String trackerCommunal;
+
+    @Value("${redmine.tracker.intercommunal}")
+    private String trackerIntercommunal;
+
+    @Value("${redmine.tracker.metropolitain}")
+    private String trackerMetropolitain;
+
     @Autowired
     AuthentificationHelper authentificationHelper;
 
@@ -55,18 +64,32 @@ public class RedmineHelper {
      */
     public PluiRequestEntity createPluiRequestIssue(PluiRequestEntity pluiRequest) throws RedmineException, ApiServiceException {
         Project sousProjet = null;
+        Tracker tracker = null;
         // On recupere le projet ou le sous projet vers lequel on veut envoyer la demande
         try {
             String identifiant = null;
             if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
-                // si type commune alors sous projet remine de la commune
+
+                // si type commune alors sous projet redmine de la commune
                 identifiant = pluiRequest.getArea().getIdentifiantRedmine();
+
+                // mettre le tracker demande communale
+                tracker = getTracker(trackerCommunal);
             } else if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
-                // si type intercommune, sous projet redmine pour les demandes intercommunes
-                identifiant = geographicAreaService.getGeographicAreaByNom(FICTIVE_INTERCO_AREA_NAME).getIdentifiantRedmine();
+                // mettre le tracker demande intercommunale
+                tracker = getTracker(trackerIntercommunal);
+                // si type intercommune sur Rennes Metropole alors sous projet interco
+                if (pluiRequest.getArea().getCodeInsee().equalsIgnoreCase(CODE_INSEE_RM)) {
+                    identifiant = geographicAreaService.getGeographicAreaByNom(FICTIVE_INTERCO_AREA_NAME).getIdentifiantRedmine();
+                } else {
+                    // si type intercommune sur Commune X alors sous projet de la commune X
+                    identifiant = pluiRequest.getArea().getIdentifiantRedmine();
+                }
             } else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
+                // mettre le tracker demande metropolitaine
+                tracker = getTracker(trackerMetropolitain);
                 // si type metropolitain alors sous projet redmine pour les demandes metropolitaines
-                identifiant = geographicAreaService.getGeographicAreaByCodeInsee(CODE_INSEE_RM).getIdentifiantRedmine();
+                identifiant = pluiRequest.getArea().getIdentifiantRedmine();
             }
 
             sousProjet = getProjectManager().getProjectByKey(identifiant);
@@ -78,6 +101,7 @@ public class RedmineHelper {
         Issue issue = new Issue(getTransport(), sousProjet.getId())
                 .setSubject(pluiRequest.getSubject())
                 .setCreatedOn(pluiRequest.getCreationDate())
+                .setTracker(tracker)
                 .setDescription(pluiRequest.getObject());
 
         // Ajout des valeurs des champs customs
@@ -146,6 +170,22 @@ public class RedmineHelper {
             throw new ApiServiceException(e.getMessage());
         }
 
+    }
+
+    private Tracker getTracker(String nomDuTracker) throws ApiServiceException {
+        Tracker tracker = null;
+        try {
+            List<Tracker> trackers = getRedmineManager().getIssueManager().getTrackers();
+            for (Tracker t: trackers) {
+                if (t.getName().equalsIgnoreCase(nomDuTracker)) {
+                    tracker = t;
+                    break;
+                }
+            }
+        } catch (RedmineException re) {
+            throw new ApiServiceException(re.getMessage(), re);
+        }
+        return tracker;
     }
 
     /**
