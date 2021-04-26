@@ -71,6 +71,9 @@ export default (state = initialState, action) => {
         case actions.PLUI_EVOLUTION_CHANGE_FORM_STATUS: {
             return assign({}, state, {status: action.status});
         }
+        case actions.PLUI_EVOLUTION_FEATURE_INFO_CLICK: {
+            return assign({}, state, {pluiRequest: null, status: status.CLEAN_REQUEST, loading: false});
+        }
         default: {
             return state;
         }
