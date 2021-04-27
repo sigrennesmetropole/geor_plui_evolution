@@ -8,7 +8,6 @@ import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layer
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
 import {changeMapInfoState, featureInfoClick, hideMapinfoMarker, showMapinfoMarker} from "@mapstore/actions/mapInfo";
 import {error, show, success} from '@mapstore/actions/notifications';
-import {PLUI_EVOLUTION_REQUEST_VIEWER} from '../components/PluiEvolutionRequestViewer';
 import {
     actions,
     closeRequest,
@@ -301,16 +300,19 @@ export const displayAllPluiRequest = (action$, store) =>
                         url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
                         featureInfo: {
-                            format: "PROPERTIES",
-                            viewer: {
-                                type: PLUI_EVOLUTION_REQUEST_VIEWER
-                            }
+                            format: 'TEMPLATE',
+                            template: renderPluiRequestInfo()
                         }
                     }),
                         selectNode(pluiEvolutionLayerId,"layer",false)
                     ]
             );
         });
+
+const renderPluiRequestInfo = () => {
+    return (
+        "<div><p><span style='font-weight: bold'>ID:</span> ${properties.id}</p><p><span style='font-weight: bold'>Référence de la demande:</span> ${properties.redmine_id}</p><p><span style='font-weight: bold'>Type de la demande:</span> ${properties.type}</p><p><span style='font-weight: bold'>Statut de la demande:</span> ${properties.status}</p><p><span style='font-weight: bold'>Sujet de la demande:</span> ${properties.subject}</p><p><span style='font-weight: bold'>Objet de la demande:</span> ${properties.object}</p></div>");
+}
 
 export const displayEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
