@@ -303,6 +303,12 @@ export const displayAllPluiRequest = (action$, store) =>
                             format: 'TEMPLATE',
                             template: renderPluiRequestInfo()
                         }
+                        /*featureInfo: {
+                            format: "PROPERTIES",
+                            viewer: {
+                                type: PLUI_EVOLUTION_REQUEST_VIEWER
+                            }
+                        }*/
                     }),
                         selectNode(pluiEvolutionLayerId,"layer",false)
                     ]

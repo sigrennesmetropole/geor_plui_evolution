@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import Dock from 'react-dock';
 import ContainerDimensions from 'react-container-dimensions';
 import {PropTypes} from 'prop-types';
@@ -20,7 +21,10 @@ import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import {getMessageById} from '@mapstore/utils/LocaleUtils';
-import {status} from '../actions/plui-evolution-action';
+import {setViewer} from '@mapstore/utils/MapInfoUtils';
+import {closeIdentify} from '@mapstore/actions/mapInfo';
+import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
+import {openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
@@ -166,6 +170,15 @@ export class PluiEvolutionPanelComponent extends React.Component {
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
         console.log('construct component...');
+
+        const PluiEvolutionRequestViewerConnected = connect((state) => ({
+            // debug
+            state : state
+        }), {
+            openPanel: openPanel,
+            closeIdentify: closeIdentify
+        })(PluiEvolutionRequestViewer);
+        // setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
     }
 
     componentWillMount() {
