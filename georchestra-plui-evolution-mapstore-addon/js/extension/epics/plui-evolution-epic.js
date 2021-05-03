@@ -311,7 +311,15 @@ export const displayAllPluiRequest = (action$, store) =>
 
 const renderPluiRequestInfo = () => {
     return (
-        "<div><p><span style='font-weight: bold'>ID:</span> ${properties.id}</p><p><span style='font-weight: bold'>Référence de la demande:</span> ${properties.redmine_id}</p><p><span style='font-weight: bold'>Type de la demande:</span> ${properties.type}</p><p><span style='font-weight: bold'>Statut de la demande:</span> ${properties.status}</p><p><span style='font-weight: bold'>Sujet de la demande:</span> ${properties.subject}</p><p><span style='font-weight: bold'>Objet de la demande:</span> ${properties.object}</p></div>");
+        "<table style='border-collapse: separate; border-spacing: 20px'>" +
+            "<tbody>" +
+                "<tr><td style='font-weight: bold'>Référence de la demande</td><td>${properties.redmine_id}</td></tr>" +
+                "<tr><td style='font-weight: bold'>Type de la demande</td><td>${properties.type}</td></tr>" +
+                "<tr><td style='font-weight: bold'>Statut de la demande</td><td>${properties.status}</td></tr>" +
+                "<tr><td style='font-weight: bold; vertical-align: top'>Sujet de la demande</td><td style='vertical-align: top'><textarea disabled rows='3' cols='45'>${properties.subject}</textarea></td></tr>" +
+                "<tr><td style='font-weight: bold; vertical-align: top'>Objet de la demande</td><td style='vertical-align: top'><textarea disabled rows='5' cols='45'>${properties.object}</textarea></td></tr>" +
+            "</tbody>" +
+        "</table>");
 }
 
 export const displayEtablissement = (action$, store) =>
