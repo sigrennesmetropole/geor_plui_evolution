@@ -191,6 +191,12 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 				.collect(Collectors.toList());
 	}
 
+	/**
+	 * Permet de mettre à jour la geometry de localisation de la PluiRequest (localisation précise ou commune)
+	 * @param pluiRequest
+	 * @param codeInsee, @Nullable codeInsee de la commune demandeuse. Il est précisé quand il s'agit d'un utilisateur de Rennes Métropole
+	 * @throws ApiServiceException
+	 */
 	private void updatePositionAndArea(PluiRequestEntity pluiRequest, String codeInsee) throws ApiServiceException {
 		// Si type communale alors position de la demande ajoutée depuis le front
 		if (pluiRequest.getType() == PluiRequestType.COMMUNE && pluiRequest.getGeometry() == null) {
@@ -258,7 +264,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 				// Si demande de type communale, alors on localise la commune a laquelle appartient le point
 				area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getGeometry());
 			} else {
-				// on lui attribue la geographic area associée au code insee fourni pour le type commune et intercommune
+				// on lui attribue la geographic area associée au code insee fourni pour le type metropolitain et intercommune
 				area = geographicAreaMapper.dtoToEntity(geographicAreaService.getGeographicAreaByCodeInsee(codeInsee));
 			}
 		} else {
