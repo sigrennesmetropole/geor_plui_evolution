@@ -8,7 +8,6 @@ import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layer
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
 import {changeMapInfoState, featureInfoClick, hideMapinfoMarker, showMapinfoMarker} from "@mapstore/actions/mapInfo";
 import {error, show, success} from '@mapstore/actions/notifications';
-import {PLUI_EVOLUTION_REQUEST_VIEWER} from '../components/PluiEvolutionRequestViewer';
 import {
     actions,
     closeRequest,
@@ -301,16 +300,33 @@ export const displayAllPluiRequest = (action$, store) =>
                         url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
                         featureInfo: {
+                            format: 'TEMPLATE',
+                            template: renderPluiRequestInfo()
+                        }
+                        /*featureInfo: {
                             format: "PROPERTIES",
                             viewer: {
                                 type: PLUI_EVOLUTION_REQUEST_VIEWER
                             }
-                        }
+                        }*/
                     }),
                         selectNode(pluiEvolutionLayerId,"layer",false)
                     ]
             );
         });
+
+const renderPluiRequestInfo = () => {
+    return (
+        "<table style='border-collapse: separate; border-spacing: 20px'>" +
+            "<tbody>" +
+                "<tr><td style='font-weight: bold'>Référence de la demande</td><td>${properties.redmine_id}</td></tr>" +
+                "<tr><td style='font-weight: bold'>Type de la demande</td><td>${properties.type}</td></tr>" +
+                "<tr><td style='font-weight: bold'>Statut de la demande</td><td>${properties.status}</td></tr>" +
+                "<tr><td style='font-weight: bold; vertical-align: top'>Sujet de la demande</td><td style='vertical-align: top'><textarea disabled rows='3' cols='45'>${properties.subject}</textarea></td></tr>" +
+                "<tr><td style='font-weight: bold; vertical-align: top'>Objet de la demande</td><td style='vertical-align: top'><textarea disabled rows='5' cols='45'>${properties.object}</textarea></td></tr>" +
+            "</tbody>" +
+        "</table>");
+}
 
 export const displayEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)

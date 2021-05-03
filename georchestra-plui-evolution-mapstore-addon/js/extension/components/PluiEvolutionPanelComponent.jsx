@@ -178,7 +178,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             openPanel: openPanel,
             closeIdentify: closeIdentify
         })(PluiEvolutionRequestViewer);
-        setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
+        // setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
     }
 
     componentWillMount() {

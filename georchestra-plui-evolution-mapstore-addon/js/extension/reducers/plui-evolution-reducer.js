@@ -1,5 +1,6 @@
 import assign from 'object-assign';
 import {actions, status} from '../actions/plui-evolution-action';
+import {FEATURE_INFO_CLICK} from 'mapstore2/web/client/actions/mapInfo';
 
 const initialState = {
     user: null,
@@ -70,6 +71,9 @@ export default (state = initialState, action) => {
         }
         case actions.PLUI_EVOLUTION_CHANGE_FORM_STATUS: {
             return assign({}, state, {status: action.status});
+        }
+        case FEATURE_INFO_CLICK: {
+            return assign({}, state, {pluiRequest: null, status: status.CLEAN_REQUEST, loading: false});
         }
         default: {
             return state;
