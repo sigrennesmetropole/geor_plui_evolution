@@ -117,7 +117,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             size: 0.30,
             fluid: true,
             position: "right",
-            zIndex: 1030
+            zIndex: 1050
         },
         dockStyle: {
             zIndex: 100,
@@ -178,7 +178,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             openPanel: openPanel,
             closeIdentify: closeIdentify
         })(PluiEvolutionRequestViewer);
-        setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
+        // setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
     }
 
     componentWillMount() {

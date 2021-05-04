@@ -18,7 +18,8 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
     @InheritInverseConfiguration
     @Mappings(
             value = {
-                    @Mapping(source = "localisation", target = "geometry")
+                    @Mapping(source = "localisation", target = "geometry"),
+                    @Mapping(ignore = true, target = "creationDate")
             }
     )
     PluiRequestEntity dtoToEntity(PluiRequest pluiRequest);
@@ -34,7 +35,8 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
     @Override
     @Mappings(
             value = {
-                    @Mapping(source = "localisation", target = "geometry")
+                    @Mapping(source = "localisation", target = "geometry"),
+                    @Mapping(ignore = true, target = "creationDate")
             }
     )
     void toEntity(PluiRequest s, @MappingTarget PluiRequestEntity entity);
