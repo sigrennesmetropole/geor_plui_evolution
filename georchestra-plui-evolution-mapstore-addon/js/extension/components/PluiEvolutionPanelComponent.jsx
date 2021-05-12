@@ -64,6 +64,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         pluiRequest: PropTypes.object,
         attachments: PropTypes.array,
         error: PropTypes.object,
+        localConfig: PropTypes.object,
         // redux
         initPluiEvolution: PropTypes.func,
         startDrawing: PropTypes.func,
@@ -87,6 +88,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadActionError: PropTypes.func,
         loadingPluiCreateForm: PropTypes.func,
         changeFormStatus: PropTypes.func,
+        ensureProj4: PropTypes.func
     };
 
     static defaultProps = {
@@ -130,6 +132,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         attachments: null,
         pluiRequest: null,
         layerConfiguration: null,
+        localConfig: null,
         // misc
         initPluiEvolution: ()=>{},
         startDrawing: ()=>{},
@@ -153,7 +156,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadingPluiCreateForm: ()=>{},
         changeFormStatus: ()=>{},
         loadActionError: ()=>{},
-        toggleControl: () => {}
+        toggleControl: () => {},
+        ensureProj4: () => {}
     };
 
     static contextTypes = {
@@ -169,16 +173,28 @@ export class PluiEvolutionPanelComponent extends React.Component {
         super(props);
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
-        console.log('construct component...');
+        console.log('pluie construct component...');
 
-        const PluiEvolutionRequestViewerConnected = connect((state) => ({
-            // debug
-            state : state
-        }), {
-            openPanel: openPanel,
-            closeIdentify: closeIdentify
-        })(PluiEvolutionRequestViewer);
-        // setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
+        // chargement des projections dans localconfig si nécessaire
+        this.props.ensureProj4(this.props.localConfig.projectionDefs);
+
+
+    }
+
+    registerViewer() {
+        console.log('pluie check viewer', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+        if( !getViewer(PLUI_EVOLUTION_REQUEST_VIEWER)) {
+            const PluiEvolutionRequestViewerConnected = connect((state) => ({
+                // debug
+                state : state
+            }), {
+                openPanel: openPanel,
+                closeIdentify: closeIdentify
+            })(PluiEvolutionRequestViewer);
+            console.log('pluie register viewer');
+            setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
+            console.log('pluie registered viewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+        }
     }
 
     componentWillMount() {
@@ -242,6 +258,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         console.log('this.props render', this.props);
         console.log('this.state render', this.state);
         if( this.props.active ){
+
+            this.registerViewer();
             // le panel est ouvert
             return (
                 <ContainerDimensions>

@@ -31,7 +31,8 @@ import {
     savePluiRequest,
     startDrawing,
     stopDrawing,
-    updateAttachments
+    updateAttachments,
+    ensureProj4
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
@@ -60,6 +61,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     status: state.pluievolution.status,
     drawing: state.pluievolution.drawing,
     error: state.pluievolution.error,
+    localConfig: state.localConfig,
     // debug
     state : state
 }), {
@@ -84,7 +86,8 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     closeRequest: closeRequest,
     loadActionError: loadActionError,
     changeFormStatus: changeFormStatus,
-    toggleControl: closePanel
+    toggleControl: closePanel,
+    ensureProj4: ensureProj4
 })(PluiEvolutionPanelComponent);
 
 export default {

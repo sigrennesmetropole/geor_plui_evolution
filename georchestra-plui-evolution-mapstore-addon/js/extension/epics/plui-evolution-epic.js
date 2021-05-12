@@ -5,6 +5,7 @@ import {saveAs} from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
+import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
 import {changeMapInfoState, featureInfoClick, hideMapinfoMarker, showMapinfoMarker} from "@mapstore/actions/mapInfo";
 import {error, show, success} from '@mapstore/actions/notifications';
@@ -30,7 +31,8 @@ import {
     setDrawing,
     status,
     updateAttachments,
-    updateLocalisation
+    updateLocalisation,
+    ensureProj4Done
 } from '../actions/plui-evolution-action';
 import {
     DEFAULT_PROJECTION,
@@ -39,6 +41,7 @@ import {
     PluiRequestType
 } from "../constants/plui-evolution-constants";
 import {pluiEvolutionEtablissementConfigurationSelector,} from '../selectors/plui-evolution-selector';
+import Proj4js from 'proj4';
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
@@ -446,6 +449,17 @@ export const geometryChangeEpic = action$ =>
             if (action.features && action.features.length > 0) {
                 const geometryType = action.features[0].geometry.type;
                 const coordinates = action.features[0].geometry.coordinates;
+                console.log('source ', Proj4js.defs(DEFAULT_PROJECTION));
+                console.log('desttn ', Proj4js.defs(pluiEvolutionLayerProjection));
+
+                console.log('plui getViewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER))
+                /*
+                if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
+                    console.log("add defs...");
+                    Proj4js.defs('EPSG:3948', '+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
+                }
+                console.log('desttn 2', Proj4js.defs(pluiEvolutionLayerProjection));
+                */
                 const normalizedCoordinates = reproject(coordinates, DEFAULT_PROJECTION, pluiEvolutionLayerProjection);
 
                 console.log('actual coordinates in ' + DEFAULT_PROJECTION, coordinates);
@@ -538,9 +552,28 @@ const buildAttachmentsRequest = (uuid, attachments) => {
         const formData = new FormData();
         formData.append('file', attachment.file);
         return Rx.Observable.defer(() => axios.post(url, formData))
-            .catch((e) =>  {
+            .catch((e) => {
                 e.attachment = attachment;
                 return Rx.Observable.throw(e);
             });
     }) : [];
 }
+
+/** Cette epics sert à charger les projection présentes dans le localconfig et actuellement pas très prise en compte au chargement */
+export const ensureProjectionDefs = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_ENSURE_PROJ4)
+        .switchMap((action) => {
+            if( action.projectionDefs && action.projectionDefs.length > 0){
+                action.projectionDefs.forEach(projectionDef => {
+                    console.log("plui projectionDef :", projectionDef);
+                    console.log("plui projectionDef ?", Proj4js.defs(projectionDef.code));
+                    if (!Proj4js.defs(projectionDef.code)) {
+                        console.log("plui add projection :", projectionDef.code);
+                        Proj4js.defs(projectionDef.code, projectionDef.def);
+                    }
+                });
+            }
+
+            return Rx.Observable.of(ensureProj4Done());
+        });
+

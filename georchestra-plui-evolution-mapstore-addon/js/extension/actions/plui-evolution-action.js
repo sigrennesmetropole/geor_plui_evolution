@@ -39,7 +39,9 @@ export const actions = {
 	PLUI_EVOLUTION_STOP_DRAWING: 'PLUI_EVOLUTION:STOP:DRAWING',
 	PLUI_EVOLUTION_UPDATE_LOCALISATION: 'PLUI_EVOLUTION:UPDATE:LOCALISATION',
 	PLUI_EVOLUTION_CLEAR_DRAWN: 'PLUI_EVOLUTION:CLEAR:DRAWN',
-	PLUI_EVOLUTION_CHANGE_FORM_STATUS: 'PLUI_EVOLUTION:FORM_STATUS:CHANGE'
+	PLUI_EVOLUTION_CHANGE_FORM_STATUS: 'PLUI_EVOLUTION:FORM_STATUS:CHANGE',
+	PLUI_EVOLUTION_ENSURE_PROJ4: 'PLUI_EVOLUTION:ENSURE_PROJ4',
+	PLUI_EVOLUTION_ENSURE_PROJ4_DONE: 'PLUI_EVOLUTION:ENSURE_PROJ4_DONE'
 };
 
 export const status = {
@@ -325,5 +327,18 @@ export function loadingPluiUpdateForm(pluiRequest) {
 	return {
 		type: actions.PLUI_EVOLUTION_LOADING_UPDATE_FORM,
 		pluiRequest: pluiRequest
+	}
+}
+
+export function ensureProj4(projectionDefs) {
+	return {
+		type: actions.PLUI_EVOLUTION_ENSURE_PROJ4,
+		projectionDefs: projectionDefs
+	};
+}
+
+export function ensureProj4Done() {
+	return {
+		type: actions.PLUI_EVOLUTION_ENSURE_PROJ4_DONE,
 	}
 }

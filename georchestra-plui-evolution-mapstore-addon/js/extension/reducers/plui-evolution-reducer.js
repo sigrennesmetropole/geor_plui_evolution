@@ -10,7 +10,7 @@ const initialState = {
 }
 
 export default (state = initialState, action) => {
-    console.log("sig reduce:" + action.type);
+    console.log("pluie reduce:" + action.type);
     switch (action.type) {
         case actions.PLUI_EVOLUTION_ACTION_ERROR: {
             return assign({}, state, {error: action.error, loading: false});
