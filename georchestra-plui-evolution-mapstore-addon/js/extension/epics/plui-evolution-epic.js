@@ -452,7 +452,7 @@ export const geometryChangeEpic = action$ =>
                 console.log('source ', Proj4js.defs(DEFAULT_PROJECTION));
                 console.log('desttn ', Proj4js.defs(pluiEvolutionLayerProjection));
 
-                console.log('plui getViewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER))
+                //console.log('plui getViewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER))
                 /*
                 if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
                     console.log("add defs...");
