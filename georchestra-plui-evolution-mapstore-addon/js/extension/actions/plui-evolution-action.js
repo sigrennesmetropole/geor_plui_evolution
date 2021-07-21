@@ -41,7 +41,9 @@ export const actions = {
 	PLUI_EVOLUTION_CLEAR_DRAWN: 'PLUI_EVOLUTION:CLEAR:DRAWN',
 	PLUI_EVOLUTION_CHANGE_FORM_STATUS: 'PLUI_EVOLUTION:FORM_STATUS:CHANGE',
 	PLUI_EVOLUTION_ENSURE_PROJ4: 'PLUI_EVOLUTION:ENSURE_PROJ4',
-	PLUI_EVOLUTION_ENSURE_PROJ4_DONE: 'PLUI_EVOLUTION:ENSURE_PROJ4_DONE'
+	PLUI_EVOLUTION_ENSURE_PROJ4_DONE: 'PLUI_EVOLUTION:ENSURE_PROJ4_DONE',
+	PLUI_EVOLUTION_OPEN_VIEWER: 'PLUI_EVOLUTION:OPEN:VIEWER',
+	PLUI_EVOLUTION_CLOSE_VIEWER: 'PLUI_EVOLUTION:CLOSE:VIEWER'
 };
 
 export const status = {
@@ -49,6 +51,7 @@ export const status = {
 	CREATE_REQUEST: "CREATE_REQUEST",
 	CLEAN_REQUEST: "CLEAN_REQUEST",
 	LOAD_REQUEST: "LOAD_REQUEST",
+	VIEW_REQUEST: "VIEW_REQUEST",
 	EMPTY: "EMPTY"
 };
 
@@ -340,5 +343,18 @@ export function ensureProj4(projectionDefs) {
 export function ensureProj4Done() {
 	return {
 		type: actions.PLUI_EVOLUTION_ENSURE_PROJ4_DONE,
+	}
+}
+
+export function loadPluiEvolutionViewer(response) {
+	return {
+		type: actions.PLUI_EVOLUTION_OPEN_VIEWER,
+		response: response
+	};
+}
+
+export function closeViewer() {
+	return {
+		type: actions.PLUI_EVOLUTION_CLOSE_VIEWER
 	}
 }

@@ -7,7 +7,14 @@ import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
-import {changeMapInfoState, featureInfoClick, hideMapinfoMarker, showMapinfoMarker} from "@mapstore/actions/mapInfo";
+import {
+    changeMapInfoState,
+    featureInfoClick,
+    hideMapinfoMarker,
+    showMapinfoMarker,
+    LOAD_FEATURE_INFO,
+    closeIdentify
+} from "@mapstore/actions/mapInfo";
 import {error, show, success} from '@mapstore/actions/notifications';
 import {
     actions,
@@ -32,7 +39,7 @@ import {
     status,
     updateAttachments,
     updateLocalisation,
-    ensureProj4Done
+    ensureProj4Done, loadPluiEvolutionViewer
 } from '../actions/plui-evolution-action';
 import {
     DEFAULT_PROJECTION,
@@ -40,13 +47,37 @@ import {
     PLUI_EVOLUTION_LAYER_TITLE,
     PluiRequestType
 } from "../constants/plui-evolution-constants";
-import {pluiEvolutionEtablissementConfigurationSelector,} from '../selectors/plui-evolution-selector';
+import {
+    isPluievolutionActivate,
+    pluiEvolutionEtablissementConfigurationSelector,
+} from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
+import {act} from "react-dom/test-utils";
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
 let pluiEvolutionLayerName;
 let pluiEvolutionLayerProjection;
+
+/**
+ * Catch GFI response on identify load event and close identify if Tabou2 identify tabs is selected
+ * TODO: take showIdentify pluginCfg param into account
+ * @param {*} action$
+ * @param {*} store
+ */
+export function loadPluiEvolutionViewerEpic(action$, store) {
+    return action$.ofType(LOAD_FEATURE_INFO)
+        .filter((action) => isPluievolutionActivate(store.getState()))
+        .switchMap((action) => {
+            // si features présentent dans la zone de clic
+            if (action?.layer?.id && action?.data?.features && action.data.features.length) {
+                return Rx.Observable.of(loadPluiEvolutionViewer(action.data)).concat(
+                    Rx.Observable.of(closeIdentify())
+                )
+            }
+            return  Rx.Observable.of();
+        });
+}
 
 export const openPanelEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_OPEN_PANEL)
@@ -196,6 +227,7 @@ export const loadMeEpic = (action$,store) =>
                 return Rx.Observable.of(gotMe(action.user)).delay(0);
             }
             const state = store.getState();
+            console.log("store#0", state);
             const url = backendURLPrefix + "/user/me";
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.from(
@@ -279,6 +311,7 @@ export const initDrawingSupportEpic = action$ =>
 export const displayAllPluiRequest = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ALL)
         .switchMap(() => {
+            console.log("store#1", store.getState())
             const pluiLayer = head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId));
             return Rx.Observable.from(
                 pluiLayer
