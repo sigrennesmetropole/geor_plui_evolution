@@ -111,20 +111,32 @@ span .info {
    margin: 16px 0;
 }
 
-.plui-evolution-request-viewer .button-navigation {
+.plui-evolution-request-viewer .button-navigation,
+.plui-evolution-viewer .button-navigation {
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 18px
 }
 
-.plui-evolution-request-viewer .button-navigation button {
+.plui-evolution-request-viewer .button-navigation button,
+.plui-evolution-viewer .button-navigation button {
 	height: 50px;
 	width: 50px;
 }
 
-.plui-evolution-request-viewer .button-navigation button .glyphicon {
+.plui-evolution-request-viewer .button-navigation button .glyphicon,
+.plui-evolution-viewer .button-navigation button .glyphicon {
 	font-size: 26px;
 }
+
+.plui-evolution-viewer .coordinates-text {
+	height: 52px;
+	font-size: 15px;
+	border-bottom: solid 1px #d9d9d9;
+	border-top: solid 1px #d9d9d9;
+	padding-top: 13px;
+}
+
 
 .plui-evolution-request-viewer .block-valid-form {
 	display: flex;

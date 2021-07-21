@@ -60,8 +60,7 @@ let pluiEvolutionLayerName;
 let pluiEvolutionLayerProjection;
 
 /**
- * Catch GFI response on identify load event and close identify if Tabou2 identify tabs is selected
- * TODO: take showIdentify pluginCfg param into account
+ * Catch GFI response on identify load event and close identify if PLUi-Evolution identify tabs is selected
  * @param {*} action$
  * @param {*} store
  */
@@ -227,7 +226,6 @@ export const loadMeEpic = (action$,store) =>
                 return Rx.Observable.of(gotMe(action.user)).delay(0);
             }
             const state = store.getState();
-            console.log("store#0", state);
             const url = backendURLPrefix + "/user/me";
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.from(
@@ -311,7 +309,6 @@ export const initDrawingSupportEpic = action$ =>
 export const displayAllPluiRequest = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ALL)
         .switchMap(() => {
-            console.log("store#1", store.getState())
             const pluiLayer = head(store.getState().layers.flat.filter(l => l.id === pluiEvolutionLayerId));
             return Rx.Observable.from(
                 pluiLayer
