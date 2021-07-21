@@ -30,7 +30,7 @@ import {
     MAX_NB_CHARACTERS_PLUI_OBJECT,
     PluiRequestType
 } from '../constants/plui-evolution-constants';
-
+import {PluiEvolutionViewer} from "@js/extension/components/PluiEvolutionViewer";
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -41,6 +41,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         drawing: PropTypes.bool,
         loading: PropTypes.bool,
         readOnly: PropTypes.bool,
+        viewerMode: PropTypes.bool,
+        response: PropTypes.object,
         // config
         wrap: PropTypes.bool,
         wrapWithPanel: PropTypes.bool,
@@ -88,7 +90,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadActionError: PropTypes.func,
         loadingPluiCreateForm: PropTypes.func,
         changeFormStatus: PropTypes.func,
-        ensureProj4: PropTypes.func
+        ensureProj4: PropTypes.func,
+        closeViewer: PropTypes.func
     };
 
     static defaultProps = {
@@ -99,6 +102,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         drawing: false,
         loading: false,
         readOnly: false,
+        viewerMode: false,
+        response: {features: []},
         // config
         wrap: false,
         modal: true,
@@ -157,7 +162,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         changeFormStatus: ()=>{},
         loadActionError: ()=>{},
         toggleControl: () => {},
-        ensureProj4: () => {}
+        ensureProj4: () => {},
+        closeViewer: () => {},
     };
 
     static contextTypes = {
@@ -258,8 +264,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
         console.log('this.props render', this.props);
         console.log('this.state render', this.state);
         if( this.props.active ){
-
-            this.registerViewer();
+            
+            //this.registerViewer();
+            //this.connectViewer();
             // le panel est ouvert
             return (
                 <ContainerDimensions>
@@ -271,11 +278,18 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                     isVisible={this.props.active}
                                     size={this.props.width / width > 1 ? 1 : this.props.width / width} >
                                     <div className={this.props.panelClassName}>
-                                        {this.renderHeader()}
+                                        {!this.props.viewerMode && this.renderHeader()}
                                         {
-                                            !this.state.initialized ?
-                                                this.renderLoading("pluievolution.open.loading") :
-                                                this.renderForm()
+                                            !this.state.initialized &&
+                                            this.renderLoading("pluievolution.open.loading")
+                                        }
+                                        {
+                                            this.state.initialized && !this.props.viewerMode &&
+                                            this.renderForm()
+                                        }
+                                        {
+                                            this.state.initialized && this.props.viewerMode &&
+                                            this.renderViewer()
                                         }
                                     </div>
                                 </Dock>
@@ -288,6 +302,13 @@ export class PluiEvolutionPanelComponent extends React.Component {
         } else {
             return null;
         }
+    }
+
+    renderViewer() {
+        return (
+            <PluiEvolutionViewer viewerMode={this.props.viewerMode} response={this.props.response}
+            openPanel={this.props.openPanel} closeViewer={this.props.closeViewer}/>
+        );
     }
 
     /**
@@ -317,15 +338,18 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * La rendition du formulaire
      */
     renderForm() {
-        return (
-            <Form model={this.state.pluiRequest}>
-                {this.renderUserInformation()}
-                {this.renderPluiManual()}
-                {this.renderActivationButtonPluiRequestForm()}
-                {this.renderPluiRequestInformations()}
-                {this.props.loading ? this.renderLoading("pluievolution.create.loading") : null}
-            </Form>
-        );
+        if (this.state.pluiRequest) {
+            return (
+                <Form model={this.state.pluiRequest}>
+                    {this.renderUserInformation()}
+                    {this.renderPluiManual()}
+                    {this.renderActivationButtonPluiRequestForm()}
+                    {this.renderPluiRequestInformations()}
+                    {this.props.loading ? this.renderLoading("pluievolution.create.loading") : null}
+                </Form>
+            );
+        }
+        return null;
     }
 
     renderLoading(msgId) {
