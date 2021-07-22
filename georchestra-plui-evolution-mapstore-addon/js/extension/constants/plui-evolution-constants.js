@@ -5,6 +5,7 @@ export const GeometryType = {
 };
 
 export const DEFAULT_PROJECTION = "EPSG:4326";
+export const SYSTEM_PROJECTION = "EPSG:3857"
 
 export const PluiRequestType = {
     COMMUNE: "TYPE_COMMUNE",

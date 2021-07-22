@@ -8,7 +8,13 @@ import {
     Row
 } from 'react-bootstrap';
 import {PluiEvolutionRequestViewer} from "@js/extension/components/PluiEvolutionRequestViewer";
+import {reproject} from "mapstore2/web/client/utils/CoordinatesUtils";
+import {DEFAULT_PROJECTION, SYSTEM_PROJECTION} from "@js/extension/constants/plui-evolution-constants";
 
+/**
+ * Composant englobant le viewer PluiEvolutionRequestViewer
+ * Contient un header et des boutons de navigation pour controler le viewer
+ */
 export class PluiEvolutionViewer extends React.Component {
     static propTypes = {
         openPanel: PropTypes.func,
@@ -112,8 +118,10 @@ export class PluiEvolutionViewer extends React.Component {
      */
     renderCoordinates() {
         const feature = this.props.response.features[0];
-        const longitude = (feature) ? feature.geometry.coordinates[0] : 0;
-        const latitude = (feature) ? feature.geometry.coordinates[1] : 0;
+        const coordinates = (feature) ? feature.geometry.coordinates : [0, 0];
+        const normalizedCoordinates = reproject(coordinates, SYSTEM_PROJECTION, DEFAULT_PROJECTION);
+        const longitude = Number(normalizedCoordinates.x);
+        const latitude = Number(normalizedCoordinates.y);
         return (
             <div className="coordinates-text">
                 <span>
