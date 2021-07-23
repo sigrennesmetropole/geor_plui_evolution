@@ -814,15 +814,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
                                 })
                             }
                         </FormControl>
-                        <InputGroup.Button>
-                            <Button
-                                disabled={this.state.pluiRequest.type !== PluiRequestType.INTERCOMMUNE && this.state.pluiRequest.type !== PluiRequestType.METROPOLITAIN}
-                                bsSize="small"
-                                bsStyle="primary"
-                                onClick={() => this.drawEtablissement(this.state.etablissementSelected)}>
-                                <Message msgId="pluievolution.clickHere"/>
-                            </Button>
-                        </InputGroup.Button>
                     </InputGroup>
                 </FormGroup>
             );
@@ -952,10 +943,14 @@ export class PluiEvolutionPanelComponent extends React.Component {
         if (e.target.value !== 0) {
             this.state.etablissementSelected = this.props.geographicEtablissements[e.target.value];
             this.state.pluiRequest.codeInsee = this.state.etablissementSelected.codeInsee;
+            // on dessine la localisation de l'etablissement sur la carte
+            this.drawEtablissement(this.state.etablissementSelected);
         }
         else {
             this.state.etablissementSelected = {};
             this.state.pluiRequest.codeInsee = "";
+            // on on la localisation de l'etablissement precedemment selectionné sur la carte
+            this.props.clearDrawn();
         }
 
         this.setState(this.state);
