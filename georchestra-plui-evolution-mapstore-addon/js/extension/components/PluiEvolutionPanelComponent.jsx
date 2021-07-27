@@ -940,7 +940,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     handleEtablissementChange = (e) => {
         console.log('handleEtablissementChange e', e);
         console.log('handleEtablissementChange e value', e.target.value);
-        if (e.target.value !== 0) {
+        if (e.target.value) {
             this.state.etablissementSelected = this.props.geographicEtablissements[e.target.value];
             this.state.pluiRequest.codeInsee = this.state.etablissementSelected.codeInsee;
             // on dessine la localisation de l'etablissement sur la carte
@@ -952,7 +952,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
             // on on la localisation de l'etablissement precedemment selectionné sur la carte
             this.props.clearDrawn();
         }
-
         this.setState(this.state);
     }
 

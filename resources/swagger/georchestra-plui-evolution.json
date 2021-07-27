@@ -545,7 +545,7 @@
 					"geographic"
 				],
 				"summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
-				"operationId": "getAllPluiRequestEtablissements",
+				"operationId": "searchEtablissements",
 				"produces": [
 					"application/json;charset=utf-8"
 				],
