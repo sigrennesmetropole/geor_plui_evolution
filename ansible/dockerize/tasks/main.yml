@@ -45,7 +45,7 @@
   template:
     src: default.properties.j2
     dest: "{{ pluievolution_config_directory }}/default.properties"
-    mode: 0770
+    mode: 0777
         
 #- name: Copy tomcat lib jar
 #  copy:

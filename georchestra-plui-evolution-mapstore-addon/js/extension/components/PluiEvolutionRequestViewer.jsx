@@ -10,12 +10,20 @@ export class PluiEvolutionRequestViewer extends React.Component {
 
     static propTypes = {
         openPanel: PropTypes.func,
-        closeIdentify: PropTypes.func
+        closeIdentify: PropTypes.func,
+        closeViewer: PropTypes.func,
+        response: PropTypes.object,
+        index: PropTypes.number,
+        viewerMode: PropTypes.bool
     };
 
     static defaultProps = {
         openPanel: () => {},
         closeIdentify: () => {},
+        closeViewer: () => {},
+        response: {features: []},
+        index: 0,
+        viewerMode: false
     }
 
     constructor(props) {
@@ -26,11 +34,11 @@ export class PluiEvolutionRequestViewer extends React.Component {
     }
 
     componentWillMount() {
-        this.setState({initialized: false});
+        this.setState({initialized: false, index: this.props.index});
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        
+
     }
 
     render() {
@@ -55,29 +63,33 @@ export class PluiEvolutionRequestViewer extends React.Component {
      * @return {Element}
      */
     renderPluiRequestsNavigation() {
-        return(
-            <div className="button-navigation">
-                <button
-                    className="square-button-md btn btn-primary"
-                    disabled={this.state.index === 0}
-                    onClick={this.handleClickButtonDisplayTaskBefore}>
-                    <Glyphicon glyph="glyphicon glyphicon-chevron-left" />
-                </button>
-                <button
-                    className="square-button-md btn btn-primary"
-                    disabled={this.state.index === this.props.response.features.length - 1}
-                    onClick={this.handleClickButtonDisplayTaskAfter}>
-                    <Glyphicon glyph="glyphicon glyphicon-chevron-right" />
-                </button>
-            </div>
-        )
+        if (!this.props.viewerMode) {
+            return (
+                <div className="button-navigation">
+                    <button
+                        className="square-button-md btn btn-primary"
+                        disabled={this.state.index === 0}
+                        onClick={this.handleClickButtonDisplayTaskBefore}>
+                        <Glyphicon glyph="glyphicon glyphicon-chevron-left"/>
+                    </button>
+                    <button
+                        className="square-button-md btn btn-primary"
+                        disabled={this.state.index === this.props.response.features.length - 1}
+                        onClick={this.handleClickButtonDisplayTaskAfter}>
+                        <Glyphicon glyph="glyphicon glyphicon-chevron-right"/>
+                    </button>
+                </div>
+            )
+        }
+        return null;
     }
 
     /**
      * La rendition de la partie info de la demande plui
      */
     renderPluiRequestInfo() {
-        const pluiRequest = this.props.response.features[this.state.index].properties;
+        const index = (this.props.viewerMode) ? this.props.index : this.state.index;
+        const pluiRequest = this.props.response.features[index].properties;
         return (
             <div>
                 <fieldset>
@@ -171,10 +183,15 @@ export class PluiEvolutionRequestViewer extends React.Component {
     }
 
     /**
+
      * L'action pour fermer la view
      */
     handleClickButtonCancelPluiRequest = () => {
-        this.props.closeIdentify();
+        if (this.props.viewerMode) {
+            this.props.closeViewer();
+        } else {
+            this.props.closeIdentify();
+        }
     }
 
     /**

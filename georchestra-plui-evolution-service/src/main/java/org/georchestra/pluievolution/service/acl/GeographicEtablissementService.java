@@ -18,7 +18,7 @@ public interface GeographicEtablissementService {
      * Permet de recuperer la liste de toutes les geographiques area
      * @return
      */
-    List<GeographicEtablissement> getAllEtablissement();
+    List<GeographicEtablissement> searchEtablissements();
 
     /**
      * Permet d'obtenir l'etablissement de l'utilisatur connecté

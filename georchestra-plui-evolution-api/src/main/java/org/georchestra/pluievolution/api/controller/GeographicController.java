@@ -47,8 +47,8 @@ public class GeographicController implements GeographicApi {
     }
 
     @Override
-    public ResponseEntity<List<GeographicEtablissement>> getAllPluiRequestEtablissements() throws Exception {
-        return new ResponseEntity<>(geographicEtablissementService.getAllEtablissement(), HttpStatus.OK);
+    public ResponseEntity<List<GeographicEtablissement>> searchEtablissements() throws Exception {
+        return new ResponseEntity<>(geographicEtablissementService.searchEtablissements(), HttpStatus.OK);
     }
 
     @Override

@@ -31,14 +31,17 @@ import {
     savePluiRequest,
     startDrawing,
     stopDrawing,
-    updateAttachments
+    updateAttachments,
+    ensureProj4, closeViewer
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
     isOpen,
     isReadOnlySelector,
+    isViewerModeSelector,
     pluiEvolutionAttachmentConfigurationSelector,
     pluiEvolutionEtablissementConfigurationSelector,
+    pluiEvolutionFeaturesResponseSelector,
     pluiEvolutionLayerConfigurationSelector,
     pluiEvolutionMeSelector,
 } from '../selectors/plui-evolution-selector';
@@ -50,6 +53,8 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     active: !!isOpen(state),
     loading: !!isLoadingSelector(state),
     readOnly: !!isReadOnlySelector(state),
+    viewerMode: !!isViewerModeSelector(state),
+    response: pluiEvolutionFeaturesResponseSelector(state),
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
     layerConfiguration: pluiEvolutionLayerConfigurationSelector(state),
     etablissementConfiguration: pluiEvolutionEtablissementConfigurationSelector(state),
@@ -60,6 +65,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     status: state.pluievolution.status,
     drawing: state.pluievolution.drawing,
     error: state.pluievolution.error,
+    localConfig: state.localConfig,
     // debug
     state : state
 }), {
@@ -84,7 +90,9 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     closeRequest: closeRequest,
     loadActionError: loadActionError,
     changeFormStatus: changeFormStatus,
-    toggleControl: closePanel
+    toggleControl: closePanel,
+    ensureProj4: ensureProj4,
+    closeViewer: closeViewer
 })(PluiEvolutionPanelComponent);
 
 export default {

@@ -1,13 +1,42 @@
 package org.georchestra.pluievolution.service.sm.impl;
 
+import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
@@ -21,25 +50,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-
-import static org.georchestra.pluievolution.service.common.constant.CommuneParams.CODE_INSEE_RM;
 
 @Service
 public class GeoserverServiceImpl implements GeoserverService {
@@ -70,7 +80,7 @@ public class GeoserverServiceImpl implements GeoserverService {
     @Override
     public InputStream getWms(GeographicArea area, String queryString, String contentType) throws ApiServiceException {
 
-        try(CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+        try(CloseableHttpClient httpClient = createHttpClient()) {
 
             String wmsUrl = geoserverUrl + "/" + geoserverWorkspace +  "/wms";
 
@@ -83,7 +93,7 @@ public class GeoserverServiceImpl implements GeoserverService {
             } else {
                 throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + response);
             }
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
         }
 
@@ -91,7 +101,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
     @Override
     public String getWfs(GeographicArea area, String queryString) throws ApiServiceException {
-        try(CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+        try(CloseableHttpClient httpClient = createHttpClient()) {
 
             String wmsUrl = geoserverUrl + "/" + geoserverWorkspace +  "/wfs";
 
@@ -102,7 +112,7 @@ public class GeoserverServiceImpl implements GeoserverService {
             final HttpResponse response = httpClient.execute(httpGet);
 
             return buildGeoserverWfsResponse(response);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
         }
     }
@@ -110,7 +120,7 @@ public class GeoserverServiceImpl implements GeoserverService {
     @Override
     public String postWfs(GeographicArea area, String queryString, String wfsContent) throws ApiServiceException {
 
-        try(CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
+        try(CloseableHttpClient httpClient = createHttpClient()) {
 
             // Concatenation de l'URL geoserver avec les paramètres deja présent dans le requete original
             String wfsUrl = geoserverUrl + "/" + geoserverWorkspace +  "/wfs?" + URLDecoder.decode(queryString, StandardCharsets.UTF_8.displayName());
@@ -136,7 +146,7 @@ public class GeoserverServiceImpl implements GeoserverService {
             final HttpResponse response = httpClient.execute(httpPost);
 
             return buildGeoserverWfsResponse(response);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
         }
     }
@@ -277,5 +287,29 @@ public class GeoserverServiceImpl implements GeoserverService {
         propertyIsEqualToElement.appendChild(literalElement);
 
         return propertyIsEqualToElement;
+    }
+    
+    private static CloseableHttpClient createHttpClient()
+            throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+
+        // use the TrustSelfSignedStrategy to allow Self Signed Certificates
+        SSLContext sslContext = SSLContextBuilder
+                .create()
+                .loadTrustMaterial(new TrustSelfSignedStrategy())
+                .build();
+
+        // we can optionally disable hostname verification. 
+        // if you don't want to further weaken the security, you don't have to include this.
+        HostnameVerifier allowAllHosts = new NoopHostnameVerifier();
+        
+        // create an SSL Socket Factory to use the SSLContext with the trust self signed certificate strategy
+        // and allow all hosts verifier.
+        SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext, allowAllHosts);
+        
+        // finally create the HttpClient using HttpClient factory methods and assign the ssl socket factory
+        return HttpClients
+                .custom()
+                .setSSLSocketFactory(connectionFactory)
+                .build();
     }
 }

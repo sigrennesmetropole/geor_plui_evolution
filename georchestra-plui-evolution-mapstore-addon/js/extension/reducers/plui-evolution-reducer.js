@@ -10,7 +10,7 @@ const initialState = {
 }
 
 export default (state = initialState, action) => {
-    console.log("sig reduce:" + action.type);
+    console.log("pluie reduce:" + action.type);
     switch (action.type) {
         case actions.PLUI_EVOLUTION_ACTION_ERROR: {
             return assign({}, state, {error: action.error, loading: false});
@@ -71,6 +71,12 @@ export default (state = initialState, action) => {
         }
         case actions.PLUI_EVOLUTION_CHANGE_FORM_STATUS: {
             return assign({}, state, {status: action.status});
+        }
+        case actions.PLUI_EVOLUTION_OPEN_VIEWER: {
+            return assign({}, state, {response: action.response, status: status.VIEW_REQUEST, open: true})
+        }
+        case actions.PLUI_EVOLUTION_CLOSE_VIEWER: {
+            return assign({}, state, {response: {}, status: status.EMPTY, open: false})
         }
         case FEATURE_INFO_CLICK: {
             return assign({}, state, {pluiRequest: null, status: status.CLEAN_REQUEST, loading: false});
