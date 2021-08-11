@@ -566,7 +566,11 @@ export const stopDrawingSupportEpic = action$ =>
             ]);
         });
 
-export const clickMapEpic = (action$) =>
+// Fonction desactivée car ouvre le panel même quand on est entrain d'utiliser un outil, comme l'outil Mesure
+// Cela est vraiment derangeant
+// Elle n'est plus utile avec le chargement actuel du plugin; ouverture/fermeture du viewer
+/**
+export const clickMapEpic = (action$, store) =>
     action$.ofType(CLICK_ON_MAP)
         .switchMap((action) => {
             const overrideParams = {};
@@ -575,6 +579,7 @@ export const clickMapEpic = (action$) =>
             };
             return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams));
         });
+**/
 
 const buildAttachmentsRequest = (uuid, attachments) => {
     const url = backendURLPrefix + "/request/" + uuid + "/upload";
