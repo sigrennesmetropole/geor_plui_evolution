@@ -6,7 +6,8 @@ import Message from '@mapstore/components/I18N/Message';
 import {injectIntl} from 'react-intl';
 import { name } from '../../../config';
 import {PluiEvolutionPanelComponent} from '../components/PluiEvolutionPanelComponent';
-import * as epics from '../epics/plui-evolution-epic';
+import * as pluiEvolutionEpics from '../epics/plui-evolution-epic';
+import * as pluiEvolutionLogsEpics from '../epics/plui-evolution-epic';
 import pluiEvolutionReducer from '../reducers/plui-evolution-reducer';
 import {
     cancelClosing,
@@ -98,7 +99,10 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
 export default {
     name,
     component: injectIntl(PluiEvolutionPanelComponentConnected),
-    epics,
+    epics: {
+        pluiEvolutionEpics: pluiEvolutionEpics,
+        pluiEvolutionLogsEpics: pluiEvolutionLogsEpics
+    },
     reducers: {
         pluievolution: pluiEvolutionReducer
     },

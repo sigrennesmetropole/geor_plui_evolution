@@ -24,7 +24,7 @@ import {getMessageById} from '@mapstore/utils/LocaleUtils';
 import {setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
-import {openPanel, status} from '../actions/plui-evolution-action';
+import {consoleLog, openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
@@ -179,7 +179,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         super(props);
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
-        console.log('pluie construct component...');
+        consoleLog('pluie construct component...');
 
         // chargement des projections dans localconfig si nécessaire
         this.props.ensureProj4(this.props.localConfig.projectionDefs);
@@ -212,7 +212,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log("pluie didUpdate...");
+        consoleLog("pluie didUpdate...");
         // Tout est-il initialisé ?
         this.state.initialized = this.props.attachmentConfiguration !== null
             && this.props.user !== null
@@ -260,9 +260,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     render() {
-        console.log("pluie render");
-        console.log('this.props render', this.props);
-        console.log('this.state render', this.state);
+        consoleLog("pluie render");
+        consoleLog('this.props render', this.props);
+        consoleLog('this.state render', this.state);
         if( this.props.active ){
             
             //this.registerViewer();
