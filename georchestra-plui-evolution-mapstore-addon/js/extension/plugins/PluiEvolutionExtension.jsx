@@ -6,8 +6,7 @@ import Message from '@mapstore/components/I18N/Message';
 import {injectIntl} from 'react-intl';
 import { name } from '../../../config';
 import {PluiEvolutionPanelComponent} from '../components/PluiEvolutionPanelComponent';
-import * as pluiEvolutionEpics from '../epics/plui-evolution-epic';
-import * as pluiEvolutionLogsEpics from '../epics/plui-evolution-epic';
+import * as epics from '../epics/plui-evolution-epic';
 import pluiEvolutionReducer from '../reducers/plui-evolution-reducer';
 import {
     cancelClosing,
@@ -33,11 +32,11 @@ import {
     startDrawing,
     stopDrawing,
     updateAttachments,
-    ensureProj4, closeViewer
+    ensureProj4, closeViewer, consoleLog, consoleLogDone
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
-    isOpen,
+    isOpen, isPluiEvolutionActivate,
     isReadOnlySelector,
     isViewerModeSelector,
     pluiEvolutionAttachmentConfigurationSelector,
@@ -68,7 +67,9 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     error: state.pluievolution.error,
     localConfig: state.localConfig,
     // debug
-    state : state
+    state : state,
+    consoleLogWasPrinted: state.pluievolution.consoleLogWasPrinted,
+    activated: !!isPluiEvolutionActivate(state)
 }), {
     initPluiEvolution: initPluiEvolution,
     startDrawing: startDrawing,
@@ -93,16 +94,15 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     changeFormStatus: changeFormStatus,
     toggleControl: closePanel,
     ensureProj4: ensureProj4,
-    closeViewer: closeViewer
+    closeViewer: closeViewer,
+    consoleLog: consoleLog,
+    consoleLogDone: consoleLogDone
 })(PluiEvolutionPanelComponent);
 
 export default {
     name,
     component: injectIntl(PluiEvolutionPanelComponentConnected),
-    epics: {
-        pluiEvolutionEpics: pluiEvolutionEpics,
-        pluiEvolutionLogsEpics: pluiEvolutionLogsEpics
-    },
+    epics,
     reducers: {
         pluievolution: pluiEvolutionReducer
     },
