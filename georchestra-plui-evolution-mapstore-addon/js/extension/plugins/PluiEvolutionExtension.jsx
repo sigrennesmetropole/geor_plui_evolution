@@ -32,11 +32,11 @@ import {
     startDrawing,
     stopDrawing,
     updateAttachments,
-    ensureProj4, closeViewer
+    ensureProj4, closeViewer, consoleLog, consoleLogDone
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
-    isOpen,
+    isOpen, isPluiEvolutionActivate,
     isReadOnlySelector,
     isViewerModeSelector,
     pluiEvolutionAttachmentConfigurationSelector,
@@ -67,7 +67,9 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     error: state.pluievolution.error,
     localConfig: state.localConfig,
     // debug
-    state : state
+    state : state,
+    consoleLogWasPrinted: state.pluievolution.consoleLogWasPrinted,
+    activated: !!isPluiEvolutionActivate(state)
 }), {
     initPluiEvolution: initPluiEvolution,
     startDrawing: startDrawing,
@@ -92,7 +94,9 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     changeFormStatus: changeFormStatus,
     toggleControl: closePanel,
     ensureProj4: ensureProj4,
-    closeViewer: closeViewer
+    closeViewer: closeViewer,
+    consoleLog: consoleLog,
+    consoleLogDone: consoleLogDone
 })(PluiEvolutionPanelComponent);
 
 export default {

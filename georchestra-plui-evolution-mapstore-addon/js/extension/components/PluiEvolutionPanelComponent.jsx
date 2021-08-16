@@ -24,13 +24,14 @@ import {getMessageById} from '@mapstore/utils/LocaleUtils';
 import {setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
-import {openPanel, status} from '../actions/plui-evolution-action';
+import {consoleLog, consoleLogDone, openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
     PluiRequestType
 } from '../constants/plui-evolution-constants';
 import {PluiEvolutionViewer} from "@js/extension/components/PluiEvolutionViewer";
+import {logEvent} from "@js/extension/epics/plui-evolution-epic";
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -91,7 +92,11 @@ export class PluiEvolutionPanelComponent extends React.Component {
         loadingPluiCreateForm: PropTypes.func,
         changeFormStatus: PropTypes.func,
         ensureProj4: PropTypes.func,
-        closeViewer: PropTypes.func
+        closeViewer: PropTypes.func,
+        consoleLog: PropTypes.func,
+        consoleLogWasPrinted: PropTypes.bool,
+        consoleLogDone: PropTypes.func,
+        activated: PropTypes.bool
     };
 
     static defaultProps = {
@@ -138,6 +143,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         pluiRequest: null,
         layerConfiguration: null,
         localConfig: null,
+        consoleLogWasPrinted: false,
+        activated: false,
         // misc
         initPluiEvolution: ()=>{},
         startDrawing: ()=>{},
@@ -164,6 +171,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         toggleControl: () => {},
         ensureProj4: () => {},
         closeViewer: () => {},
+        consoleLog: () => {},
+        consoleLogDone: () => {}
     };
 
     static contextTypes = {
@@ -179,7 +188,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         super(props);
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
-        console.log('pluie construct component...');
+        this.props.consoleLog('pluie construct component...');
 
         // chargement des projections dans localconfig si nécessaire
         this.props.ensureProj4(this.props.localConfig.projectionDefs);
@@ -188,7 +197,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     registerViewer() {
-        console.log('pluie check viewer', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+        this.props.consoleLog('pluie check viewer', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
         if( !getViewer(PLUI_EVOLUTION_REQUEST_VIEWER)) {
             const PluiEvolutionRequestViewerConnected = connect((state) => ({
                 // debug
@@ -197,9 +206,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 openPanel: openPanel,
                 closeIdentify: closeIdentify
             })(PluiEvolutionRequestViewer);
-            console.log('pluie register viewer');
+            this.props.consoleLog('pluie register viewer');
             setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
-            console.log('pluie registered viewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+            this.props.consoleLog('pluie registered viewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
         }
     }
 
@@ -212,7 +221,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log("pluie didUpdate...");
+        this.props.consoleLog("pluie didUpdate...");
         // Tout est-il initialisé ?
         this.state.initialized = this.props.attachmentConfiguration !== null
             && this.props.user !== null
@@ -259,10 +268,20 @@ export class PluiEvolutionPanelComponent extends React.Component {
 
     }
 
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextProps.consoleLogWasPrinted) { // après un console log
+            this.props.consoleLogDone();
+            return false;
+        } else if (this.props.consoleLogWasPrinted && !nextProps.consoleLogWasPrinted) { // apres un console log done
+            return false;
+        }
+        return true; // autre actions
+    }
+
     render() {
-        console.log("pluie render");
-        console.log('this.props render', this.props);
-        console.log('this.state render', this.state);
+        this.props.consoleLog("pluie render");
+        this.props.consoleLog('this.props render', this.props);
+        this.props.consoleLog('this.state render', this.state);
         if( this.props.active ){
             
             //this.registerViewer();
@@ -317,7 +336,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     renderModelClosing(){
         if (this.props.closing ) {
             // si closing == true on demande l'abandon
-            console.log("pluieclosing");
+            this.props.consoleLog("pluieclosing");
             return (<ConfirmDialog
                 show
                 modal
@@ -537,7 +556,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     renderSubject() {
-        console.log('actual subject', this.state.pluiRequest.subject);
+        this.props.consoleLog('actual subject', this.state.pluiRequest.subject);
         return (
             <FormGroup controlId="pluievolution.subject"
                        validationState={this.state.errorFields.subject ? "error" : null}>
@@ -938,8 +957,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     handleEtablissementChange = (e) => {
-        console.log('handleEtablissementChange e', e);
-        console.log('handleEtablissementChange e value', e.target.value);
+        this.props.consoleLog('handleEtablissementChange e', e);
+        this.props.consoleLog('handleEtablissementChange e value', e.target.value);
         if (e.target.value) {
             this.state.etablissementSelected = this.props.geographicEtablissements[e.target.value];
             this.state.pluiRequest.codeInsee = this.state.etablissementSelected.codeInsee;
@@ -987,7 +1006,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * @param {*} e l'événement
      */
     fileAddedHandler(e) {
-        console.log('event file', e);
+        this.props.consoleLog('event file', e);
         //les différents test avant d'uploader le fichier (type, taille)
         const attachment = {
             name: e.target.files[0].name,
