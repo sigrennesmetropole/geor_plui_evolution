@@ -5,11 +5,10 @@ import {saveAs} from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
-import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
-import {CLICK_ON_MAP} from '@mapstore/actions/map';
+// import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
+// import {CLICK_ON_MAP} from '@mapstore/actions/map';
 import {
     changeMapInfoState,
-    featureInfoClick,
     hideMapinfoMarker,
     showMapinfoMarker,
     LOAD_FEATURE_INFO,
@@ -48,7 +47,7 @@ import {
     PluiRequestType
 } from "../constants/plui-evolution-constants";
 import {
-    isPluievolutionActivate,
+    isPluievolutionActivateAndSelected,
     pluiEvolutionEtablissementConfigurationSelector,
 } from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
@@ -66,7 +65,7 @@ let pluiEvolutionLayerProjection;
  */
 export function loadPluiEvolutionViewerEpic(action$, store) {
     return action$.ofType(LOAD_FEATURE_INFO)
-        .filter((action) => isPluievolutionActivate(store.getState()))
+        .filter((action) => isPluievolutionActivateAndSelected(store.getState()))
         .switchMap((action) => {
             // si features présentent dans la zone de clic
             if (action?.layer?.id && action?.data?.features && action.data.features.length) {
@@ -566,7 +565,11 @@ export const stopDrawingSupportEpic = action$ =>
             ]);
         });
 
-export const clickMapEpic = (action$) =>
+// Fonction desactivée car ouvre le panel même quand on est entrain d'utiliser un outil, comme l'outil Mesure
+// Cela est vraiment derangeant
+// Elle n'est plus utile avec le chargement actuel du plugin; ouverture/fermeture du viewer
+/**
+export const clickMapEpic = (action$, store) =>
     action$.ofType(CLICK_ON_MAP)
         .switchMap((action) => {
             const overrideParams = {};
@@ -575,6 +578,7 @@ export const clickMapEpic = (action$) =>
             };
             return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams));
         });
+**/
 
 const buildAttachmentsRequest = (uuid, attachments) => {
     const url = backendURLPrefix + "/request/" + uuid + "/upload";
@@ -606,4 +610,16 @@ export const ensureProjectionDefs = (action$) =>
 
             return Rx.Observable.of(ensureProj4Done());
         });
+
+export function logEvent(action$, store) {
+    return action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_LOG)
+        .filter((action) => store.getState()?.pluievolution.activated)
+        .switchMap((action) => {
+            // On pourra par la suite ajouter une condition pour voir si les log sont autorisés
+            if (action.logMessages) {
+                console.log(...action?.logMessages);
+            }
+            return Rx.Observable.of();
+        });
+}
 

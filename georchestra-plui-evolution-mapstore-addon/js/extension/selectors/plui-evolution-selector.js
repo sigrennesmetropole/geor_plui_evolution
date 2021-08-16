@@ -27,15 +27,21 @@ export const pluiEvolutionEtablissementConfigurationSelector = (state) => get(st
 
 export const pluiEvolutionMeSelector = (state) => get(state, "pluievolution.user");
 
+export const isPluiEvolutionActivate = (state) => get(state, "pluievolution.activated");
+
 /**
  * Retourne vrai si la couche du layer pluiEvolution existe, est visible et est selectionnée
  * @param state
  * @returns {boolean}
  */
-export function isPluievolutionActivate(state) {
-    const pluievolutionLayerId = state.pluievolution.layerConfiguration.layerWorkspace;
-    let layers = state.layers.flat;
-    layers = layers.filter(layer => layer.id === pluievolutionLayerId);
-    let pluievolutionLayer = layers.length !== 0 ? layers[0] : null;
-    return pluievolutionLayer != null && pluievolutionLayer?.visibility && state.layers.selected.includes(pluievolutionLayerId);
+export function isPluievolutionActivateAndSelected(state) {
+    const pluievolutionLayerId = state.pluievolution?.layerConfiguration?.layerWorkspace;
+    if (pluievolutionLayerId != null) {
+        let layers = state.layers?.flat;
+        layers = layers != null ? layers.filter(layer => layer.id === pluievolutionLayerId) : null;
+        let pluievolutionLayer = layers!= null && layers.length !== 0 ? layers[0] : null;
+        return pluievolutionLayer != null && pluievolutionLayer?.visibility && state.layers.selected.includes(pluievolutionLayerId);
+    }
+    return false;
+
 }

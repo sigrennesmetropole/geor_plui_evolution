@@ -43,7 +43,9 @@ export const actions = {
 	PLUI_EVOLUTION_ENSURE_PROJ4: 'PLUI_EVOLUTION:ENSURE_PROJ4',
 	PLUI_EVOLUTION_ENSURE_PROJ4_DONE: 'PLUI_EVOLUTION:ENSURE_PROJ4_DONE',
 	PLUI_EVOLUTION_OPEN_VIEWER: 'PLUI_EVOLUTION:OPEN:VIEWER',
-	PLUI_EVOLUTION_CLOSE_VIEWER: 'PLUI_EVOLUTION:CLOSE:VIEWER'
+	PLUI_EVOLUTION_CLOSE_VIEWER: 'PLUI_EVOLUTION:CLOSE:VIEWER',
+	PLUI_EVOLUTION_DISPLAY_LOG: 'PLUI:EVOLUTION:DISPLAY:LOG',
+	PLUI_EVOLUTION_DISPLAY_LOG_DONE: 'PLUI:EVOLUTION:DISPLAY:LOG:DONE',
 };
 
 export const status = {
@@ -356,5 +358,18 @@ export function loadPluiEvolutionViewer(response) {
 export function closeViewer() {
 	return {
 		type: actions.PLUI_EVOLUTION_CLOSE_VIEWER
+	}
+}
+
+export function consoleLog(...logMessages) {
+	return {
+		type: actions.PLUI_EVOLUTION_DISPLAY_LOG,
+		logMessages: logMessages
+	}
+}
+
+export function consoleLogDone() {
+	return {
+		type: actions.PLUI_EVOLUTION_DISPLAY_LOG_DONE
 	}
 }
