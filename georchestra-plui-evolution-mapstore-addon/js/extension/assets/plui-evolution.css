@@ -115,7 +115,7 @@ span .info {
 .plui-evolution-viewer .button-navigation {
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 18px
+	margin: 0 0 18px 0;
 }
 
 .plui-evolution-request-viewer .button-navigation button,
