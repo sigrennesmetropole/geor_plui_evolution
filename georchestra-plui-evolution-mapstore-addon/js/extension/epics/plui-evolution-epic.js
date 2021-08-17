@@ -6,7 +6,7 @@ import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/acti
 import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 // import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
-// import {CLICK_ON_MAP} from '@mapstore/actions/map';
+import {CLICK_ON_MAP} from '@mapstore/actions/map';
 import {
     changeMapInfoState,
     hideMapinfoMarker,
@@ -52,6 +52,7 @@ import {
 } from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
 import {act} from "react-dom/test-utils";
+import {featureInfoClick} from "../../../mapstore2-georchestra/MapStore2/web/client/actions/mapInfo";
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
@@ -565,12 +566,10 @@ export const stopDrawingSupportEpic = action$ =>
             ]);
         });
 
-// Fonction desactivée car ouvre le panel même quand on est entrain d'utiliser un outil, comme l'outil Mesure
-// Cela est vraiment derangeant
-// Elle n'est plus utile avec le chargement actuel du plugin; ouverture/fermeture du viewer
-/**
+// L'interception des clics pour le plugin n'est faite que si le plugin est actif et sa couche est selectionnée
 export const clickMapEpic = (action$, store) =>
     action$.ofType(CLICK_ON_MAP)
+        .filter((action) => isPluievolutionActivateAndSelected(store.getState()))
         .switchMap((action) => {
             const overrideParams = {};
             overrideParams[pluiEvolutionLayerName] = {
@@ -578,7 +577,6 @@ export const clickMapEpic = (action$, store) =>
             };
             return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams));
         });
-**/
 
 const buildAttachmentsRequest = (uuid, attachments) => {
     const url = backendURLPrefix + "/request/" + uuid + "/upload";
