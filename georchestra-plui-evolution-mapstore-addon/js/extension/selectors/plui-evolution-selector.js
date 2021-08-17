@@ -40,7 +40,7 @@ export function isPluievolutionActivateAndSelected(state) {
         let layers = state.layers?.flat;
         layers = layers != null ? layers.filter(layer => layer.id === pluievolutionLayerId) : null;
         let pluievolutionLayer = layers!= null && layers.length !== 0 ? layers[0] : null;
-        return pluievolutionLayer != null && pluievolutionLayer?.visibility && state.layers.selected.includes(pluievolutionLayerId);
+        return pluievolutionLayer && pluievolutionLayer.visibility && state.layers.selected.includes(pluievolutionLayerId);
     }
     return false;
 
