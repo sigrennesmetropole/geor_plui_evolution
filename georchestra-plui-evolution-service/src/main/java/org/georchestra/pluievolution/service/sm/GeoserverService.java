@@ -1,9 +1,8 @@
 package org.georchestra.pluievolution.service.sm;
 
 import org.georchestra.pluievolution.core.dto.GeographicArea;
+import org.georchestra.pluievolution.service.bean.GeoserverStream;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
-
-import java.io.InputStream;
 
 public interface GeoserverService {
     /**
@@ -12,7 +11,7 @@ public interface GeoserverService {
      * @param queryString       paramètre de la requête url
      * @return                  Image WMS
      */
-    InputStream getWms(GeographicArea area, String queryString, String contentType) throws ApiServiceException;
+    GeoserverStream getWms(GeographicArea area, String queryString, String contentType) throws ApiServiceException;
 
     /**
      * Requête WFS POST
