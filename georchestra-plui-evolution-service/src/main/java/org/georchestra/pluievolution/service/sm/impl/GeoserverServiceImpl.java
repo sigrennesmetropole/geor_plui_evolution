@@ -90,7 +90,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 			throws ApiServiceException {
 
 		if (!enableWmts && queryString != null && queryString.toLowerCase().contains(SERVICE_WMTS)) {
-			throw new ApiServiceException(GEOSERVER_SERVICE_ERROR, ApiServiceExceptionsStatus.NOT_FOUND);
+			throw new ApiServiceException(GEOSERVER_SERVICE_ERROR, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 
 		try (CloseableHttpClient httpClient = createHttpClient()) {
@@ -111,10 +111,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
 			} else {
-				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + response);
+				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + response,
+						ApiServiceExceptionsStatus.BAD_REQUEST);
 			}
 		} catch (final Exception e) {
-			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
+			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 
 	}
