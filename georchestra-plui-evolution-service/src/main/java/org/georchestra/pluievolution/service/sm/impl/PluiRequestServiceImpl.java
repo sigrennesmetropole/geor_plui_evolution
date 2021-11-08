@@ -18,6 +18,7 @@ import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatus;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.helper.request.AttachmentHelper;
 import org.georchestra.pluievolution.service.helper.request.RedmineHelper;
@@ -30,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -244,7 +246,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 
 		if (geographic == null) {
-			throw new ApiServiceException("Organisation inconnue", "404");
+			throw new ApiServiceException("Organisation inconnue", ApiServiceExceptionsStatus.NOT_FOUND);
 		}
 
 		return geographic.getGeometry();

@@ -3,6 +3,7 @@ package org.georchestra.pluievolution.service.exception;
 public class ApiServiceException extends Exception {
 
     private static final long serialVersionUID = 1L;
+    
     private String appExceptionStatusCode;
 
     public ApiServiceException() {
