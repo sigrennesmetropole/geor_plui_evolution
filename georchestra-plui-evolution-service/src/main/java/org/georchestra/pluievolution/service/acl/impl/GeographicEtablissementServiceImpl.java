@@ -7,9 +7,11 @@ import org.georchestra.pluievolution.core.entity.acl.GeographicEtablissementEnti
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatus;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicEtablissementMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,40 +19,41 @@ import java.util.List;
 @Service
 public class GeographicEtablissementServiceImpl implements GeographicEtablissementService {
 
-    @Autowired
-    GeographicEtablissementDao geographicEtablissementDao;
+	@Autowired
+	GeographicEtablissementDao geographicEtablissementDao;
 
-    @Autowired
-    GeographicEtablissementMapper geographicEtablissementMapper;
+	@Autowired
+	GeographicEtablissementMapper geographicEtablissementMapper;
 
-    @Autowired
-    GeographicAreaService geographicAreaService;
+	@Autowired
+	GeographicAreaService geographicAreaService;
 
-    @Autowired
-    AuthentificationHelper authentificationHelper;
+	@Autowired
+	AuthentificationHelper authentificationHelper;
 
-    @Override
-    public GeographicEtablissement getGeographicEtablissementByCodeInsee(String codeInsee) {
-        return geographicEtablissementMapper.entityToDto(geographicEtablissementDao.findByCodeInsee(codeInsee));
-    }
+	@Override
+	public GeographicEtablissement getGeographicEtablissementByCodeInsee(String codeInsee) {
+		return geographicEtablissementMapper.entityToDto(geographicEtablissementDao.findByCodeInsee(codeInsee));
+	}
 
-    @Override
-    public List<GeographicEtablissement> searchEtablissements() {
-        List<GeographicEtablissementEntity> geographicAreaEntities = geographicEtablissementDao.findAll();
-        return geographicEtablissementMapper.entitiesToDto(geographicAreaEntities);
-    }
+	@Override
+	public List<GeographicEtablissement> searchEtablissements() {
+		List<GeographicEtablissementEntity> geographicAreaEntities = geographicEtablissementDao.findAll();
+		return geographicEtablissementMapper.entitiesToDto(geographicAreaEntities);
+	}
 
-    @Override
-    public GeographicEtablissement getCurrentUserEtablissement() throws ApiServiceException {
-        // nom organisation == nom geographic area
-        // on recupere donc la geographic area a partir du nom
-        String nom = authentificationHelper.getOrganisation();
-        GeographicArea geographicArea = geographicAreaService.getGeographicAreaByNom(nom);
-        GeographicEtablissementEntity entity = geographicEtablissementDao.findByCodeInsee(geographicArea.getCodeInsee());
+	@Override
+	public GeographicEtablissement getCurrentUserEtablissement() throws ApiServiceException {
+		// nom organisation == nom geographic area
+		// on recupere donc la geographic area a partir du nom
+		String nom = authentificationHelper.getOrganisation();
+		GeographicArea geographicArea = geographicAreaService.getGeographicAreaByNom(nom);
+		GeographicEtablissementEntity entity = geographicEtablissementDao
+				.findByCodeInsee(geographicArea.getCodeInsee());
 
-        if (entity == null) {
-            throw new ApiServiceException("Organisation inconnue", "404");
-        }
-        return geographicEtablissementMapper.entityToDto(entity);
-    }
+		if (entity == null) {
+			throw new ApiServiceException("Organisation inconnue", ApiServiceExceptionsStatus.NOT_FOUND);
+		}
+		return geographicEtablissementMapper.entityToDto(entity);
+	}
 }
