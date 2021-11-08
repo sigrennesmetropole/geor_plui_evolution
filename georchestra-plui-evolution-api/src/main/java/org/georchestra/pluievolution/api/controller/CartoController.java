@@ -2,6 +2,10 @@ package org.georchestra.pluievolution.api.controller;
 
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +55,7 @@ public class CartoController implements CartoApi {
 		OutputStream out = response.getOutputStream();
 		if ("GetMap".equals(request.getParameter("REQUEST"))) {
 			GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
-					request.getQueryString(), "application/img");
+					request.getCharacterEncoding(), request.getQueryString(), "application/img");
 			if (geoserverStream != null && geoserverStream.getStream() != null) {
 				BufferedImage bufferedImage = ImageIO.read(geoserverStream.getStream());
 				if (bufferedImage != null) {
@@ -60,7 +64,7 @@ public class CartoController implements CartoApi {
 			}
 		} else {
 			GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
-					request.getQueryString(), "application/json");
+					request.getCharacterEncoding(), request.getQueryString(), "application/json");
 			if (geoserverStream != null && geoserverStream.getStream() != null) {
 				response.setContentType(geoserverStream.getMimeType());
 				response.setCharacterEncoding("UTF-8");
@@ -81,19 +85,31 @@ public class CartoController implements CartoApi {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 
-		String json = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(), request.getQueryString());
+		String json = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(),
+				request.getCharacterEncoding(), request.getQueryString());
 		return ResponseEntity.ok(json);
 	}
 
 	@Override
-	public ResponseEntity<String> postWfs(@Valid String wfsContent) throws Exception {
-
+	public ResponseEntity<String> postWfs(@Valid String body) throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 
-		String json = geoserverService.postWfs(geographicAreaService.getCurrentUserArea(), request.getQueryString(),
-				wfsContent);
-		return ResponseEntity.ok(json);
+		String wfsQueryString = request.getQueryString();
+		String wfsContent = "";
+		if (body != null) {
+			String[] parts = body.split("&");
+			for (int i = 0; i < parts.length; i++) {
+				if (parts[i].startsWith("<")) {
+					wfsContent = parts[i];
+				} else if (parts[i].startsWith("%")) {
+					wfsContent = URLDecoder.decode(parts[i], request.getCharacterEncoding());
+				}
+			}
+		}
+
+		return ResponseEntity.ok(geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
+				request.getCharacterEncoding(), wfsQueryString, wfsContent));
 	}
 
 }

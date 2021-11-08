@@ -7,6 +7,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -86,7 +87,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	private boolean enableWmts;
 
 	@Override
-	public GeoserverStream getWms(GeographicArea area, String queryString, String contentType)
+	public GeoserverStream getWms(GeographicArea area, String encoding, String queryString, String contentType)
 			throws ApiServiceException {
 
 		if (!enableWmts && queryString != null && queryString.toLowerCase().contains(SERVICE_WMTS)) {
@@ -96,8 +97,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			String wmsUrl = buildURL("wms");
-
-			HttpGet httpGet = buildGeoserverHttpGet(wmsUrl, area, queryString, contentType);
+			HttpGet httpGet = buildGeoserverHttpGet(wmsUrl, area, queryString, contentType, encoding);
 			final HttpResponse response = httpClient.execute(httpGet);
 
 			// Code 200 : succès
@@ -121,12 +121,12 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public String getWfs(GeographicArea area, String queryString) throws ApiServiceException {
+	public String getWfs(GeographicArea area, String encoding, String queryString) throws ApiServiceException {
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			String wfsUrl = buildURL("wfs");
-
-			HttpGet httpGet = buildGeoserverHttpGet(wfsUrl, area, queryString, MediaType.APPLICATION_JSON_VALUE);
+			HttpGet httpGet = buildGeoserverHttpGet(wfsUrl, area, queryString, MediaType.APPLICATION_JSON_VALUE,
+					encoding);
 
 			LOG.info("URL Get WFS {}", httpGet.getURI());
 
@@ -139,13 +139,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public String postWfs(GeographicArea area, String queryString, String wfsContent) throws ApiServiceException {
+	public String postWfs(GeographicArea area, String encoding, String queryString, String wfsContent)
+			throws ApiServiceException {
 
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
 			// requete original
-			String wfsUrl = buildURL("/wfs?" + URLDecoder.decode(queryString, StandardCharsets.UTF_8.displayName()));
+			String wfsUrl = buildURL("wfs?" + buildQuery(queryString, encoding));
 
 			// Filtre si l'utilisateur n'est pas un agent RM
 			if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
@@ -184,11 +185,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 * @throws UnsupportedEncodingException problème lors de l'encodage de la
 	 *                                      requête
 	 */
-	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType)
-			throws UnsupportedEncodingException {
+	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
+			String encoding) throws UnsupportedEncodingException {
 		// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
 		// requete original
-		String urlGet = baseUrl + "?" + URLDecoder.decode(queryString, StandardCharsets.UTF_8.displayName());
+		String urlGet = baseUrl + "?" + buildQuery(queryString, encoding);
 		// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
 		if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
 			urlGet += String.format("&cql_filter=%s=%s", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
@@ -242,7 +243,11 @@ public class GeoserverServiceImpl implements GeoserverService {
 	private String addFilterToWFSContent(String wfsContent, String codeInsee) throws ApiServiceException {
 
 		try {
-			String newWFS = wfsContent;
+			String newWFS = "";
+			if( !wfsContent.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {				
+				newWFS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
+			}
+			newWFS += wfsContent;
 			final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
@@ -348,5 +353,13 @@ public class GeoserverServiceImpl implements GeoserverService {
 		}
 		urlBuilder.append(service);
 		return urlBuilder.toString();
+	}
+
+	private String buildQuery(String query, String encoding) throws UnsupportedEncodingException {
+		if (StringUtils.isNotEmpty(query)) {
+			return URLDecoder.decode(query, Charset.forName(encoding));
+		} else {
+			return StringUtils.EMPTY;
+		}
 	}
 }
