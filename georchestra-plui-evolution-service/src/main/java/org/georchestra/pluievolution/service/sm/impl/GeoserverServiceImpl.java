@@ -218,7 +218,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 */
 	private String buildGeoserverWfsResponse(HttpResponse httpResponse) throws ApiServiceException {
 		// Code 200 : succès
-		if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() == 200) {
+		if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() >= 200
+				&& httpResponse.getStatusLine().getStatusCode() <= 302) {
 			// Renvoi du contenu JSON (String dans le contrôleur)
 			final StringWriter writer = new StringWriter();
 			try {
@@ -244,7 +245,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 		try {
 			String newWFS = "";
-			if( !wfsContent.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {				
+			if (!wfsContent.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
 				newWFS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 			}
 			newWFS += wfsContent;
