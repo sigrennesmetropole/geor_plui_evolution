@@ -102,11 +102,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// Code 200 : succès
 			if (response.getStatusLine().getStatusCode() == 200) {
-				Header header = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
-				String outputContentType = contentType;
-				if (header != null && StringUtils.isNotEmpty(header.getValue())) {
-					outputContentType = header.getValue();
-				}
+				String outputContentType = extractContentType(response,contentType);
 				return GeoserverStream.builder().status(response.getStatusLine().getStatusCode())
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
@@ -120,8 +116,17 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	}
 
+	private String extractContentType(final HttpResponse response, String defaultValue) {
+		Header header = response.getFirstHeader(HttpHeaders.CONTENT_TYPE);
+		String outputContentType = defaultValue;
+		if (header != null && StringUtils.isNotEmpty(header.getValue())) {
+			outputContentType = header.getValue();
+		}
+		return outputContentType;
+	}
+
 	@Override
-	public String getWfs(GeographicArea area, String encoding, String queryString) throws ApiServiceException {
+	public GeoserverStream getWfs(GeographicArea area, String encoding, String queryString) throws ApiServiceException {
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			String wfsUrl = buildURL("wfs");
@@ -139,7 +144,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	@Override
-	public String postWfs(GeographicArea area, String encoding, String queryString, String wfsContent)
+	public GeoserverStream postWfs(GeographicArea area, String encoding, String queryString, String wfsContent)
 			throws ApiServiceException {
 
 		try (CloseableHttpClient httpClient = createHttpClient()) {
@@ -216,7 +221,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 * @return réponse parsée
 	 * @throws ApiServiceException Erreur lors du parsing de la réponse
 	 */
-	private String buildGeoserverWfsResponse(HttpResponse httpResponse) throws ApiServiceException {
+	private GeoserverStream buildGeoserverWfsResponse(HttpResponse httpResponse) throws ApiServiceException {
 		// Code 200 : succès
 		if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() >= 200
 				&& httpResponse.getStatusLine().getStatusCode() <= 302) {
@@ -227,7 +232,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 			} catch (IOException e) {
 				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse, e);
 			}
-			return writer.toString();
+			String outputContentType = extractContentType(httpResponse,MediaType.APPLICATION_JSON_VALUE);
+			return GeoserverStream.builder().content(writer.toString()).status(httpResponse.getStatusLine().getStatusCode()).content(outputContentType).build();
 		} else {
 			throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse);
 		}
