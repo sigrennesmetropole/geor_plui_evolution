@@ -21,6 +21,7 @@ import org.georchestra.pluievolution.service.sm.ConfigurationService;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -85,9 +86,9 @@ public class CartoController implements CartoApi {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 
-		String json = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(),
+		GeoserverStream geoserverStream = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(),
 				request.getCharacterEncoding(), request.getQueryString());
-		return ResponseEntity.ok(json);
+		return ResponseEntity.status(geoserverStream.getStatus()).contentType(MediaType.parseMediaType(geoserverStream.getMimeType())).body(geoserverStream.getContent());
 	}
 
 	@Override
@@ -107,9 +108,9 @@ public class CartoController implements CartoApi {
 				}
 			}
 		}
-
-		return ResponseEntity.ok(geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
-				request.getCharacterEncoding(), wfsQueryString, wfsContent));
+		GeoserverStream geoserverStream =geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
+				request.getCharacterEncoding(), wfsQueryString, wfsContent);
+		return ResponseEntity.status(geoserverStream.getStatus()).contentType(MediaType.parseMediaType(geoserverStream.getMimeType())).body(geoserverStream.getContent());
 	}
 
 }

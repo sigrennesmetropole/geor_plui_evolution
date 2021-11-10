@@ -23,7 +23,7 @@ public interface GeoserverService {
      * @return                          résultat wfs
      * @throws ApiServiceException      Erreur lors de la requête WFS GET
      */
-    String postWfs(GeographicArea area,String encoding,  String queryString, String wfsContent) throws ApiServiceException;
+    GeoserverStream postWfs(GeographicArea area,String encoding,  String queryString, String wfsContent) throws ApiServiceException;
 
     /**
      * Requête WFS GET
@@ -33,5 +33,5 @@ public interface GeoserverService {
      * @return                          résultat wfs
      * @throws ApiServiceException      Erreur lors de la requête WFS GET
      */
-    String getWfs( GeographicArea area,String encoding, String queryString) throws ApiServiceException;;
+    GeoserverStream getWfs( GeographicArea area,String encoding, String queryString) throws ApiServiceException;;
 }
