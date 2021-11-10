@@ -102,7 +102,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// Code 200 : succès
 			if (response.getStatusLine().getStatusCode() == 200) {
-				String outputContentType = extractContentType(response,contentType);
+				String outputContentType = extractContentType(response, contentType);
 				return GeoserverStream.builder().status(response.getStatusLine().getStatusCode())
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
@@ -121,6 +121,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 		String outputContentType = defaultValue;
 		if (header != null && StringUtils.isNotEmpty(header.getValue())) {
 			outputContentType = header.getValue();
+		}
+		if (StringUtils.isEmpty(outputContentType)) {
+			outputContentType = defaultValue;
 		}
 		return outputContentType;
 	}
@@ -226,14 +229,18 @@ public class GeoserverServiceImpl implements GeoserverService {
 		if (httpResponse != null && httpResponse.getStatusLine().getStatusCode() >= 200
 				&& httpResponse.getStatusLine().getStatusCode() <= 302) {
 			// Renvoi du contenu JSON (String dans le contrôleur)
+			LOG.info("Wfs received {}", httpResponse.getStatusLine());
 			final StringWriter writer = new StringWriter();
 			try {
 				IOUtils.copy(httpResponse.getEntity().getContent(), writer, StandardCharsets.UTF_8.displayName());
+				LOG.info("Wfs copy {}", writer.toString());
 			} catch (IOException e) {
 				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse, e);
 			}
-			String outputContentType = extractContentType(httpResponse,MediaType.APPLICATION_JSON_VALUE);
-			return GeoserverStream.builder().content(writer.toString()).status(httpResponse.getStatusLine().getStatusCode()).content(outputContentType).build();
+			String outputContentType = extractContentType(httpResponse, MediaType.APPLICATION_JSON_VALUE);
+			LOG.info("Wfs contenttype {}", outputContentType);
+			return GeoserverStream.builder().content(writer.toString())
+					.status(httpResponse.getStatusLine().getStatusCode()).mimeType(outputContentType).build();
 		} else {
 			throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse);
 		}
