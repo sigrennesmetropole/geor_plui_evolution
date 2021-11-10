@@ -88,7 +88,9 @@ public class CartoController implements CartoApi {
 
 		GeoserverStream geoserverStream = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(),
 				request.getCharacterEncoding(), request.getQueryString());
-		return ResponseEntity.status(geoserverStream.getStatus()).contentType(MediaType.parseMediaType(geoserverStream.getMimeType())).body(geoserverStream.getContent());
+		return ResponseEntity.status(geoserverStream.getStatus())
+				.contentType(MediaType.parseMediaType(geoserverStream.getMimeType()))
+				.body(geoserverStream.getContent());
 	}
 
 	@Override
@@ -108,9 +110,11 @@ public class CartoController implements CartoApi {
 				}
 			}
 		}
-		GeoserverStream geoserverStream =geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
+		GeoserverStream geoserverStream = geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
 				request.getCharacterEncoding(), wfsQueryString, wfsContent);
-		return ResponseEntity.status(geoserverStream.getStatus()).contentType(MediaType.parseMediaType(geoserverStream.getMimeType())).body(geoserverStream.getContent());
+		return ResponseEntity.status(geoserverStream.getStatus())
+				.contentType(MediaType.parseMediaType(geoserverStream.getMimeType()))
+				.body(geoserverStream.getContent());
 	}
 
 }
