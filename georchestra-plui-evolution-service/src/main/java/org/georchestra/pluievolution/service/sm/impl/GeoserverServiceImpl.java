@@ -230,17 +230,27 @@ public class GeoserverServiceImpl implements GeoserverService {
 				&& httpResponse.getStatusLine().getStatusCode() <= 302) {
 			// Renvoi du contenu JSON (String dans le contrôleur)
 			LOG.info("Wfs received {}", httpResponse.getStatusLine());
-			final StringWriter writer = new StringWriter();
-			try {
-				IOUtils.copy(httpResponse.getEntity().getContent(), writer, StandardCharsets.UTF_8.displayName());
-				LOG.info("Wfs copy {}", writer.toString());
-			} catch (IOException e) {
-				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse, e);
-			}
 			String outputContentType = extractContentType(httpResponse, MediaType.APPLICATION_JSON_VALUE);
 			LOG.info("Wfs contenttype {}", outputContentType);
-			return GeoserverStream.builder().content(writer.toString())
-					.status(httpResponse.getStatusLine().getStatusCode()).mimeType(outputContentType).build();
+
+			if (httpResponse.getStatusLine().getStatusCode() < 300) {
+				final StringWriter writer = new StringWriter();
+				try {
+					IOUtils.copy(httpResponse.getEntity().getContent(), writer, StandardCharsets.UTF_8.displayName());
+					LOG.info("Wfs copy {}", writer);
+					return GeoserverStream.builder().content(writer.toString())
+							.status(httpResponse.getStatusLine().getStatusCode()).mimeType(outputContentType).build();
+				} catch (IOException e) {
+					throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse, e);
+				}
+			} else {
+				for (Header header : httpResponse.getAllHeaders()) {
+					LOG.info("header {}", header);
+				}
+				return GeoserverStream.builder().status(httpResponse.getStatusLine().getStatusCode())
+						.mimeType(outputContentType).build();
+			}
+
 		} else {
 			throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + httpResponse);
 		}
