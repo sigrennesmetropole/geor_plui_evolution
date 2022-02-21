@@ -52,6 +52,9 @@ public class PluiRequestEntity implements LongId {
 	@Column(name = "object", length = 300, nullable = false)
 	private String object;
 
+	@Column(name = "plui_procedure", length = 50, nullable = true)
+	private String pluiProcedure;
+
 	@Column(name = "comment", length = 1024)
 	private String comment;
 
