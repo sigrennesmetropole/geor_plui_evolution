@@ -144,6 +144,7 @@ CREATE TABLE pluievolution.plui_request
     redmine_id integer,
     status character varying(50) COLLATE pg_catalog."default",
     subject character varying(130) COLLATE pg_catalog."default" NOT NULL,
+    plui_procedure character varying(50) COLLATE pg_catalog."default",
     type character varying(20) COLLATE pg_catalog."default",
     uuid uuid NOT NULL,
     area_id bigint,
@@ -186,7 +187,8 @@ SELECT pr.id,
        pr.uuid,
        ga.codeinsee,
        ga.nom AS nom_area,
-       pr.redmine_id
+       pr.redmine_id,
+       pr.plui_procedure
 FROM plui_request pr
          LEFT JOIN geographic_area ga ON pr.area_id = ga.id;
 
