@@ -158,7 +158,10 @@ export class PluiEvolutionRequestViewer extends React.Component {
                             <Message msgId="pluievolution.pluiProcedure.title"/>
                         </ControlLabel>
                         <Col sm={8} >
-                            {pluiRequest.plui_procedure}
+                            {
+                                !!pluiRequest.plui_procedure ? pluiRequest.plui_procedure :
+                                    (<Message msgId="pluievolution.pluiProcedure.empty"/>)
+                            }
                         </Col>
                     </FormGroup>
                 </fieldset>
