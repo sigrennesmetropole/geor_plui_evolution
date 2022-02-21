@@ -29,6 +29,9 @@
 				"placeholder": "Saisissez l'objet de la demande",
 				"error": "L'objet de la demande est absent"
 			},
+			"pluiProcedure": {
+				"title": "Procédure du PLUi"
+			},
 			"comment": {
 				"title": "Commentaires des services"
 			},

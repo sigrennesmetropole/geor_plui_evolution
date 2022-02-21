@@ -152,6 +152,16 @@ export class PluiEvolutionRequestViewer extends React.Component {
                         </Col>
                     </FormGroup>
                 </fieldset>
+                <fieldset>
+                    <FormGroup controlId="pluievolution.pluiProcedure">
+                        <ControlLabel className="col-sm-4">
+                            <Message msgId="pluievolution.pluiProcedure.title"/>
+                        </ControlLabel>
+                        <Col sm={8} >
+                            {pluiRequest.plui_procedure}
+                        </Col>
+                    </FormGroup>
+                </fieldset>
             </div>
         )
     }
