@@ -268,7 +268,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 		try {
 			String newWFS = "";
-			if (!wfsContent.startsWith("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")) {
+			if (!wfsContent.startsWith("<?xml")) {
 				newWFS = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 			}
 			newWFS += wfsContent;
