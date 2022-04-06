@@ -18,7 +18,10 @@ import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +44,7 @@ class PluiRequestServiceTest {
 
 	PluiRequest pluiRequest1;
 
-	@BeforeAll
+	@BeforeEach
 	public void init() {
 		pluiRequest = new PluiRequest();
 		pluiRequest.setType(PluiRequestType.COMMUNE);
