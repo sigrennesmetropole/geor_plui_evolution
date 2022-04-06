@@ -77,10 +77,10 @@ class PluiRequestServiceTest {
 		// assertNotNull("L'initiateur de la demande doit avoir ete renseigné",
 		// pluiRequest1.getInitiator());
 
-		assertEquals("L'objet de la demande doit le meme que celui renseigné", pluiRequest.getObject(),
-				pluiRequest1.getObject());
-		assertEquals("Le sujet de la demade doit etre le meme que celui renseigné", pluiRequest.getSubject(),
-				pluiRequest1.getSubject());
+		assertEquals(pluiRequest.getObject(), pluiRequest1.getObject(),
+				"L'objet de la demande doit le meme que celui renseigné");
+		assertEquals(pluiRequest.getSubject(), pluiRequest1.getSubject(),
+				"Le sujet de la demade doit etre le meme que celui renseigné");
 
 	}
 
