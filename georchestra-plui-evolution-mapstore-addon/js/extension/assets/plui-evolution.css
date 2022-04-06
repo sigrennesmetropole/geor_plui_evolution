@@ -108,7 +108,7 @@ span .info {
 }
 
 .plui-evolution-request-viewer fieldset {
-   margin: 16px 0;
+   margin: 16px 0 !important;
 }
 
 .plui-evolution-request-viewer .button-navigation,
