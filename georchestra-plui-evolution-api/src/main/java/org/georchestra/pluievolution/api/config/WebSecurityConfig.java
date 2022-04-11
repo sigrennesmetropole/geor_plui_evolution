@@ -50,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		// Url autorisées
 		// 4200 pour les développement | 8080 pour le déploiement
-		configuration.setAllowedOrigins(Collections.singletonList("*"));
+		configuration.setAllowedOriginPatterns(Collections.singletonList("*"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
