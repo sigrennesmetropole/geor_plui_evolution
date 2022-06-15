@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -44,11 +45,20 @@ import org.georchestra.pluievolution.service.bean.GeoserverStream;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatus;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.filter.text.ecql.ECQL;
+import org.geotools.util.factory.GeoTools;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -194,14 +204,52 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 *                                      requête
 	 */
 	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
-			String encoding) throws UnsupportedEncodingException {
+			String encoding) throws CQLException {
 		// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
+		queryString = buildQuery(queryString, encoding);
+
 		// requete original
-		String urlGet = baseUrl + "?" + buildQuery(queryString, encoding);
+		String urlGet = baseUrl + "?" + queryString;
 		// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
+		// Ce nouveau ne doit pas se substituer aux filtres deja present...
+		// Si un filtre est deja present, le nouveau filtre s'y ajoute avec la condition AND
+		// Si l'utilisateur n'est pas un agent RM, le filtre si existant dans l'URL reste tel quel
 		if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
-			urlGet += String.format("&cql_filter=%s=%s", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
+			String cqlFilterName = "cql_filter";
+
+			// Parametre du filtre CQL, null si absent
+			Pair<String, String> cql = getQueryParam(cqlFilterName, queryString);
+
+			// filtre sur la commune
+			Filter filter = CQL.toFilter(String.format("%s=%s", CODE_INSEE_COLUMN_NAME, area.getCodeInsee()));
+
+			// Si le parametre cql existe deja dans l'url
+			// On le concatene a celui sur la colonne
+			if (cql != null) {
+				FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
+
+				// On interprete le filtre dans la requete
+				Filter filterFromUrl = ECQL.toFilter(cql.getSecond());
+				// On fait la jonction des deux filtre en AND
+				// Les deux conditions devront etre respectées alors
+				filter = ff.and(filter, filterFromUrl);
+
+				// Si le  nom du param diffère notamment au niveau de la casse, on le recupere tel que dans l'url
+				cqlFilterName = cql.getFirst();
+			}
+
+			// On retranscris en chaine de caratere les deux filtres combinés, si un filtre était deja présent sinon le filtre sure la commune
+			String filterCql = ECQL.toCQL(filter);
+
+			// On met à jour notre URL avec le filtre
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
+			uriBuilder.replaceQueryParam(cqlFilterName, filterCql);
+
+			// On met à jour l'URL
+			urlGet = uriBuilder.build().encode().toUriString();
+
 		}
+
 
 		// paramètres d'authentification
 		final String userpass = geoserverUsername + ":" + geoserverPassword;
@@ -215,6 +263,24 @@ public class GeoserverServiceImpl implements GeoserverService {
 		httpGet.setHeader(HttpHeaders.AUTHORIZATION, basicAuth);
 
 		return httpGet;
+	}
+
+	/**
+	 * Permet de recuperer une query param sous la forme de clé valeur
+	 * @param name			nom de la queryParam
+	 * @param queryString	chaine de caracteres des params
+	 * @return une paire (nom, valeur)
+	 */
+	private Pair<String, String> getQueryParam(String name, String queryString) {
+		if (StringUtils.isNotEmpty(queryString) && StringUtils.isNotEmpty(name)) {
+			List<String> queries = List.of(queryString.split("&"));
+			for (String query : queries) {
+				if (query.toLowerCase().startsWith(name.toLowerCase().trim())) {
+					return query.contains("=") ? Pair.of(query.split("=")[0], query.substring(query.indexOf("=") + 1)) : null;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -379,7 +445,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 		return urlBuilder.toString();
 	}
 
-	private String buildQuery(String query, String encoding) throws UnsupportedEncodingException {
+	private String buildQuery(String query, String encoding) {
 		if (StringUtils.isNotEmpty(query)) {
 			return URLDecoder.decode(query, Charset.forName(encoding));
 		} else {
