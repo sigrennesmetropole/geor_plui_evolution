@@ -2,7 +2,7 @@ import * as Rx from 'rxjs';
 import axios from 'axios';
 import {head} from 'lodash';
 import {saveAs} from 'file-saver';
-import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
+import {changeDrawingStatus, END_DRAWING, endDrawing, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
 // import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
@@ -51,7 +51,6 @@ import {
     pluiEvolutionEtablissementConfigurationSelector,
 } from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
-import {act} from "react-dom/test-utils";
 import {featureInfoClick} from "../../../mapstore2-georchestra/MapStore2/web/client/actions/mapInfo";
 
 let backendURLPrefix = "/pluievolution";
@@ -332,6 +331,7 @@ export const displayAllPluiRequest = (action$, store) =>
                         singleTile: false,
                         url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
+
                         featureInfo: {
                             format: 'TEMPLATE',
                             template: renderPluiRequestInfo()
@@ -505,10 +505,38 @@ export const geometryChangeEpic = action$ =>
             return Rx.Observable.of(updateLocalisation(localisation));
         });
 
-export const endDrawingEpic = action$ =>
+export const endDrawingEpic = (action$, store) =>
     action$.ofType(END_DRAWING)
-        .filter(action => action.owner === 'pluievolution')
-        .switchMap(() => {
+        .filter((action) => action.owner === 'pluievolution' || (action.owner === 'queryform' && action.geometry.projection !== pluiEvolutionLayerProjection && isPluievolutionActivateAndSelected(store.getState())))
+        .switchMap((action) => {
+            if (action.owner === 'queryform') {
+                if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
+                    console.log("add defs...");
+                    Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+                }
+
+                let geometry = action.geometry;
+                if (geometry.coordinates && geometry.coordinates.length > 0) {
+                    const projected = geometry.coordinates[0].map(elt =>
+                    {
+                        const reprojected = reproject(elt, geometry.projection, pluiEvolutionLayerProjection);
+                        return [reprojected.x, reprojected.y]
+                    })
+                    geometry.coordinates = [projected];
+                }
+                if (geometry.center) {
+                    const reprojCenter = reproject(geometry.center, geometry.projection, pluiEvolutionLayerProjection)
+                    geometry.center = [reprojCenter.x, reprojCenter.y];
+                }
+
+                if (geometry.extent) {
+                    const reprojExtent1 = reproject([geometry.extent[0], geometry.extent[1]], geometry.projection, pluiEvolutionLayerProjection)
+                    const reprojExtent2 = reproject([geometry.extent[2], geometry.extent[3]], geometry.projection, pluiEvolutionLayerProjection)
+                    geometry.extent = [reprojExtent1.x, reprojExtent1.y, reprojExtent2.x, reprojExtent2.y]
+                }
+                geometry.projection = pluiEvolutionLayerProjection;
+                return Rx.Observable.of(endDrawing(geometry, 'queryform'));
+            }
             return Rx.Observable.of(setDrawing(false));
         });
 
