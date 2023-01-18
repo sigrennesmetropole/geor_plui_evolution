@@ -8,6 +8,7 @@ import { name } from '../../../config';
 import {PluiEvolutionPanelComponent} from '../components/PluiEvolutionPanelComponent';
 import * as epics from '../epics/plui-evolution-epic';
 import pluiEvolutionReducer from '../reducers/plui-evolution-reducer';
+import {toggleControl} from "@mapstore/actions/controls";
 import {
     cancelClosing,
     changeFormStatus,
@@ -26,7 +27,6 @@ import {
     loadEtablissementConfiguration,
     loadingPluiCreateForm,
     loadLayerConfiguration,
-    openPanel,
     requestClosing,
     savePluiRequest,
     startDrawing,
@@ -107,14 +107,16 @@ export default createPlugin(name, {
         pluievolution: pluiEvolutionReducer
     },
     containers: {
-        BurgerMenu: {
+        SidebarMenu: {
             name: 'pluievolution',
             position: 9,
-            panel: false,
+            panel: true,
             tooltip: "pluievolution.name",
             text: <Message msgId="pluievolution.name" />,
             icon: <Glyphicon glyph="exclamation-sign" />,
-            action: () => openPanel(null)
+            doNotHide: true,
+            toggle: true,
+            action: toggleControl.bind(null, 'pluievolution', null)
         }
     }
 });
