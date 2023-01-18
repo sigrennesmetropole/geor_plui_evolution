@@ -5,31 +5,31 @@ const DEV_HOST = "localhost:8080";
 
 module.exports = {
     '/rest': {
-        target: "https://dev.mapstore.geo-solutions.it/mapstore",
+        target: "https://dev-mapstore2.geosolutionsgroup.com/mapstore",
         secure: false,
         headers: {
-            host: "dev.mapstore.geo-solutions.it"
+            host: "dev-mapstore2.geosolutionsgroup.com"
         }
     },
     '/pdf': {
-        target: "https://dev.mapstore.geo-solutions.it/mapstore",
+        target: "https://dev-mapstore2.geosolutionsgroup.com/mapstore",
         secure: false,
         headers: {
-            host: "dev.mapstore.geo-solutions.it"
+            host: "dev-mapstore2.geosolutionsgroup.com"
         }
     },
     '/mapstore/pdf': {
-        target: "https://dev.mapstore.geo-solutions.it",
+        target: "https://dev-mapstore2.geosolutionsgroup.com",
         secure: false,
         headers: {
-            host: "dev.mapstore.geo-solutions.it"
+            host: "dev-mapstore2.geosolutionsgroup.com"
         }
     },
     '/proxy': {
         target: "http://localhost:8082/",
         secure: false,
         headers: {
-            host: "dev.mapstore.geo-solutions.it"
+            host: "dev-mapstore2.geosolutionsgroup.com"
         }
     },
     '/docs': {
@@ -41,6 +41,6 @@ module.exports = {
         pathRewrite: {'/pluievolution': '/'},
         headers: {
             host: "localhost"
-        }   
+        }
     }
 };
