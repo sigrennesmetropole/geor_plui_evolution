@@ -47,6 +47,8 @@ import {
 } from '../selectors/plui-evolution-selector';
 import '../assets/plui-evolution.css';
 import {createPlugin} from "@mapstore/utils/PluginsUtils";
+import {mapLayoutValuesSelector} from "../selectors/maplayout";
+
 
 const isEnabled = createControlEnabledSelector('pluievolution');
 
@@ -67,8 +69,9 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     drawing: state.pluievolution.drawing,
     error: state.pluievolution.error,
     localConfig: state.localConfig,
+    dockStyle: mapLayoutValuesSelector(state, { right: true, height: true}, true),
     // debug
-    state : state,
+    state: state,
     consoleLogWasPrinted: state.pluievolution.consoleLogWasPrinted,
     activated: !!isPluiEvolutionActivate(state)
 }), {
