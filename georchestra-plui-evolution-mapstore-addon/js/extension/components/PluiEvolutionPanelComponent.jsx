@@ -1,7 +1,5 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import Dock from 'react-dock';
-import ContainerDimensions from 'react-container-dimensions';
 import {PropTypes} from 'prop-types';
 import {
     Button,
@@ -24,14 +22,14 @@ import {getMessageById} from '@mapstore/utils/LocaleUtils';
 import {setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
-import {consoleLog, consoleLogDone, openPanel, status} from '../actions/plui-evolution-action';
+import {openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT,
     PluiRequestType
 } from '../constants/plui-evolution-constants';
-import {PluiEvolutionViewer} from "@js/extension/components/PluiEvolutionViewer";
-import {logEvent} from "@js/extension/epics/plui-evolution-epic";
+import {PluiEvolutionViewer} from "../components/PluiEvolutionViewer";
+import ResponsivePanel from "@mapstore/components/misc/panels/ResponsivePanel";
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -55,6 +53,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         buttonStyle: PropTypes.object,
         style: PropTypes.object,
         dockProps: PropTypes.object,
+        dockStyle: PropTypes.object,
         width: PropTypes.number,
         // data
         attachmentConfiguration: PropTypes.object,
@@ -96,7 +95,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         consoleLog: PropTypes.func,
         consoleLogWasPrinted: PropTypes.bool,
         consoleLogDone: PropTypes.func,
-        activated: PropTypes.bool
+        activated: PropTypes.bool,
+        openPanel: PropTypes.func
     };
 
     static defaultProps = {
@@ -132,7 +132,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             zIndex: 1050
         },
         dockStyle: {
-            zIndex: 100,
+            zIndex: 100
         },
         // data
         attachmentConfiguration: null,
@@ -172,7 +172,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         ensureProj4: () => {},
         closeViewer: () => {},
         consoleLog: () => {},
-        consoleLogDone: () => {}
+        consoleLogDone: () => {},
+        openPanel: () => {}
     };
 
     static contextTypes = {
@@ -288,39 +289,41 @@ export class PluiEvolutionPanelComponent extends React.Component {
             //this.connectViewer();
             // le panel est ouvert
             return (
-                <ContainerDimensions>
-                    { ({ width }) =>
-                        <span>
-                            <span className="ms-plui-evolution-panel react-dock-no-resize ms-absolute-dock ms-side-panel">
-                                <Dock
-                                    dockStyle={this.props.dockStyle} {...this.props.dockProps}
-                                    isVisible={this.props.active}
-                                    size={this.props.width / width > 1 ? 1 : this.props.width / width} >
-                                    <div className={this.props.panelClassName}>
-                                        {!this.props.viewerMode && this.renderHeader()}
-                                        {
-                                            !this.state.initialized &&
-                                            this.renderLoading("pluievolution.open.loading")
-                                        }
-                                        {
-                                            this.state.initialized && !this.props.viewerMode &&
-                                            this.renderForm()
-                                        }
-                                        {
-                                            this.state.initialized && this.props.viewerMode &&
-                                            this.renderViewer()
-                                        }
-                                    </div>
-                                </Dock>
-                            </span>
-                            {this.renderModelClosing()}
-                        </span>
-                    }
-                </ContainerDimensions>
+                <ResponsivePanel
+                    containerStyle={this.props.dockStyle}
+                    style={this.props.dockStyle}
+                    containerId="ms-plui-evolution-panel"
+                    containerClassName="plui-evolution-dock-container"
+                    className={this.props.panelClassName}
+                    open={this.props.active}
+                    position="right"
+                    bsStyle="primary"
+                    size={this.props.width}
+                    title={<Message msgId="pluievolution.msgBox.title"/>}
+                    glyph="exclamation-sign"
+                    onClose={() => this.cancel()}>
+                    <span>
+                        <div style={{'margin-top': '20px'}}>
+                            {
+                                !this.state.initialized &&
+                                    this.renderLoading("pluievolution.open.loading")
+                            }
+                            {
+                                this.state.initialized && !this.props.viewerMode &&
+                                    this.renderForm()
+                            }
+                            {
+                                this.state.initialized && this.props.viewerMode &&
+                                    this.renderViewer()
+                            }
+                        </div>
+                        {this.renderModelClosing()}
+                    </span>
+                </ResponsivePanel>
             );
-        } else {
-            return null;
         }
+        return null;
+
     }
 
     renderViewer() {
@@ -333,7 +336,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     /**
      * La rendition de la fenêtre modal de confirmation d'abandon
      */
-    renderModelClosing(){
+    renderModelClosing() {
         if (this.props.closing ) {
             // si closing == true on demande l'abandon
             this.props.consoleLog("pluieclosing");
@@ -348,9 +351,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 closeText={<Message msgId="pluievolution.msgBox.cancel" />}>
                 <Message msgId="pluievolution.msgBox.info"/>
             </ConfirmDialog>);
-        } else {
-            return null;
         }
+        return null;
+
     }
 
     /**
@@ -423,9 +426,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
             return (
                 <span className="info"><Message msgId={this.props.message}/></span>
             );
-        } else {
-            return null;
         }
+        return null;
+
     }
 
     /**
@@ -452,9 +455,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
         if (this.isAgentRmUser(user)) {
             return !!this.props.geographicEtablissements;
         }
-        else {
-            return true;
-        }
+
+        return true;
+
     }
 
     isAgentRmUser(user) {
@@ -879,11 +882,11 @@ export class PluiEvolutionPanelComponent extends React.Component {
             return (
                 <Message msgId="pluievolution.loading"/>
             );
-        } else {
-            return (
-                <Message msgId="pluievolution.localisation.geolocate"/>
-            );
         }
+        return (
+            <Message msgId="pluievolution.localisation.geolocate"/>
+        );
+
     }
 
     drawEtablissement(geographicEtablissement) {
