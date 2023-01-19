@@ -5,8 +5,8 @@ import {saveAs} from 'file-saver';
 import {changeDrawingStatus, END_DRAWING, endDrawing, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {reproject} from '@mapstore/utils/CoordinatesUtils';
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
-// import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
+import {TOGGLE_CONTROL, toggleControl} from "@mapstore/actions/controls";
 import {
     changeMapInfoState,
     hideMapinfoMarker,
@@ -38,26 +38,90 @@ import {
     status,
     updateAttachments,
     updateLocalisation,
-    ensureProj4Done, loadPluiEvolutionViewer
+    ensureProj4Done, loadPluiEvolutionViewer, openPanel, closePanel, closeViewer
 } from '../actions/plui-evolution-action';
 import {
     DEFAULT_PROJECTION,
     GeometryType,
     PLUI_EVOLUTION_LAYER_TITLE,
-    PluiRequestType
+    PLUIEVOLUTION_PANEL_WIDTH,
+    PluiRequestType,
+    RIGHT_SIDEBAR_MARGIN_LEFT
 } from "../constants/plui-evolution-constants";
 import {
     isPluievolutionActivateAndSelected,
     pluiEvolutionEtablissementConfigurationSelector,
+    pluievolutionSidebarControlSelector,
 } from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
-import {featureInfoClick} from "../../../mapstore2-georchestra/MapStore2/web/client/actions/mapInfo";
+import {
+    FORCE_UPDATE_MAP_LAYOUT,
+    UPDATE_MAP_LAYOUT,
+    updateDockPanelsList,
+    updateMapLayout
+} from "@mapstore/actions/maplayout";
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
 let pluiEvolutionLayerName;
 let pluiEvolutionLayerProjection;
+let currentLayout;
 
+export const openPluivelutionPanelEpic = (action$, store) =>
+    action$.ofType(TOGGLE_CONTROL)
+        .filter((action) => action.control === "pluievolution" && !!store.getState() && !!pluievolutionSidebarControlSelector(store.getState()))
+        .switchMap(() => {
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout = layout;
+            return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), updateMapLayout(layout), openPanel(null)]);
+        });
+
+export const closePluivelutionPanelEpic = (action$, store) =>
+    action$.ofType(TOGGLE_CONTROL, actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_VIEWER, actions.PLUI_EVOLUTION_CLOSE_PANEL)
+        .filter(action => action.type === actions.PLUI_EVOLUTION_CLOSE_VIEWER ||
+            ([actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_PANEL].includes(action.type) && !!pluievolutionSidebarControlSelector(store.getState())) ||
+                (action.control === "pluievolution" && !!store.getState() && !pluievolutionSidebarControlSelector(store.getState())))
+        .switchMap((action) => {
+            const actionsList = [updateDockPanelsList('pluievolution', 'remove', 'right')];
+            if (!!pluievolutionSidebarControlSelector(store.getState())) {
+                actionsList.push(toggleControl('pluievolution'));
+            }
+            if (store.getState().pluievolution.status === status.VIEW_REQUEST) {
+                actionsList.push(closeViewer());
+            } else {
+                actionsList.push(closePanel());
+            }
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: false, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: layout.boundingSidebarRect.right, boundingMapRect: {...layout.boundingMapRect, right: layout.boundingSidebarRect.right}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout= layout;
+            return Rx.Observable.from(actionsList).concat(Rx.Observable.of(updateMapLayout(layout)));
+        });
+
+export function onOpeningAnotherRightPanel(action$, store) {
+    return action$.ofType(TOGGLE_CONTROL)
+        .filter((action) => store && store.getState() &&
+            action.control !== 'pluievolution' &&
+            store.getState().maplayout.dockPanels.right.includes("pluievolution") &&
+            store.getState().maplayout.dockPanels.right.includes(action.control))
+        .switchMap(() => {
+            return Rx.Observable.of(updateDockPanelsList("signalement", "remove", "right"))
+                .concat(Rx.Observable.of(closePanel()));
+        });
+}
+
+export function onUpdatingLayoutWhenPluiPanelOpened(action$, store) {
+    return action$.ofType(UPDATE_MAP_LAYOUT, FORCE_UPDATE_MAP_LAYOUT)
+        .filter((action) => store && store.getState() &&
+            !!pluievolutionSidebarControlSelector(store.getState()) &&
+            currentLayout?.right !== action?.layout?.right)
+        .switchMap((action) => {
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout = layout;
+            return Rx.Observable.of(updateMapLayout(layout));
+        });
+}
 /**
  * Catch GFI response on identify load event and close identify if PLUi-Evolution identify tabs is selected
  * @param {*} action$
@@ -65,13 +129,14 @@ let pluiEvolutionLayerProjection;
  */
 export function loadPluiEvolutionViewerEpic(action$, store) {
     return action$.ofType(LOAD_FEATURE_INFO)
-        .filter((action) => isPluievolutionActivateAndSelected(store.getState()))
+        .filter(action => isPluievolutionActivateAndSelected(store.getState()))
         .switchMap((action) => {
             // si features présentent dans la zone de clic
             if (action?.layer?.id && action?.data?.features && action.data.features.length) {
-                return Rx.Observable.of(loadPluiEvolutionViewer(action.data)).concat(
-                    Rx.Observable.of(closeIdentify())
-                )
+                let layout = store.getState().maplayout;
+                layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: false, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+                currentLayout = layout;
+                return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), loadPluiEvolutionViewer(action.data), updateMapLayout(layout)], closeIdentify());
             }
             return  Rx.Observable.of();
         });
