@@ -72,6 +72,7 @@ export class PluiEvolutionRequestViewer extends React.Component {
                         onClick={this.handleClickButtonDisplayTaskBefore}>
                         <Glyphicon glyph="glyphicon glyphicon-chevron-left"/>
                     </button>
+                    <span>{ this.state.index + 1 } / {this.props.response.features.length}</span>
                     <button
                         className="square-button-md btn btn-primary"
                         disabled={this.state.index === this.props.response.features.length - 1}

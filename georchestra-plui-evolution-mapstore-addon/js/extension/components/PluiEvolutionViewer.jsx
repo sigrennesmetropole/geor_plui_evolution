@@ -46,7 +46,6 @@ export class PluiEvolutionViewer extends React.Component {
             return (
             <div className="plui-evolution-viewer">
                 <Form>
-                    {this.renderHeader()}
                     {this.renderCoordinates()}
                     {this.renderPluiRequestsNavigation()}
                     <PluiEvolutionRequestViewer closeViewer={this.props.closeViewer}

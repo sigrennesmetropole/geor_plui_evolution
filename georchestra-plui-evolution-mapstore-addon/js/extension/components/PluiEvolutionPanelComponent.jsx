@@ -19,13 +19,13 @@ import Message from '@mapstore/components/I18N/Message';
 import ConfirmDialog from '@mapstore/components/misc/ConfirmDialog';
 import LoadingSpinner from '@mapstore/components/misc/LoadingSpinner';
 import {getMessageById} from '@mapstore/utils/LocaleUtils';
-import {setViewer} from '@mapstore/utils/MapInfoUtils';
+import {getViewer, setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
 import {openPanel, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
-    MAX_NB_CHARACTERS_PLUI_OBJECT,
+    MAX_NB_CHARACTERS_PLUI_OBJECT, PLUIEVOLUTION_PANEL_WIDTH, PLUIEVOLUTION_VIEWER_WIDTH,
     PluiRequestType
 } from '../constants/plui-evolution-constants';
 import {PluiEvolutionViewer} from "../components/PluiEvolutionViewer";
@@ -55,6 +55,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         dockProps: PropTypes.object,
         dockStyle: PropTypes.object,
         width: PropTypes.number,
+        viewerWidth: PropTypes.number,
         // data
         attachmentConfiguration: PropTypes.object,
         layerConfiguration: PropTypes.object,
@@ -123,7 +124,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         createGlyph: "ok",
         deleteGlyph: "trash",
         // side panel properties
-        width: 660,
+        width: PLUIEVOLUTION_PANEL_WIDTH,
+        viewerWidth: PLUIEVOLUTION_VIEWER_WIDTH,
         dockProps: {
             dimMode: "none",
             size: 0.30,
@@ -298,14 +300,14 @@ export class PluiEvolutionPanelComponent extends React.Component {
                     open={this.props.active}
                     position="right"
                     bsStyle="primary"
-                    size={this.props.width}
+                    size={this.props.viewerMode ? this.props.viewerWidth : this.props.width }
                     title={<Message msgId="pluievolution.msgBox.title"/>}
                     glyph="exclamation-sign"
                     onClose={() => this.cancel()}>
                     <span>
                         <div style={{'margin-top': '20px'}}>
                             {
-                                !this.state.initialized &&
+                                (!this.state.initialized) &&
                                     this.renderLoading("pluievolution.open.loading")
                             }
                             {
@@ -1088,7 +1090,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * L'action d'abandon
      */
     cancel = () => {
-        this.props.closeRequest();
+        this.props.viewerMode ? this.props.closeViewer() : this.props.closeRequest();
     }
 
     /**
