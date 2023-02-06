@@ -485,6 +485,10 @@ export const displayEtablissement = (action$, store) =>
 export const startDrawingEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
         .switchMap((action) => {
+            if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
+                console.log("add defs...");
+                Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+            }
             const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
             let coordinates = Array(0);
             if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
