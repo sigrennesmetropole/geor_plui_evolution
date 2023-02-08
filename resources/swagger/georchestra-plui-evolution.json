@@ -470,7 +470,7 @@
 				"description": "Requete WFS de récupération des informations sur le service",
 				"operationId": "getWfs",
 				"produces": [
-					"application/json"
+					"application/json", "application/octet-stream", "application/xml"
 				],
 				"responses": {
 					"200": {
@@ -489,7 +489,7 @@
 				"description": "Requete WFS de recuperation d'un claque",
 				"operationId": "postWfs",
 				"produces": [
-					"application/json"
+					"application/json", "application/octet-stream", "application/xml"
 				],
 				"parameters": [
 					{

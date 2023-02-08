@@ -141,7 +141,7 @@
       "title": "plugins.HelpLink.title",
       "description": "plugins.HelpLink.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -150,7 +150,7 @@
       "title": "plugins.Share.title",
       "description": "plugins.Share.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -170,7 +170,7 @@
       "title": "plugins.Annotations.title",
       "description": "plugins.Annotations.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -268,7 +268,7 @@
       "title": "plugins.Measure.title",
       "description": "plugins.Measure.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -277,7 +277,7 @@
       "title": "plugins.Print.title",
       "description": "plugins.Print.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -286,7 +286,7 @@
       "title": "plugins.MapCatalog.title",
       "description": "plugins.MapCatalog.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -295,7 +295,7 @@
       "title": "plugins.MapImport.title",
       "description": "plugins.MapImport.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -304,7 +304,7 @@
       "title": "plugins.MapExport.title",
       "description": "plugins.MapExport.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
@@ -314,7 +314,7 @@
       "description": "plugins.Settings.description",
       "children": ["Version"],
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ],
       "defaultConfig": {
         "wrap": true
@@ -334,7 +334,7 @@
       "glyph": "info-sign",
       "title": "plugins.About.title",
       "description": "plugins.About.description",
-      "dependencies": ["BurgerMenu"]
+      "dependencies": ["SidebarMenu"]
     },
     {
       "name": "MousePosition",
@@ -448,7 +448,7 @@
       "title": "plugins.Save.title",
       "description": "plugins.Save.description",
       "dependencies": [
-        "BurgerMenu",
+        "SidebarMenu",
         "SaveAs"
       ]
     },
@@ -459,12 +459,11 @@
       "hidden": true,
       "description": "plugins.SaveAs.description",
       "dependencies": [
-        "BurgerMenu"
+        "SidebarMenu"
       ]
     },
     {
       "name": "BurgerMenu",
-      "hidden": true,
       "glyph": "menu-hamburger",
       "title": "plugins.BurgerMenu.title",
       "description": "plugins.BurgerMenu.description",
@@ -542,7 +541,7 @@
       "name": "MapTemplates",
       "title": "Map Templates",
       "dependencies": [
-          "BurgerMenu"
+          "SidebarMenu"
       ]
     }, {
       "name": "UserExtensions",
@@ -550,13 +549,13 @@
       "title": "plugins.UserExtensions.title",
       "hidden": true,
       "description": "plugins.UserExtensions.description",
-      "dependencies": ["BurgerMenu"]
+      "dependencies": ["SidebarMenu"]
     }, {
       "name": "UserSession",
       "glyph": "floppy-save",
       "title": "plugins.UserSession.title",
       "description": "plugins.UserSession.description",
-      "dependencies": ["BurgerMenu"]
+      "dependencies": ["SidebarMenu"]
     }
   ]
 }
