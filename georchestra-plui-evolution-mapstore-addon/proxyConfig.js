@@ -26,7 +26,7 @@ module.exports = {
         }
     },
     '/proxy': {
-        target: "http://localhost:8082/",
+        target: "http://dev-mapstore2.geosolutionsgroup.com/mapstore",
         secure: false,
         headers: {
             host: "dev-mapstore2.geosolutionsgroup.com"
@@ -38,7 +38,9 @@ module.exports = {
     },
     '/pluievolution': {
         target: "http://localhost:8082",
-        pathRewrite: {'/pluievolution': '/'},
+        pathRewrite: {
+            '/pluievolution': '/'
+        },
         headers: {
             host: "localhost"
         }
