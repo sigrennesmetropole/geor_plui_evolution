@@ -452,7 +452,7 @@
 				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
 				"operationId": "getWms",
 				"produces": [
-					"image/png"
+					"image/png", "application/json", "text/plain"
 				],
 				"responses": {
 					"200": {
@@ -830,6 +830,10 @@
 				"type": {
 					"type": "object",
 					"$ref": "#/definitions/GeometryType"
+				},
+				"projection": {
+					"type": "integer",
+					"format": "int32"
 				}
 			}
 		},

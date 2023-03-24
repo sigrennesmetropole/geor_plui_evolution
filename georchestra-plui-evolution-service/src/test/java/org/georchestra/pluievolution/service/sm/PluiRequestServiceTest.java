@@ -16,6 +16,7 @@ import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,7 +61,7 @@ class PluiRequestServiceTest {
 	}
 
 	@Test
-	void mappingPluiRequest() {
+	void mappingPluiRequest() throws ApiServiceException {
 		PluiRequestEntity pluiRequestEntity = pluiRequestMapper.dtoToEntity(pluiRequest);
 		assertNull(pluiRequestEntity.getCreationDate(), "La date de creation doit etre nulle");
 		pluiRequestEntity.setCreationDate(new Date());

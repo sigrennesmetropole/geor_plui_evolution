@@ -2,6 +2,7 @@ package org.georchestra.pluievolution.service.mapper;
 
 import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,7 +23,7 @@ public interface PluiRequestMapper extends AbstractMapper<PluiRequestEntity, Plu
                     @Mapping(ignore = true, target = "creationDate")
             }
     )
-    PluiRequestEntity dtoToEntity(PluiRequest pluiRequest);
+    PluiRequestEntity dtoToEntity(PluiRequest pluiRequest) throws ApiServiceException;
 
     @Override
     @Mappings(
