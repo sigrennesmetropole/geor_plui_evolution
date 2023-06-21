@@ -14,7 +14,7 @@ cache:
     - $CI_PROJECT_DIR/**/target/**/*
 
 default:
-  image: maven:3.6.0-jdk-11
+  image: maven:3.6.3-jdk-11
   
   before_script:
     - apt update && apt install -y gettext-base build-essential
@@ -39,7 +39,7 @@ pluievolutionapi:build:
       - master
       - open/master  
   tags: 
-   - cdp-rennes  
+   - iaas
   artifacts:
     reports:
       dotenv:
@@ -57,7 +57,7 @@ pluievolutionapi:build:master:
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests -Pprod 
   stage: build
   tags: 
-   - cdp-rennes
+   - iaas
   only:
     refs:
       - master
@@ -113,7 +113,7 @@ pluievolutionapi:sonar:master:
 pluievolutionapi:deploy:
   stage: deploy
   tags: 
-   - cdp-rennes
+   - iaas
   image: ansible/ansible-runner:1.4.4
   dependencies:
     - pluievolutionapi:build
@@ -132,7 +132,7 @@ pluievolutionapi:deploy:
 pluievolutionapi:deploy:master:
   stage: deploy
   tags: 
-   - cdp-rennes  
+   - iaas
   image: ansible/ansible-runner:1.4.4
   dependencies:
     - pluievolutionapi:build:master
