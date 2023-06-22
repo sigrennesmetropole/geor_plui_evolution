@@ -1,11 +1,10 @@
 package org.georchestra.pluievolution.api.controller;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -13,10 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.georchestra.pluievolution.api.CartoApi;
 import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
 import org.georchestra.pluievolution.service.bean.GeoserverStream;
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.sm.ConfigurationService;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class CartoController implements CartoApi {
 	@Autowired
 	ConfigurationService configurationService;
 
+	private static final String GET_MAP_REQUEST_PARAM_VALUE = "GetMap";
+	private static final String REQUEST_PARAM = "REQUEST";
+
 	@Override
 	public ResponseEntity<Void> getWms() throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
@@ -53,27 +57,50 @@ public class CartoController implements CartoApi {
 		HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getResponse();
 
-		OutputStream out = response.getOutputStream();
-		if ("GetMap".equals(request.getParameter("REQUEST"))) {
-			GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
-					request.getCharacterEncoding(), request.getQueryString(), "application/img");
-			if (geoserverStream != null && geoserverStream.getStream() != null) {
-				BufferedImage bufferedImage = ImageIO.read(geoserverStream.getStream());
-				if (bufferedImage != null) {
-					ImageIO.write(bufferedImage, "png", out);
-				}
+		if (response != null) {
+			OutputStream out = response.getOutputStream();
+			if (GET_MAP_REQUEST_PARAM_VALUE.equalsIgnoreCase(getParameterIgnoreCase(request, REQUEST_PARAM))) {
+				getWmsImage(request, out);
+			} else {
+				getWmsOther(request, response);
 			}
-		} else {
-			GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
-					request.getCharacterEncoding(), request.getQueryString(), "application/json");
-			if (geoserverStream != null && geoserverStream.getStream() != null) {
-				response.setContentType(geoserverStream.getMimeType());
-				response.setCharacterEncoding("UTF-8");
-				IOUtils.copy(geoserverStream.getStream(), response.getOutputStream());
+			out.close();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Traitement du getWms si request de type GETMAP
+	 * @param request
+	 * @param out
+	 * @throws Exception
+	 */
+	private void getWmsImage(HttpServletRequest request, OutputStream out) throws ApiServiceException, IOException {
+		GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
+				request.getCharacterEncoding(), request.getQueryString(), "image/png");
+		if (geoserverStream != null && geoserverStream.getStream() != null) {
+			BufferedImage bufferedImage = ImageIO.read(geoserverStream.getStream());
+			if (bufferedImage != null) {
+				ImageIO.write(bufferedImage, "png", out);
 			}
 		}
-		out.close();
-		return null;
+	}
+
+	/**
+	 * Traitement du getWms si autre type de requete
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	private void getWmsOther(HttpServletRequest request, HttpServletResponse response) throws ApiServiceException, IOException {
+		GeoserverStream geoserverStream = geoserverService.getWms(geographicAreaService.getCurrentUserArea(),
+				request.getCharacterEncoding(), request.getQueryString(), "application/json");
+		if (geoserverStream != null && geoserverStream.getStream() != null) {
+			response.setContentType(geoserverStream.getMimeType());
+			response.setCharacterEncoding("UTF-8");
+			IOUtils.copy(geoserverStream.getStream(), response.getOutputStream());
+		}
 	}
 
 	@Override
@@ -89,7 +116,7 @@ public class CartoController implements CartoApi {
 		GeoserverStream geoserverStream = geoserverService.getWfs(geographicAreaService.getCurrentUserArea(),
 				request.getCharacterEncoding(), request.getQueryString());
 		return ResponseEntity.status(geoserverStream.getStatus())
-				.contentType(MediaType.parseMediaType(geoserverStream.getMimeType()))
+				.contentType(getMediatTypeFromGeoserverStream(geoserverStream))
 				.body(geoserverStream.getContent());
 	}
 
@@ -113,8 +140,47 @@ public class CartoController implements CartoApi {
 		GeoserverStream geoserverStream = geoserverService.postWfs(geographicAreaService.getCurrentUserArea(),
 				request.getCharacterEncoding(), wfsQueryString, wfsContent);
 		return ResponseEntity.status(geoserverStream.getStatus())
-				.contentType(MediaType.parseMediaType(geoserverStream.getMimeType()))
+				.contentType(getMediatTypeFromGeoserverStream(geoserverStream))
 				.body(geoserverStream.getContent());
+	}
+
+	/**
+	 * Les parametres transmis ont une casse differente selon la plateforme
+	 * @param request	La requete
+	 * @param paramName	Le nom du parametre recherché
+	 * @return	Valeur du parametre
+	 */
+	private String getParameterIgnoreCase(HttpServletRequest request, String paramName) {
+		Iterator<String> it = request.getParameterNames().asIterator();
+		while (it.hasNext()) {
+			String someParam = it.next();
+			if (StringUtils.equalsIgnoreCase(someParam, paramName)) {
+				return request.getParameter(someParam);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Permet d'obtenir le mediatype à pa
+	 * @param stream	Reponse du geoserver
+	 * @return
+	 */
+	private MediaType getMediatTypeFromGeoserverStream(GeoserverStream stream) {
+		MediaType mt;
+		if (stream != null) {
+			String mimetype = stream.getMimeType();
+			if (mimetype.contains(";")) {
+				mimetype = mimetype.split(";")[0];
+			}
+			try {
+				mt = MediaType.parseMediaType(mimetype);
+			} catch (Exception e) {
+				mt = MediaType.TEXT_PLAIN;
+			}
+			return mt;
+		}
+		return MediaType.TEXT_PLAIN;
 	}
 
 }
