@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Plugin PLUi Evolution
 
 ## I - Construction de l'application
@@ -162,3 +163,7 @@ freemarker.fontsPath=fonts
 *TODO*
 
 ## III - Configuration
+=======
+# geor_plui_evolution
+Code du module Evolutions du PLUi pour georchestra
+>>>>>>> 57babfff2e4a4b1347687071238fe6df2cd04a5f
