@@ -2,17 +2,16 @@ import * as Rx from 'rxjs';
 import axios from 'axios';
 import {head} from 'lodash';
 import {saveAs} from 'file-saver';
-import {changeDrawingStatus, END_DRAWING, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
-import {reproject} from '@mapstore/utils/CoordinatesUtils';
+import {changeDrawingStatus, GEOMETRY_CHANGED} from "@mapstore/actions/draw";
 import {addLayer, refreshLayerVersion, selectNode} from '@mapstore/actions/layers';
-// import {setViewer, getViewer} from '@mapstore/utils/MapInfoUtils';
 import {CLICK_ON_MAP} from '@mapstore/actions/map';
+import {TOGGLE_CONTROL, toggleControl} from "@mapstore/actions/controls";
 import {
     changeMapInfoState,
     hideMapinfoMarker,
     showMapinfoMarker,
     LOAD_FEATURE_INFO,
-    closeIdentify
+    closeIdentify, featureInfoClick
 } from "@mapstore/actions/mapInfo";
 import {error, show, success} from '@mapstore/actions/notifications';
 import {
@@ -38,26 +37,90 @@ import {
     status,
     updateAttachments,
     updateLocalisation,
-    ensureProj4Done, loadPluiEvolutionViewer
+    ensureProj4Done, loadPluiEvolutionViewer, openPanel, closePanel, closeViewer
 } from '../actions/plui-evolution-action';
 import {
-    DEFAULT_PROJECTION,
+    DEFAULT_PROJECTION, DEFAULT_PROJECTION_CODE,
     GeometryType,
     PLUI_EVOLUTION_LAYER_TITLE,
-    PluiRequestType
+    PLUIEVOLUTION_PANEL_WIDTH, PLUIEVOLUTION_VIEWER_WIDTH,
+    PluiRequestType,
+    RIGHT_SIDEBAR_MARGIN_LEFT
 } from "../constants/plui-evolution-constants";
 import {
     isPluievolutionActivateAndSelected,
     pluiEvolutionEtablissementConfigurationSelector,
+    pluievolutionSidebarControlSelector,
 } from '../selectors/plui-evolution-selector';
 import Proj4js from 'proj4';
-import {act} from "react-dom/test-utils";
-import {featureInfoClick} from "../../../mapstore2-georchestra/MapStore2/web/client/actions/mapInfo";
+import {
+    FORCE_UPDATE_MAP_LAYOUT, forceUpdateMapLayout,
+    UPDATE_MAP_LAYOUT,
+    updateDockPanelsList,
+    updateMapLayout
+} from "@mapstore/actions/maplayout";
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
 let pluiEvolutionLayerName;
 let pluiEvolutionLayerProjection;
+let currentLayout;
+
+export const openPluivelutionPanelEpic = (action$, store) =>
+    action$.ofType(TOGGLE_CONTROL)
+        .filter((action) => action.control === "pluievolution" && !!store.getState() && !!pluievolutionSidebarControlSelector(store.getState()))
+        .switchMap(() => {
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout = layout;
+            return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), updateMapLayout(layout), openPanel(null)]);
+        });
+
+export const closePluivelutionPanelEpic = (action$, store) =>
+    action$.ofType(TOGGLE_CONTROL, actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_VIEWER, actions.PLUI_EVOLUTION_CLOSE_PANEL)
+        .filter(action => action.type === actions.PLUI_EVOLUTION_CLOSE_VIEWER ||
+            ([actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_PANEL].includes(action.type) && !!pluievolutionSidebarControlSelector(store.getState())) ||
+                (action.control === "pluievolution" && !!store.getState() && !pluievolutionSidebarControlSelector(store.getState())))
+        .switchMap((action) => {
+            const actionsList = [updateDockPanelsList('pluievolution', 'remove', 'right')];
+            if (!!pluievolutionSidebarControlSelector(store.getState())) {
+                actionsList.push(toggleControl('pluievolution'));
+            }
+            if (store.getState().pluievolution.status === status.VIEW_REQUEST) {
+                actionsList.push(closeViewer());
+            } else {
+                actionsList.push(closePanel());
+            }
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: false, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: layout.boundingSidebarRect.right, boundingMapRect: {...layout.boundingMapRect, right: layout.boundingSidebarRect.right}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout= layout;
+            return Rx.Observable.from(actionsList).concat(Rx.Observable.of(updateMapLayout(layout)).delay(0));
+        });
+
+export function onOpeningAnotherRightPanel(action$, store) {
+    return action$.ofType(TOGGLE_CONTROL)
+        .filter((action) => store && store.getState() &&
+            action.control !== 'pluievolution' &&
+            store.getState().maplayout.dockPanels.right.includes("pluievolution") &&
+            store.getState().maplayout.dockPanels.right.includes(action.control))
+        .switchMap(() => {
+            return Rx.Observable.of(updateDockPanelsList("signalement", "remove", "right"))
+                .concat(Rx.Observable.of(closePanel()));
+        });
+}
+
+export function onUpdatingLayoutWhenPluiPanelOpened(action$, store) {
+    return action$.ofType(UPDATE_MAP_LAYOUT, FORCE_UPDATE_MAP_LAYOUT)
+        .filter((action) => store && store.getState() &&
+            !!pluievolutionSidebarControlSelector(store.getState()) &&
+            currentLayout?.right !== action?.layout?.right)
+        .switchMap((action) => {
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout = layout;
+            return Rx.Observable.of(updateMapLayout(layout));
+        });
+}
 
 /**
  * Catch GFI response on identify load event and close identify if PLUi-Evolution identify tabs is selected
@@ -66,13 +129,14 @@ let pluiEvolutionLayerProjection;
  */
 export function loadPluiEvolutionViewerEpic(action$, store) {
     return action$.ofType(LOAD_FEATURE_INFO)
-        .filter((action) => isPluievolutionActivateAndSelected(store.getState()))
+        .filter(action => isPluievolutionActivateAndSelected(store.getState()))
         .switchMap((action) => {
             // si features présentent dans la zone de clic
             if (action?.layer?.id && action?.data?.features && action.data.features.length) {
-                return Rx.Observable.of(loadPluiEvolutionViewer(action.data)).concat(
-                    Rx.Observable.of(closeIdentify())
-                )
+                let layout = store.getState().maplayout;
+                layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: false, ...layout.boundingMapRect, right: PLUIEVOLUTION_VIEWER_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_VIEWER_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+                currentLayout = layout;
+                return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), closeIdentify(), loadPluiEvolutionViewer(action.data)]).concat(Rx.Observable.of(updateMapLayout(layout)).delay(0));
             }
             return  Rx.Observable.of();
         });
@@ -333,37 +397,21 @@ export const displayAllPluiRequest = (action$, store) =>
                         url: backendURLPrefix + "/carto/wmsRequest",
                         visibility: true,
                         featureInfo: {
-                            format: 'TEMPLATE',
-                            template: renderPluiRequestInfo()
+                            format: "PROPERTIES"
                         }
-                        /*featureInfo: {
-                            format: "PROPERTIES",
-                            viewer: {
-                                type: PLUI_EVOLUTION_REQUEST_VIEWER
-                            }
-                        }*/
                     }),
                         selectNode(pluiEvolutionLayerId,"layer",false)
                     ]
             );
         });
 
-const renderPluiRequestInfo = () => {
-    return (
-        "<table style='border-collapse: separate; border-spacing: 20px'>" +
-            "<tbody>" +
-                "<tr><td style='font-weight: bold'>Référence de la demande</td><td>${properties.redmine_id}</td></tr>" +
-                "<tr><td style='font-weight: bold'>Type de la demande</td><td>${properties.type}</td></tr>" +
-                "<tr><td style='font-weight: bold'>Statut de la demande</td><td>${properties.status}</td></tr>" +
-                "<tr><td style='font-weight: bold; vertical-align: top'>Sujet de la demande</td><td style='vertical-align: top'><textarea disabled rows='3' cols='45'>${properties.subject}</textarea></td></tr>" +
-                "<tr><td style='font-weight: bold; vertical-align: top'>Objet de la demande</td><td style='vertical-align: top'><textarea disabled rows='5' cols='45'>${properties.object}</textarea></td></tr>" +
-            "</tbody>" +
-        "</table>");
-}
-
 export const displayEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
+            if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
+                console.log("add defs...");
+                Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+            }
             const state = store.getState();
             let requestEtablissement = null;
 
@@ -440,6 +488,10 @@ export const displayEtablissement = (action$, store) =>
 export const startDrawingEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
         .switchMap((action) => {
+            if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
+                console.log("add defs...");
+                Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+            }
             const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
             let coordinates = Array(0);
             if (existingLocalisation && GeometryType.POINT === action.localisation.type) {
@@ -479,37 +531,16 @@ export const geometryChangeEpic = action$ =>
             if (action.features && action.features.length > 0) {
                 const geometryType = action.features[0].geometry.type;
                 const coordinates = action.features[0].geometry.coordinates;
-                console.log('source ', Proj4js.defs(DEFAULT_PROJECTION));
-                console.log('desttn ', Proj4js.defs(pluiEvolutionLayerProjection));
-
-                //console.log('plui getViewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER))
-                /*
-                if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
-                    console.log("add defs...");
-                    Proj4js.defs('EPSG:3948', '+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs');
-                }
-                console.log('desttn 2', Proj4js.defs(pluiEvolutionLayerProjection));
-                */
-                const normalizedCoordinates = reproject(coordinates, DEFAULT_PROJECTION, pluiEvolutionLayerProjection);
-
-                console.log('actual coordinates in ' + DEFAULT_PROJECTION, coordinates);
-                console.log('reprojected coordinates in ' + pluiEvolutionLayerProjection, normalizedCoordinates);
 
                 if (GeometryType.POINT === geometryType) {
                     localisation = {
                         type: GeometryType.POINT,
-                        coordinates: [normalizedCoordinates.x, normalizedCoordinates.y]
+                        coordinates: [coordinates[0], coordinates[1]],
+                        projection: DEFAULT_PROJECTION_CODE
                     };
                 }
             }
             return Rx.Observable.of(updateLocalisation(localisation));
-        });
-
-export const endDrawingEpic = action$ =>
-    action$.ofType(END_DRAWING)
-        .filter(action => action.owner === 'pluievolution')
-        .switchMap(() => {
-            return Rx.Observable.of(setDrawing(false));
         });
 
 export const clearDrawnEpic = action$ =>
@@ -575,7 +606,7 @@ export const clickMapEpic = (action$, store) =>
             overrideParams[pluiEvolutionLayerName] = {
                 info_format: "application/json"
             };
-            return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams));
+            return Rx.Observable.of(featureInfoClick(action.point, pluiEvolutionLayerName, [], overrideParams)).concat(Rx.Observable.of(forceUpdateMapLayout()));
         });
 
 const buildAttachmentsRequest = (uuid, attachments) => {

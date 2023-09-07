@@ -3,9 +3,7 @@
         {
             "name": "PluiEvolutionExtension",
             "description": "PLUI Evolution Extension",
-            "dependencies": [
-                "BurgerMenu"
-            ]
+            "dependencies": []
         }
     ]
 }

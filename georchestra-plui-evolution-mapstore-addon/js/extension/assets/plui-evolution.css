@@ -84,6 +84,11 @@
 	margin: auto;
 	height: 300px;
 	width: 300px;
+	border: 15px solid transparent !important;
+	border-top-color: rgba(7, 138, 163, 0.2) !important;
+	border-right-color: rgba(7, 138, 163, 0.2) !important;
+	border-bottom-color: rgba(7, 138, 163, 0.2) !important;
+	border-left-color: #078aa3 !important;
 }
 
 .plui-evolution-panel .plui-loading-container .plui-loading span {
@@ -130,11 +135,9 @@ span .info {
 }
 
 .plui-evolution-viewer .coordinates-text {
-	height: 52px;
+	height: 35px;
 	font-size: 15px;
 	border-bottom: solid 1px #d9d9d9;
-	border-top: solid 1px #d9d9d9;
-	padding-top: 13px;
 }
 
 

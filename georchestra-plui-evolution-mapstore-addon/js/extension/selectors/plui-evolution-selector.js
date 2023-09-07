@@ -29,6 +29,8 @@ export const pluiEvolutionMeSelector = (state) => get(state, "pluievolution.user
 
 export const isPluiEvolutionActivate = (state) => get(state, "pluievolution.activated");
 
+export const pluievolutionSidebarControlSelector = (state) => get(state, "controls.pluievolution.enabled");
+
 /**
  * Retourne vrai si la couche du layer pluiEvolution existe, est visible et est selectionnée
  * @param state

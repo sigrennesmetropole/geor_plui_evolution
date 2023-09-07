@@ -1,5 +1,6 @@
 package org.georchestra.pluievolution.service.mapper;
 
+import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface AbstractMapper<E, D> {
      * @param dto dto to transform to entity
      * @return entity
      */
-    E dtoToEntity(D dto);
+    E dtoToEntity(D dto) throws ApiServiceException;
 
     /**
      * @param entity entity to transform to dto
