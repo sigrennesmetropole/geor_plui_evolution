@@ -46,7 +46,6 @@ export class PluiEvolutionViewer extends React.Component {
             return (
             <div className="plui-evolution-viewer">
                 <Form>
-                    {this.renderHeader()}
                     {this.renderCoordinates()}
                     {this.renderPluiRequestsNavigation()}
                     <PluiEvolutionRequestViewer closeViewer={this.props.closeViewer}
@@ -59,30 +58,6 @@ export class PluiEvolutionViewer extends React.Component {
             )
         }
         return null;
-    }
-
-    /**
-     * La rendition de l'entête
-     */
-    renderHeader() {
-        return (
-            <Grid fluid className="ms-header ms-primary" style={{ width: '100%', boxShadow: 'none'}}>
-                <Row>
-                    <Col xs={2}>
-                        <button className="square-button bg-primary no-border no-events btn btn-primary">
-                            <Glyphicon glyph="map-marker"/>
-                        </button>
-                    </Col>
-                    <Col xs={8}>
-                    </Col>
-                    <Col xs={2}>
-                        <button className="square-button no-border bg-primary btn btn-primary" onClick={() => this.close()} >
-                            <Glyphicon glyph="1-close"/>
-                        </button>
-                    </Col>
-                </Row>
-            </Grid>
-        );
     }
 
     /**
