@@ -158,10 +158,9 @@ freemarker.fontsPath=fonts
 
 ```
 
-#### II.3 - Déploiement de l'addon Mapstore
+#### II.3 - Déploiement de l'addon Mapstore`
 
 *TODO*
 
 ## III - Configuration
 
-*TODO*
