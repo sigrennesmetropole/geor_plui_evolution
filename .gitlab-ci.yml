@@ -146,4 +146,4 @@ pluievolutionapi:deploy:master:
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
     - cp plui-evolution_rct_var.yml $HOME/plui-evolution_var.yml
-    - ansible-playbook plui-evolution-docker.yml -v -i REN1VML0095," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
+    - ansible-playbook plui-evolution-docker.yml -v -i "REN1VML0095," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
