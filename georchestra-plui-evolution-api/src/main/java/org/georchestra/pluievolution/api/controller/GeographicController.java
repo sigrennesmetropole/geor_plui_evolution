@@ -1,6 +1,5 @@
 package org.georchestra.pluievolution.api.controller;
 
-import io.swagger.annotations.Api;
 import org.georchestra.pluievolution.api.GeographicApi;
 import org.georchestra.pluievolution.core.dto.EtablissementConfiguration;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
@@ -13,11 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@Api(tags = "geographic")
 public class GeographicController implements GeographicApi {
 
 
@@ -37,7 +34,7 @@ public class GeographicController implements GeographicApi {
     }
 
     @Override
-    public ResponseEntity<GeographicArea> getPluiRequestAreaByCodeInsee(@Valid String codeInsee) throws Exception {
+    public ResponseEntity<GeographicArea> getPluiRequestAreaByCodeInsee(String codeInsee) throws Exception {
         return new ResponseEntity<>(geographicAreaService.getGeographicAreaByCodeInsee(codeInsee), HttpStatus.OK);
     }
 

@@ -334,7 +334,10 @@
       "glyph": "info-sign",
       "title": "plugins.About.title",
       "description": "plugins.About.description",
-      "dependencies": ["SidebarMenu"]
+      "dependencies": ["SidebarMenu"],
+      "defaultConfig": {
+        "githubUrl": "https://github.com/sigrennesmetropole/geor_plui_evolution/tree/master"
+      }
     },
     {
       "name": "MousePosition",

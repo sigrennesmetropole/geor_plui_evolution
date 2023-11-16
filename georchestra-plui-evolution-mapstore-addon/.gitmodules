@@ -1,0 +1,9 @@
+[submodule "MapStore2"]
+	path = MapStore2
+	url = https://github.com/geosolutions-it/MapStore2.git
+	branch = 2023.02.xx
+
+[submodule "mapstore2-georchestra"]
+	path = mapstore2-georchestra
+	url = https://github.com/georchestra/mapstore2-georchestra.git
+	branch = 2023.02.xx

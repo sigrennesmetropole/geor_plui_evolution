@@ -1,9 +1,3 @@
-delete from geographic_area where true;
-delete from geographic_etablissement where true;
-delete from plui_request where true;
-delete from user_ where true;
-
-
 -- Insertion de users
 INSERT INTO user_ ( login, first_name, last_name, email, organization) VALUES ( 'user_rm', 'User', 'RM', 'user_rm@rennesmetropole.fr', 'RENNES-METROPOLE');
 INSERT INTO user_ ( login, first_name, last_name, email, organization) VALUES ( 'user_rennes', 'User', 'RENNES', 'user_rennes@rennes.fr', 'RENNES');

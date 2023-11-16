@@ -2,7 +2,6 @@ package org.georchestra.pluievolution.service.mapper;
 
 import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point;
-import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
@@ -18,6 +17,8 @@ import org.opengis.referencing.operation.TransformException;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public abstract class LocalizedMapper {
@@ -60,7 +61,7 @@ public abstract class LocalizedMapper {
         if (geometry == null) {
             return null;
         }
-        Point2D pt2D = new Point2D();
+        List<BigDecimal> pt2D = new ArrayList<>();
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().x));
         pt2D.add(BigDecimal.valueOf(geometry.getCoordinate().y));
         Point point = new Point();

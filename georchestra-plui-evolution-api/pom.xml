@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.5.1</version>
+		<version>1.5.3</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -67,34 +67,74 @@
 			<version>1.1.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-models</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+		</dependency>
+
+		<!-- Swagger UI dependency -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+		</dependency>
+
+		<!-- Swagger 2 doc dependency -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>com.fasterxml.jackson.core</groupId>
+					<artifactId>jackson-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.swagger</groupId>
+					<artifactId>swagger-models</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>io.swagger</groupId>
+					<artifactId>swagger-annotations</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
 		<plugins>
 			<!-- Swagger -->
 			<plugin>
-				<groupId>io.swagger</groupId>
-				<artifactId>swagger-codegen-maven-plugin</artifactId>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<configuration>
 					<!-- Les interfaces sont généres dans la target, c'est normal -->
 					<apiPackage>org.georchestra.pluievolution.api</apiPackage>
 					<modelPackage>org.georchestra.pluievolution.core.dto</modelPackage>
 					<inputSpec>resources/swagger/georchestra-plui-evolution.json</inputSpec>
-					<language>spring</language>
-					<library>spring-mvc</library>
+					<library>spring-boot</library>
+					<generatorName>spring</generatorName>
 					<generateModelTests>false</generateModelTests>
 					<generateModelDocumentation>false</generateModelDocumentation>
-					<generateSupportingFiles>false</generateSupportingFiles>
-					<generateApiDocumentation>false</generateApiDocumentation>
+					<generateSupportingFiles>true</generateSupportingFiles>
+					<generateApiDocumentation>true</generateApiDocumentation>
 					<generateApis>true</generateApis>
 					<generateModels>false</generateModels>
 					<configOptions>
-						<!-- Activier le 'interfaceOnly' à true pour la compile, sinon conflit, 
-							et à false pour la génération -->
 						<interfaceOnly>true</interfaceOnly>
-						<!--<skipOverwrite>true</skipOverwrite> -->
+						<dateLibrary>java8</dateLibrary>
+						<serializableModel>true</serializableModel>
+						<unhandledException>true</unhandledException>
 					</configOptions>
-					<templateDirectory>${project.basedir}/src/conf/generation/</templateDirectory>
+					<templateDirectory>../resources/swagger/generation</templateDirectory>
 				</configuration>
 				<executions>
 					<execution>

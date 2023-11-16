@@ -13,5 +13,4 @@ public interface MailService {
 
 	void sendMail(MailDescription mailDescription) throws EMailException;
 
-	String getDefaultFrom();
 }

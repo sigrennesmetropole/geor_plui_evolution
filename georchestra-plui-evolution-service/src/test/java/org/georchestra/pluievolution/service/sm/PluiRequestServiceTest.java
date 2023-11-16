@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 import org.georchestra.pluievolution.StarterSpringBootTestApplication;
@@ -14,12 +16,15 @@ import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.dto.Point;
-import org.georchestra.pluievolution.core.dto.Point2D;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.mapper.PluiRequestMapper;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.filter.text.ecql.ECQL;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opengis.filter.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +53,7 @@ class PluiRequestServiceTest {
 		pluiRequest.setType(PluiRequestType.COMMUNE);
 		pluiRequest.setObject("Ici l'objet de la demande");
 		pluiRequest.setSubject("Ici le sujet de la demande");
-		Point2D pt2D = new Point2D();
+		List<BigDecimal> pt2D = new ArrayList<>();
 		pt2D.add(BigDecimal.valueOf(48.104594766322386));
 		pt2D.add(BigDecimal.valueOf(-1.666802393510429));
 		Point point = new Point();
@@ -84,5 +89,7 @@ class PluiRequestServiceTest {
 				"Le sujet de la demade doit etre le meme que celui renseigné");
 
 	}
+
+
 
 }
