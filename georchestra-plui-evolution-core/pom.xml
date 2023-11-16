@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.5.1</version>
+		<version>1.5.3</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -67,21 +67,21 @@
 			<artifactId>gt-referencing</artifactId>
 		</dependency>
 
-		<!-- Swagger UI dependency -->
+		<!-- OpenApi UI dependency -->
+
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-models</artifactId>
 		</dependency>
-		<!-- Swagger 2 doc dependency -->
+
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>com.fasterxml.jackson.core</groupId>
-					<artifactId>jackson-annotations</artifactId>
-				</exclusion>
-			</exclusions>
+			<groupId>io.swagger.core.v3</groupId>
+			<artifactId>swagger-annotations</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.openapitools</groupId>
+			<artifactId>jackson-databind-nullable</artifactId>
 		</dependency>
 
     </dependencies>
@@ -89,21 +89,22 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>io.swagger</groupId>
-				<artifactId>swagger-codegen-maven-plugin</artifactId>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<configuration>
 					<modelPackage>org.georchestra.pluievolution.core.dto</modelPackage>
 					<inputSpec>resources/swagger/georchestra-plui-evolution.json</inputSpec>
-					<language>spring</language>
-					<library>spring-mvc</library>
-					<generateModelTests>false</generateModelTests>
-					<generateModelDocumentation>false</generateModelDocumentation>
+					<library>spring-boot</library>
+					<generatorName>spring</generatorName>
+					<generateModelTests>true</generateModelTests>
+					<generateModelDocumentation>true</generateModelDocumentation>
 					<generateSupportingFiles>false</generateSupportingFiles>
 					<generateApiDocumentation>false</generateApiDocumentation>
 					<generateApis>false</generateApis>
 					<generateModels>true</generateModels>
 					<configOptions>
 						<dateLibrary>legacy</dateLibrary>
+						<useSwaggerUI>true</useSwaggerUI>
 					</configOptions>
 				</configuration>
 				<executions>

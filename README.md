@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Plugin PLUi Evolution
 
 ## I - Construction de l'application
@@ -158,12 +158,10 @@ freemarker.fontsPath=fonts
 
 ```
 
-#### II.3 - Déploiement de l'addon Mapstore`
+#### II.3 - Déploiement de l'addon Mapstore
 
 *TODO*
 
 ## III - Configuration
-=======
-# geor_plui_evolution
-Code du module Evolutions du PLUi pour georchestra
->>>>>>> 57babfff2e4a4b1347687071238fe6df2cd04a5f
+
+*TODO*

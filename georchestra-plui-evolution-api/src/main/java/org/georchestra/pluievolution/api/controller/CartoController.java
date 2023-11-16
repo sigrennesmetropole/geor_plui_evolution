@@ -9,7 +9,6 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,14 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import io.swagger.annotations.Api;
-
 /**
  * @author NCA20245
  *
  */
 @RestController
-@Api(tags = "carto")
 public class CartoController implements CartoApi {
 
 	@Autowired
@@ -121,7 +117,7 @@ public class CartoController implements CartoApi {
 	}
 
 	@Override
-	public ResponseEntity<String> postWfs(@Valid String body) throws Exception {
+	public ResponseEntity<String> postWfs(String body) throws Exception {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
 				.getRequest();
 

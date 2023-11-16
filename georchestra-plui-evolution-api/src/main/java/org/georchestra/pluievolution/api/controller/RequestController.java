@@ -7,9 +7,6 @@ import java.io.File;
 import java.util.List;
 import java.util.UUID;
 
-import javax.validation.Valid;
-
-import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
@@ -28,7 +25,6 @@ import org.springframework.web.multipart.MultipartFile;
  *
  */
 @RestController
-@Api(tags = "request")
 public class RequestController implements RequestApi {
 
 	@Autowired
@@ -41,17 +37,17 @@ public class RequestController implements RequestApi {
 	GeographicAreaService geographicAreaService;
 
 	@Override
-	public ResponseEntity<PluiRequest> createPluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
+	public ResponseEntity<PluiRequest> createPluiRequest(PluiRequest pluiRequest) throws Exception {
 		return new ResponseEntity<>(pluiRequestService.createPluiRequest(pluiRequest), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<PluiRequest> updatePluiRequest(@Valid PluiRequest pluiRequest) throws Exception {
+	public ResponseEntity<PluiRequest> updatePluiRequest(PluiRequest pluiRequest) throws Exception {
 		return new ResponseEntity<>(pluiRequestService.updatePluiRequest(pluiRequest), HttpStatus.OK);
 	}
 
 	@Override
-	public ResponseEntity<Attachment> uploadDocument(UUID uuid, @Valid MultipartFile file) throws Exception {
+	public ResponseEntity<Attachment> uploadDocument(UUID uuid, MultipartFile file) throws Exception {
 
 		File document = java.io.File.createTempFile(UUID.randomUUID().toString(), ".doc");
 		FileUtils.copyInputStreamToFile(file.getInputStream(), document);

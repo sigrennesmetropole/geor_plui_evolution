@@ -13,20 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2018-06-12T10:28:09.523+02:00")
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controlleur pour la configuration.
  */
 @RestController
-@Api(tags = "administration")
 public class AdministrationController implements AdministrationApi {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AdministrationController.class);
@@ -39,7 +31,7 @@ public class AdministrationController implements AdministrationApi {
 
 	@Override
 	public ResponseEntity<ConfigurationData> getConfiguration() throws Exception {
-		return new ResponseEntity<ConfigurationData>(configurationService.getApplicationVersion(), HttpStatus.OK);
+		return new ResponseEntity<>(configurationService.getApplicationVersion(), HttpStatus.OK);
 	}
 
 	@Override
@@ -58,7 +50,7 @@ public class AdministrationController implements AdministrationApi {
 	 * 
 	 * @return une "js"
 	 */
-	@RequestMapping(value = "/extension/index.js", produces = { "application/javascript" }, method = RequestMethod.GET)
+	@GetMapping(value = "/extension/index.js", produces = { "application/javascript" })
 	public ResponseEntity<String> indexJs() {
 		return ResponseEntity.ok("console.log(\"Sigm indexjs\");");
 	}
@@ -71,7 +63,7 @@ public class AdministrationController implements AdministrationApi {
 	 * @return
 	 * @throws URISyntaxException
 	 */
-	@RequestMapping(value = "/proxy", method = RequestMethod.GET)
+	@GetMapping(value = "/proxy")
 	public ResponseEntity<Void> proxy(@RequestParam(value = "url", required = false) String url)
 			throws URISyntaxException {
 		URI frontURI = new URI(url);

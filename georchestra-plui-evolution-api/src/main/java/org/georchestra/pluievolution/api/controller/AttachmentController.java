@@ -3,7 +3,6 @@
  */
 package org.georchestra.pluievolution.api.controller;
 
-import io.swagger.annotations.Api;
 import org.georchestra.pluievolution.api.AttachmentApi;
 import org.georchestra.pluievolution.api.controller.common.AbstractExportDocumentApi;
 import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@Api(tags = "attachment")
 public class AttachmentController extends AbstractExportDocumentApi implements AttachmentApi {
 	
 	@Autowired

@@ -5,7 +5,6 @@ import static org.georchestra.pluievolution.service.common.constant.CommuneParam
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -45,13 +44,6 @@ import org.georchestra.pluievolution.service.bean.GeoserverStream;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatus;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
-import org.geotools.factory.CommonFactoryFinder;
-import org.geotools.filter.text.cql2.CQL;
-import org.geotools.filter.text.cql2.CQLException;
-import org.geotools.filter.text.ecql.ECQL;
-import org.geotools.util.factory.GeoTools;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,6 +73,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 	private static final String GEOSERVER_SERVICE_ERROR = "Service unavailable";
 	private static final String GEOSERVER_WFS_FILTER_ERROR = "Erreur lors de la modification du flux WFS : ";
 
+	private static final String CQL_FILTER_PARAM_NAME = "cql_filter";
+
 	@Value("${pluievolution.geoserver.url}")
 	private String geoserverUrl;
 
@@ -101,9 +95,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 			throws ApiServiceException {
 
 		if (!enableWmts && queryString != null && queryString.toLowerCase().contains(SERVICE_WMTS)) {
+			LOG.debug("{} {}", GEOSERVER_SERVICE_ERROR, "Erreur WMTS");
 			throw new ApiServiceException(GEOSERVER_SERVICE_ERROR, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
-
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			String wmsUrl = buildURL("wms");
@@ -111,17 +105,17 @@ public class GeoserverServiceImpl implements GeoserverService {
 			final HttpResponse response = httpClient.execute(httpGet);
 
 			// Code 200 : succès
-			if (response.getStatusLine().getStatusCode() == 200) {
-				String outputContentType = extractContentType(response, contentType);
+			String outputContentType = extractContentType(response, contentType);
+			if (response.getStatusLine().getStatusCode() == 200 && !StringUtils.contains(outputContentType, "text/xml")) {
 				return GeoserverStream.builder().status(response.getStatusLine().getStatusCode())
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
 			} else {
-				throw new ApiServiceException(GEOSERVER_CALQUE_ERROR + response,
+				throw new ApiServiceException(String.format("%s %s", GEOSERVER_CALQUE_ERROR, response),
 						ApiServiceExceptionsStatus.BAD_REQUEST);
 			}
-		} catch (final Exception e) {
-			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e, ApiServiceExceptionsStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			throw new ApiServiceException(String.format("%s %s", GEOSERVER_REQUEST_ERROR, e.getMessage()), e, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 
 	}
@@ -152,7 +146,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			return buildGeoserverWfsResponse(response);
 		} catch (final Exception e) {
-			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
+			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR + e.getMessage(), e);
 		}
 	}
 
@@ -200,69 +194,52 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 * @param queryString paramètres de la requête get
 	 * @param contentType content type de la requête
 	 * @return HttpGet
-	 * @throws UnsupportedEncodingException problème lors de l'encodage de la
-	 *                                      requête
 	 */
 	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
-			String encoding) throws CQLException {
+			String encoding) throws ApiServiceException {
 		// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
 		queryString = buildQuery(queryString, encoding);
+		try {
 
-		// requete original
-		String urlGet = baseUrl + "?" + queryString;
-		// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
-		// Ce nouveau ne doit pas se substituer aux filtres deja present...
-		// Si un filtre est deja present, le nouveau filtre s'y ajoute avec la condition AND
-		// Si l'utilisateur n'est pas un agent RM, le filtre si existant dans l'URL reste tel quel
-		if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
-			String cqlFilterName = "cql_filter";
+			// requete original
+			String urlGet = baseUrl + "?" + queryString;
+			Pair<String, String> cql = getQueryParam(CQL_FILTER_PARAM_NAME, queryString);
+			String filter = cql != null ? cql.getSecond() : "";
+			// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
+			// Ce nouveau ne doit pas se substituer aux filtres deja present...
+			// Si un filtre est deja present, le nouveau filtre s'y ajoute avec la condition AND
+			// Si l'utilisateur est un agent RM, le filtre si existant dans l'URL reste tel quel
+			if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
+				if (StringUtils.isNotEmpty(filter)) {
+					filter = String.format("(%s) AND ", filter);
+				}
+				filter += String.format("%s='%s'", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
 
-			// Parametre du filtre CQL, null si absent
-			Pair<String, String> cql = getQueryParam(cqlFilterName, queryString);
+				// On met à jour notre URL avec le filtre
+				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
+				uriBuilder.replaceQueryParam(cql != null ? cql.getFirst() : CQL_FILTER_PARAM_NAME, filter);
 
-			// filtre sur la commune
-			Filter filter = CQL.toFilter(String.format("%s=%s", CODE_INSEE_COLUMN_NAME, area.getCodeInsee()));
+				// On met à jour l'URL
+				urlGet = uriBuilder.build().encode().toUriString();
 
-			// Si le parametre cql existe deja dans l'url
-			// On le concatene a celui sur la colonne
-			if (cql != null) {
-				FilterFactory ff = CommonFactoryFinder.getFilterFactory(GeoTools.getDefaultHints());
-
-				// On interprete le filtre dans la requete
-				Filter filterFromUrl = ECQL.toFilter(cql.getSecond());
-				// On fait la jonction des deux filtre en AND
-				// Les deux conditions devront etre respectées alors
-				filter = ff.and(filter, filterFromUrl);
-
-				// Si le  nom du param diffère notamment au niveau de la casse, on le recupere tel que dans l'url
-				cqlFilterName = cql.getFirst();
 			}
 
-			// On retranscris en chaine de caratere les deux filtres combinés, si un filtre était deja présent sinon le filtre sure la commune
-			String filterCql = ECQL.toCQL(filter);
 
-			// On met à jour notre URL avec le filtre
-			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
-			uriBuilder.replaceQueryParam(cqlFilterName, filterCql);
+			// paramètres d'authentification
+			final String userpass = geoserverUsername + ":" + geoserverPassword;
+			final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
 
-			// On met à jour l'URL
-			urlGet = uriBuilder.build().encode().toUriString();
+			// Concatenation de l'URL Fullmaps avec les paramètres deja présent dans le
+			// requete original
+			final HttpGet httpGet = new HttpGet(urlGet);
 
+			httpGet.setHeader(HttpHeaders.CONTENT_TYPE, contentType);
+			httpGet.setHeader(HttpHeaders.AUTHORIZATION, basicAuth);
+			return httpGet;
+		} catch (Exception e) {
+			throw new ApiServiceException("Une erreur a été pendant la mise à jour du filtre CQL: " + e.getMessage());
 		}
 
-
-		// paramètres d'authentification
-		final String userpass = geoserverUsername + ":" + geoserverPassword;
-		final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
-
-		// Concatenation de l'URL Fullmaps avec les paramètres deja présent dans le
-		// requete original
-		final HttpGet httpGet = new HttpGet(urlGet);
-
-		httpGet.setHeader(HttpHeaders.CONTENT_TYPE, contentType);
-		httpGet.setHeader(HttpHeaders.AUTHORIZATION, basicAuth);
-
-		return httpGet;
 	}
 
 	/**
@@ -445,11 +422,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 		return urlBuilder.toString();
 	}
 
-	private String buildQuery(String query, String encoding) {
-		if (StringUtils.isNotEmpty(query)) {
-			return URLDecoder.decode(query, Charset.forName(encoding));
-		} else {
+	private String buildQuery(String query, String encoding) throws ApiServiceException {
+		try {
+			if (StringUtils.isNotEmpty(query)) {
+				return URLDecoder.decode(query, Charset.forName(encoding));
+			}
 			return StringUtils.EMPTY;
+		} catch (Exception e) {
+			throw new ApiServiceException("Une erreur recontrée pendant le décodage de l'url " + e.getMessage(), e);
 		}
 	}
 }

@@ -66,9 +66,6 @@
           },
           "defaultTextAnnotation": "New"
         },
-        "maptype": {
-            "mapType": "{context.mode === 'desktop' ? 'openlayers' : 'leaflet'}"
-        },
         "catalog": {
           "default": {
             "newService": {
@@ -405,7 +402,10 @@
                 }
             }, {
               "name": "About",
-              "showIn": ["SidebarMenu"]
+              "showIn": ["SidebarMenu"],
+              "cfg": {
+                "githubUrl": "https://github.com/sigrennesmetropole/geor_plui_evolution/tree/master"
+              }
             }
             , {
               "name": "MousePosition",

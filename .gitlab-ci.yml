@@ -114,7 +114,7 @@ pluievolutionapi:deploy:
   stage: deploy
   tags: 
    - iaas
-  image: ansible/ansible-runner:1.4.4
+  image: glregistry.boost.open.global/boost/docker/mvn-node-jdk11-ansible:latest
   dependencies:
     - pluievolutionapi:build
   only:
@@ -127,13 +127,13 @@ pluievolutionapi:deploy:
     - cd $CI_PROJECT_DIR/ansible
     - chmod og-rw key/id_rsa
     - cp plui-evolution_dev_var.yml $HOME/plui-evolution_var.yml
-    - ansible-playbook plui-evolution-docker.yml -v -i "10.215.160.196," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
+    - ansible-playbook plui-evolution-docker.yml -v -i "REN1VML0096," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
 
 pluievolutionapi:deploy:master:
   stage: deploy
   tags: 
    - iaas
-  image: ansible/ansible-runner:1.4.4
+  image: glregistry.boost.open.global/boost/docker/mvn-node-jdk11-ansible:latest
   dependencies:
     - pluievolutionapi:build:master
   only:
@@ -146,4 +146,4 @@ pluievolutionapi:deploy:master:
     - cd $CI_PROJECT_DIR/ansible  
     - chmod og-rw key/id_rsa
     - cp plui-evolution_rct_var.yml $HOME/plui-evolution_var.yml
-    - ansible-playbook plui-evolution-docker.yml -v -i "194.2.68.134," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no
+    - ansible-playbook plui-evolution-docker.yml -v -i "REN1VML0095," -u root --private-key=key/id_rsa --ssh-common-args=-oStrictHostKeyChecking=no

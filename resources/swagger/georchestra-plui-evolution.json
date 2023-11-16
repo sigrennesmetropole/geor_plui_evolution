@@ -452,11 +452,23 @@
 				"description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
 				"operationId": "getWms",
 				"produces": [
-					"image/png", "*/*"
+					"image/png"
 				],
 				"responses": {
 					"200": {
 						"description": "Reponse du geoserver"
+					},
+					"400": {
+						"description": "Bad request",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
 					}
 				}
 			}
@@ -477,6 +489,18 @@
 						"description": "Reponse du geoserver",
 						"schema": {
 							"type": "string"
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
 						}
 					}
 				}
@@ -507,6 +531,18 @@
 						"description": "OK",
 						"schema": {
 							"type": "string"
+						}
+					},
+					"400": {
+						"description": "Bad request",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
+						}
+					},
+					"500": {
+						"description": "Internal server error",
+						"schema": {
+							"$ref": "#/definitions/ApiError"
 						}
 					}
 				}

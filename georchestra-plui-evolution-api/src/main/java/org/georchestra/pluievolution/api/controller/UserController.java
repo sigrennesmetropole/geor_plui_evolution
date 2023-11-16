@@ -3,7 +3,6 @@
  */
 package org.georchestra.pluievolution.api.controller;
 
-import io.swagger.annotations.Api;
 import org.georchestra.pluievolution.api.UserApi;
 import org.georchestra.pluievolution.core.dto.GeographicEtablissement;
 import org.georchestra.pluievolution.core.dto.User;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@Api(tags = "user")
 public class UserController implements UserApi {
 
 	@Autowired
