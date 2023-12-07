@@ -1,4 +1,5 @@
 import {hideMapinfoMarker} from "@mapstore/actions/mapInfo";
+import {UPDATE_MAP_LAYOUT} from "@mapstore/actions/maplayout";
 
 export const actions = {
 	PLUI_EVOLUTION_INIT: 'PLUI_EVOLUTION:INIT',
@@ -46,7 +47,7 @@ export const actions = {
 	PLUI_EVOLUTION_OPEN_VIEWER: 'PLUI_EVOLUTION:OPEN:VIEWER',
 	PLUI_EVOLUTION_CLOSE_VIEWER: 'PLUI_EVOLUTION:CLOSE:VIEWER',
 	PLUI_EVOLUTION_DISPLAY_LOG: 'PLUI:EVOLUTION:DISPLAY:LOG',
-	PLUI_EVOLUTION_DISPLAY_LOG_DONE: 'PLUI:EVOLUTION:DISPLAY:LOG:DONE',
+	PLUI_EVOLUTION_DISPLAY_LOG_DONE: 'PLUI:EVOLUTION:DISPLAY:LOG:DONE'
 };
 
 export const status = {
@@ -373,4 +374,12 @@ export function consoleLogDone() {
 	return {
 		type: actions.PLUI_EVOLUTION_DISPLAY_LOG_DONE
 	}
+}
+
+export function pluiEvolutionUpdateMapLayout(layout) {
+	return {
+		layout,
+		type: UPDATE_MAP_LAYOUT,
+		source: "pluievolution"
+	};
 }
