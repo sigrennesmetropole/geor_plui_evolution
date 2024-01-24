@@ -1,5 +1,6 @@
 package org.georchestra.pluievolution.service.sm;
 
+import org.apache.http.client.methods.HttpGet;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.service.bean.GeoserverStream;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
@@ -33,5 +34,8 @@ public interface GeoserverService {
      * @return                          résultat wfs
      * @throws ApiServiceException      Erreur lors de la requête WFS GET
      */
-    GeoserverStream getWfs( GeographicArea area,String encoding, String queryString) throws ApiServiceException;;
+    GeoserverStream getWfs( GeographicArea area,String encoding, String queryString) throws ApiServiceException;
+
+    HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
+                                         String encoding) throws ApiServiceException;
 }

@@ -195,7 +195,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 	 * @param contentType content type de la requête
 	 * @return HttpGet
 	 */
-	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
+	@Override
+	public HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
 			String encoding) throws ApiServiceException {
 		// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
 		queryString = buildQuery(queryString, encoding);
@@ -203,6 +204,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// requete original
 			String urlGet = baseUrl + "?" + queryString;
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
 			Pair<String, String> cql = getQueryParam(CQL_FILTER_PARAM_NAME, queryString);
 			String filter = cql != null ? cql.getSecond() : "";
 			// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
@@ -216,11 +218,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 				filter += String.format("%s='%s'", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
 
 				// On met à jour notre URL avec le filtre
-				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
-				uriBuilder.replaceQueryParam(cql != null ? cql.getFirst() : CQL_FILTER_PARAM_NAME, filter);
 
-				// On met à jour l'URL
-				urlGet = uriBuilder.build().encode().toUriString();
+				uriBuilder.replaceQueryParam(cql != null ? cql.getFirst() : CQL_FILTER_PARAM_NAME, filter);
 
 			}
 
@@ -228,6 +227,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 			// paramètres d'authentification
 			final String userpass = geoserverUsername + ":" + geoserverPassword;
 			final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+
+			// On met à jour l'URL
+			urlGet = uriBuilder.build().encode().toUriString();
 
 			// Concatenation de l'URL Fullmaps avec les paramètres deja présent dans le
 			// requete original
