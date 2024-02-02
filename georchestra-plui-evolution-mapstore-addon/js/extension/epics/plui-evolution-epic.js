@@ -37,7 +37,8 @@ import {
     status,
     updateAttachments,
     updateLocalisation,
-    ensureProj4Done, loadPluiEvolutionViewer, openPanel, closePanel, closeViewer
+    ensureProj4Done, loadPluiEvolutionViewer, openPanel, closePanel, closeViewer,
+    pluiEvolutionUpdateMapLayout
 } from '../actions/plui-evolution-action';
 import {
     DEFAULT_PROJECTION, DEFAULT_PROJECTION_CODE,
@@ -56,8 +57,7 @@ import Proj4js from 'proj4';
 import {
     FORCE_UPDATE_MAP_LAYOUT, forceUpdateMapLayout,
     UPDATE_MAP_LAYOUT,
-    updateDockPanelsList,
-    updateMapLayout
+    updateDockPanelsList
 } from "@mapstore/actions/maplayout";
 
 let backendURLPrefix = "/pluievolution";
@@ -66,17 +66,17 @@ let pluiEvolutionLayerName;
 let pluiEvolutionLayerProjection;
 let currentLayout;
 
-export const openPluivelutionPanelEpic = (action$, store) =>
+export const openPluievelutionPanelEpic = (action$, store) =>
     action$.ofType(TOGGLE_CONTROL)
         .filter((action) => action.control === "pluievolution" && !!store.getState() && !!pluievolutionSidebarControlSelector(store.getState()))
         .switchMap(() => {
             let layout = store.getState().maplayout;
             layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
             currentLayout = layout;
-            return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), updateMapLayout(layout), openPanel(null)]);
+            return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), pluiEvolutionUpdateMapLayout(layout), openPanel(null)]);
         });
 
-export const closePluivelutionPanelEpic = (action$, store) =>
+export const closePluievelutionPanelEpic = (action$, store) =>
     action$.ofType(TOGGLE_CONTROL, actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_VIEWER, actions.PLUI_EVOLUTION_CLOSE_PANEL)
         .filter(action => action.type === actions.PLUI_EVOLUTION_CLOSE_VIEWER ||
             ([actions.PLUI_EVOLUTION_CLOSE_REQUEST, actions.PLUI_EVOLUTION_CLOSE_PANEL].includes(action.type) && !!pluievolutionSidebarControlSelector(store.getState())) ||
@@ -94,31 +94,31 @@ export const closePluivelutionPanelEpic = (action$, store) =>
             let layout = store.getState().maplayout;
             layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: false, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: layout.boundingSidebarRect.right, boundingMapRect: {...layout.boundingMapRect, right: layout.boundingSidebarRect.right}, boundingSidebarRect: layout.boundingSidebarRect};
             currentLayout= layout;
-            return Rx.Observable.from(actionsList).concat(Rx.Observable.of(updateMapLayout(layout)).delay(0));
+            return Rx.Observable.from(actionsList).concat(Rx.Observable.of(pluiEvolutionUpdateMapLayout(layout)).delay(0));
         });
 
-export function onOpeningAnotherRightPanel(action$, store) {
+export function onOpeningAnotherRightPanelPlui(action$, store) {
     return action$.ofType(TOGGLE_CONTROL)
         .filter((action) => store && store.getState() &&
             action.control !== 'pluievolution' &&
             store.getState().maplayout.dockPanels.right.includes("pluievolution") &&
             store.getState().maplayout.dockPanels.right.includes(action.control))
         .switchMap(() => {
-            return Rx.Observable.of(updateDockPanelsList("signalement", "remove", "right"))
-                .concat(Rx.Observable.of(closePanel()));
+            return Rx.Observable.from([closePanel(), updateDockPanelsList("pluievolution", "remove", "right")]);
         });
 }
 
 export function onUpdatingLayoutWhenPluiPanelOpened(action$, store) {
     return action$.ofType(UPDATE_MAP_LAYOUT, FORCE_UPDATE_MAP_LAYOUT)
         .filter((action) => store && store.getState() &&
+            (action.source === "pluievolution" || action.source === undefined) &&
             !!pluievolutionSidebarControlSelector(store.getState()) &&
             currentLayout?.right !== action?.layout?.right)
         .switchMap((action) => {
             let layout = store.getState().maplayout;
             layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
             currentLayout = layout;
-            return Rx.Observable.of(updateMapLayout(layout));
+            return Rx.Observable.of(pluiEvolutionUpdateMapLayout(layout));
         });
 }
 
@@ -136,13 +136,13 @@ export function loadPluiEvolutionViewerEpic(action$, store) {
                 let layout = store.getState().maplayout;
                 layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: false, ...layout.boundingMapRect, right: PLUIEVOLUTION_VIEWER_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_VIEWER_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
                 currentLayout = layout;
-                return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), closeIdentify(), loadPluiEvolutionViewer(action.data)]).concat(Rx.Observable.of(updateMapLayout(layout)).delay(0));
+                return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), closeIdentify(), loadPluiEvolutionViewer(action.data)]).concat(Rx.Observable.of(pluiEvolutionUpdateMapLayout(layout)).delay(0));
             }
             return  Rx.Observable.of();
         });
 }
 
-export const openPanelEpic = (action$) =>
+export const openPluiPanelEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_OPEN_PANEL)
         .switchMap((action) => {
 
@@ -185,7 +185,7 @@ export const initPluiEvolutionEpic = (action$) =>
             return Rx.Observable.of(initPluiEvolutionDone()).delay(0);
         });
 
-export const loadAttachmentConfigurationEpic = (action$) =>
+export const loadPluiAttachmentConfigurationEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOAD)
         .switchMap((action) => {
             if (action.attachmentConfiguration) {
@@ -197,7 +197,7 @@ export const loadAttachmentConfigurationEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
         });
 
-export const loadLayerConfigurationEpic = (action$) =>
+export const loadPluiLayerConfigurationEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_LAYER_CONFIGURATION_LOAD)
         .switchMap((action) => {
             if (action.layerConfiguration) {
@@ -226,7 +226,7 @@ export const loadEtablissementConfigurationEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.etablissementConfiguration.error", null, e)));
         });
 
-export const getAllGeographicEtablissementEpic = (action$) =>
+export const getAllGeographicPluiEtablissementEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_GEOGRAPHIC_ETABLISSEMENT_GET_ALL)
         .switchMap((action) => {
             const url = backendURLPrefix + "/geographic/etablissements";
@@ -235,7 +235,7 @@ export const getAllGeographicEtablissementEpic = (action$) =>
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.geographicEtablissement.error", null, e)));
         });
 
-export const getAttachmentsEpic = (action$) =>
+export const getPluiAttachmentsEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_GET_ATTACHMENTS)
         .switchMap((action) => {
             const url = backendURLPrefix + "/request/" + action.uuid + "/attachments";
@@ -252,7 +252,7 @@ export const getAttachmentsEpic = (action$) =>
                 ));
         });
 
-export const downloadAttachmentEpic = (action$) =>
+export const downloadPluiAttachmentEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_DOWNLOAD_ATTACHMENT)
         .switchMap((action) => {
             const url = backendURLPrefix + "/attachment/" + action.attachment.id + "/download";
@@ -283,7 +283,7 @@ export const downloadAttachmentEpic = (action$) =>
                 ));
         });
 
-export const loadMeEpic = (action$,store) =>
+export const loadMeEpicPlui = (action$,store) =>
     action$.ofType(actions.PLUI_EVOLUTION_USER_ME_GET)
         .switchMap((action) => {
             if (action.user) {
@@ -366,7 +366,7 @@ export const savePluiRequest = (action$) =>
                 });
         });
 
-export const initDrawingSupportEpic = action$ =>
+export const initPluiDrawingSupportEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_INIT_SUPPORT_DRAWING)
         .switchMap(() => Rx.Observable.of(changeMapInfoState(false)));
 
@@ -405,7 +405,7 @@ export const displayAllPluiRequest = (action$, store) =>
             );
         });
 
-export const displayEtablissement = (action$, store) =>
+export const displayPluiEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
             if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
@@ -485,7 +485,7 @@ export const displayEtablissement = (action$, store) =>
                 ));
         });
 
-export const startDrawingEpic = action$ =>
+export const startDrawingPluiEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
         .switchMap((action) => {
             if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
@@ -523,7 +523,7 @@ export const startDrawingEpic = action$ =>
             ]);
         });
 
-export const geometryChangeEpic = action$ =>
+export const geometryChangePluiEpic = action$ =>
     action$.ofType(GEOMETRY_CHANGED)
         .filter(action => action.owner === 'pluievolution')
         .switchMap( (action) => {
@@ -543,7 +543,7 @@ export const geometryChangeEpic = action$ =>
             return Rx.Observable.of(updateLocalisation(localisation));
         });
 
-export const clearDrawnEpic = action$ =>
+export const clearDrawnPluiEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_CLEAR_DRAWN)
         .switchMap(() => {
             return Rx.Observable.from([
@@ -553,7 +553,7 @@ export const clearDrawnEpic = action$ =>
             ]);
         });
 
-export const stopDrawingEpic = (action$, store) =>
+export const stopDrawingPluiEpic = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_STOP_DRAWING)
         .switchMap((action) => {
             const state = store.getState();
@@ -588,7 +588,7 @@ export const stopDrawingEpic = (action$, store) =>
             ]);
         });
 
-export const stopDrawingSupportEpic = action$ =>
+export const stopDrawingSupportPluiEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_STOP_SUPPORT_DRAWING)
         .switchMap(() => {
             return Rx.Observable.from([
@@ -598,7 +598,7 @@ export const stopDrawingSupportEpic = action$ =>
         });
 
 // L'interception des clics pour le plugin n'est faite que si le plugin est actif et sa couche est selectionnée
-export const clickMapEpic = (action$, store) =>
+export const clickMapPluiEpic = (action$, store) =>
     action$.ofType(CLICK_ON_MAP)
         .filter((action) => isPluievolutionActivateAndSelected(store.getState()))
         .switchMap((action) => {
@@ -623,7 +623,7 @@ const buildAttachmentsRequest = (uuid, attachments) => {
 }
 
 /** Cette epics sert à charger les projection présentes dans le localconfig et actuellement pas très prise en compte au chargement */
-export const ensureProjectionDefs = (action$) =>
+export const ensureProjectionDefsPlui = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_ENSURE_PROJ4)
         .switchMap((action) => {
             if( action.projectionDefs && action.projectionDefs.length > 0){
@@ -640,7 +640,7 @@ export const ensureProjectionDefs = (action$) =>
             return Rx.Observable.of(ensureProj4Done());
         });
 
-export function logEvent(action$, store) {
+export function logPluiEvent(action$, store) {
     return action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_LOG)
         .filter((action) => store.getState()?.pluievolution.activated)
         .switchMap((action) => {

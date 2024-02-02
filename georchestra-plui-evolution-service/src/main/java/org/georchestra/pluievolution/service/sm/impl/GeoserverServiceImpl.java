@@ -54,6 +54,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -188,14 +189,15 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	/**
 	 * Génration de la requête get pour geoserver
-	 * 
+	 *
 	 * @param baseUrl     url get
 	 * @param area        geographic area pour filtrer
 	 * @param queryString paramètres de la requête get
 	 * @param contentType content type de la requête
 	 * @return HttpGet
 	 */
-	private HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
+	@Override
+	public HttpGet buildGeoserverHttpGet(String baseUrl, GeographicArea area, String queryString, String contentType,
 			String encoding) throws ApiServiceException {
 		// Concatenation de l'URL geoserver avec les paramètres deja présent dans le
 		queryString = buildQuery(queryString, encoding);
@@ -203,6 +205,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// requete original
 			String urlGet = baseUrl + "?" + queryString;
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
 			Pair<String, String> cql = getQueryParam(CQL_FILTER_PARAM_NAME, queryString);
 			String filter = cql != null ? cql.getSecond() : "";
 			// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
@@ -216,11 +219,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 				filter += String.format("%s='%s'", CODE_INSEE_COLUMN_NAME, area.getCodeInsee());
 
 				// On met à jour notre URL avec le filtre
-				UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
-				uriBuilder.replaceQueryParam(cql != null ? cql.getFirst() : CQL_FILTER_PARAM_NAME, filter);
 
-				// On met à jour l'URL
-				urlGet = uriBuilder.build().encode().toUriString();
+				uriBuilder.replaceQueryParam(cql != null ? cql.getFirst() : CQL_FILTER_PARAM_NAME, filter);
 
 			}
 
@@ -228,6 +228,9 @@ public class GeoserverServiceImpl implements GeoserverService {
 			// paramètres d'authentification
 			final String userpass = geoserverUsername + ":" + geoserverPassword;
 			final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+
+			// On met à jour l'URL
+			urlGet = uriBuilder.build().encode().toUriString();
 
 			// Concatenation de l'URL Fullmaps avec les paramètres deja présent dans le
 			// requete original
@@ -262,7 +265,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	/**
 	 * Parsing de la réponse pour la requête WFS
-	 * 
+	 *
 	 * @param httpResponse réponse de la requête WFS
 	 * @return réponse parsée
 	 * @throws ApiServiceException Erreur lors du parsing de la réponse
@@ -301,7 +304,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	/**
 	 * Ajout d'un filtre ogc à la requête WFS
-	 * 
+	 *
 	 * @param wfsContent contenu xml de la requête
 	 * @param codeInsee  code insee
 	 * @return requête filtrée
@@ -328,9 +331,17 @@ public class GeoserverServiceImpl implements GeoserverService {
 			final Node wfsQueryNode = document.getElementsByTagName("wfs:Query").item(0);
 			final Node filterNode = document.getElementsByTagName("ogc:Filter").item(0);
 
+
 			if (wfsQueryNode != null) {
 				if (filterNode != null) {
-					filterNode.appendChild(buildPropertyToEqualElement(document, codeInsee));
+					// On applique un operateur AND entre les filtre existants et le nouveau
+					NodeList filterChilds = filterNode.getChildNodes();
+					Node andOperator = buildAndFilterOperatorElement(document);
+					for (int i = 0; i < filterChilds.getLength(); i++) {
+						andOperator.appendChild(filterChilds.item(i));
+					}
+					andOperator.appendChild(buildPropertyToEqualElement(document, codeInsee));
+					filterNode.appendChild(andOperator);
 				} else {
 					wfsQueryNode.appendChild(buildFilterElement(document, codeInsee));
 				}
@@ -357,7 +368,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 	/**
 	 * Générer l'élement xml pour le fitlre wfs ogc:Filter
-	 * 
+	 *
 	 * @param document  document
 	 * @param codeInsee code insee
 	 * @return element
@@ -370,8 +381,18 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	/**
+	 * Générer l'operateur AND xml pour le fitlre wfs et permettre de combiner les differents filtres
+	 *
+	 * @param document  document
+	 * @return element
+	 */
+	private Element buildAndFilterOperatorElement(Document document) {
+		return document.createElement("ogc:And");
+	}
+
+	/**
 	 * Générer l'élement xml pour le fitlre wfs ogc:PropertyToEqual
-	 * 
+	 *
 	 * @param document  document
 	 * @param codeInsee code insee
 	 * @return element

@@ -6,7 +6,7 @@
 
 	<groupId>org.georchestra</groupId>
 	<artifactId>georchestra-plui-evolution</artifactId>
-	<version>1.5.3</version>
+	<version>1.5.4</version>
 	<packaging>pom</packaging>
 
 	<name>georchestra-plui-evolution</name>
@@ -122,7 +122,7 @@
 				<artifactId>georchestra-plui-evolution-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			
+
 			<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
@@ -384,7 +384,7 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 				</plugin>
-				
+
 			</plugins>
 		</pluginManagement>
 	</build>

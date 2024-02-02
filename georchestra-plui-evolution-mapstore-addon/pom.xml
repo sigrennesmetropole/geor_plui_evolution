@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.5.3</version>
+		<version>1.5.4</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>georchestra-plui-evolution-mapstore-addon</artifactId>
 	<packaging>war</packaging>
-	
+
 	<properties>
 		<finalName>plui-evolution</finalName>
 		<addon.project.location>${project.dir}</addon.project.location>
@@ -54,7 +54,7 @@
 							<npmVersion>8.19.4</npmVersion>
 						</configuration>
 					</execution>
-					
+
 					<!-- It will execute command "npm install" in project dir -->
 					<execution>
 						<phase>generate-resources</phase>
@@ -66,7 +66,7 @@
 							<arguments>${npmicommand}</arguments>
 						</configuration>
 					</execution>
-					
+
 				</executions>
 			</plugin>
 
@@ -98,7 +98,7 @@
 		</plugins>
 
 	</build>
-	
+
 	<profiles>
 		<!-- Profil de développement local -->
 		<profile>
@@ -113,7 +113,7 @@
 			</properties>
 		</profile>
 
-		<!-- Profil de production (utilisé sur la plateforme de DEV, QUALIF et 
+		<!-- Profil de production (utilisé sur la plateforme de DEV, QUALIF et
 			PROD) -->
 		<profile>
 			<id>prod</id>

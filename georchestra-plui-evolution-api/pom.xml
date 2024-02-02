@@ -5,14 +5,14 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.5.3</version>
+		<version>1.5.4</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>georchestra-plui-evolution-api</artifactId>
 	<packaging>jar</packaging>
-	
+
 	<properties>
 		<finalName>plui-evolution</finalName>
 		<mapstore-georchestra>target/github-mapstore2-georchestra</mapstore-georchestra>
@@ -253,7 +253,7 @@
 							<!-- chemin relatif depuis le target du présent projet -->
 							<dockerDirectory>${project.basedir}/../docker/plui-evolution</dockerDirectory>
 
-							<!-- copy the service's jar file from target into the root directory 
+							<!-- copy the service's jar file from target into the root directory
 								of the image -->
 							<resources>
 								<resource>
@@ -261,10 +261,10 @@
 									<directory>${project.build.directory}</directory>
 									<include>${finalName}.war</include>
 								</resource>
-								<!-- <resource> <targetPath>/etc/georchestra</targetPath> <directory>${project.build.directory}/datadir</directory> 
+								<!-- <resource> <targetPath>/etc/georchestra</targetPath> <directory>${project.build.directory}/datadir</directory>
 									<include>${project.artifactId}/**</include> </resource> -->
 							</resources>
-							<!-- This will require to set up the docker-hub credentials correctly 
+							<!-- This will require to set up the docker-hub credentials correctly
 								into your ~/.m2/settings.xml, see: https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries -->
 							<serverId>docker-hub</serverId>
 							<registryUrl>https://index.docker.io/v1/</registryUrl>
