@@ -93,9 +93,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         changeFormStatus: PropTypes.func,
         ensureProj4: PropTypes.func,
         closeViewer: PropTypes.func,
-        consoleLog: PropTypes.func,
-        consoleLogWasPrinted: PropTypes.bool,
-        consoleLogDone: PropTypes.func,
         activated: PropTypes.bool,
         openPanel: PropTypes.func
     };
@@ -145,7 +142,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         pluiRequest: null,
         layerConfiguration: null,
         localConfig: null,
-        consoleLogWasPrinted: false,
         activated: false,
         // misc
         initPluiEvolution: ()=>{},
@@ -173,8 +169,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         toggleControl: () => {},
         ensureProj4: () => {},
         closeViewer: () => {},
-        consoleLog: () => {},
-        consoleLogDone: () => {},
         openPanel: () => {}
     };
 
@@ -191,16 +185,20 @@ export class PluiEvolutionPanelComponent extends React.Component {
         super(props);
         this.state = this.initialState;
         this.props.initPluiEvolution(this.props.backendURL);
-        this.props.consoleLog('pluie construct component...');
+
+        // disable custom logging function if debug_signalement is set to false in local config
+        if (this.props.debugPluiEvolution) {
+            window.pluiEvolution.debug = (...args) => { console.log(...args) };
+        }
 
         // chargement des projections dans localconfig si nécessaire
         this.props.ensureProj4(this.props.localConfig.projectionDefs);
 
-
+        window.pluiEvolution.debug('pluie construct component...');
     }
 
     registerViewer() {
-        this.props.consoleLog('pluie check viewer', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+        window.pluiEvolution.debug('pluie check viewer', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
         if( !getViewer(PLUI_EVOLUTION_REQUEST_VIEWER)) {
             const PluiEvolutionRequestViewerConnected = connect((state) => ({
                 // debug
@@ -209,9 +207,9 @@ export class PluiEvolutionPanelComponent extends React.Component {
                 openPanel: openPanel,
                 closeIdentify: closeIdentify
             })(PluiEvolutionRequestViewer);
-            this.props.consoleLog('pluie register viewer');
+            window.pluiEvolution.debug('pluie register viewer');
             setViewer(PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewerConnected);
-            this.props.consoleLog('pluie registered viewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
+            window.pluiEvolution.debug('pluie registered viewer:', getViewer(PLUI_EVOLUTION_REQUEST_VIEWER));
         }
     }
 
@@ -224,7 +222,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        this.props.consoleLog("pluie didUpdate...");
+        window.pluiEvolution.debug("pluie didUpdate...");
         // Tout est-il initialisé ?
         this.state.initialized = this.props.attachmentConfiguration !== null
             && this.props.user !== null
@@ -271,20 +269,10 @@ export class PluiEvolutionPanelComponent extends React.Component {
 
     }
 
-    shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.consoleLogWasPrinted) { // après un console log
-            this.props.consoleLogDone();
-            return false;
-        } else if (this.props.consoleLogWasPrinted && !nextProps.consoleLogWasPrinted) { // apres un console log done
-            return false;
-        }
-        return true; // autre actions
-    }
-
     render() {
-        this.props.consoleLog("pluie render");
-        this.props.consoleLog('this.props render', this.props);
-        this.props.consoleLog('this.state render', this.state);
+        window.pluiEvolution.debug("pluie render");
+        window.pluiEvolution.debug('this.props render', this.props);
+        window.pluiEvolution.debug('this.state render', this.state);
         if( this.props.active ){
             
             //this.registerViewer();
@@ -341,7 +329,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     renderModelClosing() {
         if (this.props.closing ) {
             // si closing == true on demande l'abandon
-            this.props.consoleLog("pluieclosing");
+            window.pluiEvolution.debug("pluieclosing");
             return (<ConfirmDialog
                 show
                 modal
@@ -561,7 +549,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     renderSubject() {
-        this.props.consoleLog('actual subject', this.state.pluiRequest.subject);
+        window.pluiEvolution.debug('actual subject', this.state.pluiRequest.subject);
         return (
             <FormGroup controlId="pluievolution.subject"
                        validationState={this.state.errorFields.subject ? "error" : null}>
@@ -962,8 +950,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
     }
 
     handleEtablissementChange = (e) => {
-        this.props.consoleLog('handleEtablissementChange e', e);
-        this.props.consoleLog('handleEtablissementChange e value', e.target.value);
+        window.pluiEvolution.debug('handleEtablissementChange e', e);
+        window.pluiEvolution.debug('handleEtablissementChange e value', e.target.value);
         if (e.target.value) {
             this.state.etablissementSelected = this.props.geographicEtablissements[e.target.value];
             this.state.pluiRequest.codeInsee = this.state.etablissementSelected.codeInsee;
@@ -1011,7 +999,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
      * @param {*} e l'événement
      */
     fileAddedHandler(e) {
-        this.props.consoleLog('event file', e);
+        window.pluiEvolution.debug('event file', e);
         //les différents test avant d'uploader le fichier (type, taille)
         const attachment = {
             name: e.target.files[0].name,

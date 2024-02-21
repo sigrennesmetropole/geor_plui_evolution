@@ -11,10 +11,7 @@ const initialState = {
 }
 
 export default (state = initialState, action) => {
-    if (action.type !== actions.PLUI_EVOLUTION_DISPLAY_LOG && action.type !== actions.PLUI_EVOLUTION_DISPLAY_LOG_DONE && state.activated) {
-        console.log("pluie reduce:" + action.type);
-
-    }
+    window.pluiEvolution.debug("pluie reduce:" + action.type);
 
     switch (action.type) {
         case actions.PLUI_EVOLUTION_ACTION_ERROR: {
@@ -85,12 +82,6 @@ export default (state = initialState, action) => {
         }
         case FEATURE_INFO_CLICK: {
             return assign({}, state, {pluiRequest: null, status: status.CLEAN_REQUEST, loading: false});
-        }
-        case actions.PLUI_EVOLUTION_DISPLAY_LOG: {
-            return assign({}, state, {consoleLogWasPrinted: true});
-        }
-        case actions.PLUI_EVOLUTION_DISPLAY_LOG_DONE: {
-            return assign({}, state, {consoleLogWasPrinted: false});
         }
         default: {
             return state;

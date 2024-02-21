@@ -178,7 +178,7 @@ export const loadingPluiCreateFormEpic = (action$) =>
 export const initPluiEvolutionEpic = (action$) =>
     action$.ofType(actions.PLUI_EVOLUTION_INIT)
         .switchMap((action) => {
-            console.log("pluie epics init:"+ action.url);
+            window.pluiEvolution.debug("pluie epics init:"+ action.url);
             if( action.url ) {
                 backendURLPrefix = action.url;
             }
@@ -409,7 +409,7 @@ export const displayPluiEtablissement = (action$, store) =>
     action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_ETABLISSEMENT)
         .switchMap((action) => {
             if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
-                console.log("add defs...");
+                window.pluiEvolution.debug("add defs...");
                 Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
             }
             const state = store.getState();
@@ -489,7 +489,7 @@ export const startDrawingPluiEpic = action$ =>
     action$.ofType(actions.PLUI_EVOLUTION_START_DRAWING)
         .switchMap((action) => {
             if( !Proj4js.defs(pluiEvolutionLayerProjection) ) {
-                console.log("add defs...");
+                window.pluiEvolution.debug("add defs...");
                 Proj4js.defs("EPSG:3948","+proj=lcc +lat_1=47.25 +lat_2=48.75 +lat_0=48 +lon_0=3 +x_0=1700000 +y_0=7200000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
             }
             const existingLocalisation = action.localisation && action.localisation.coordinates && action.localisation.coordinates.length > 0;
@@ -628,10 +628,10 @@ export const ensureProjectionDefsPlui = (action$) =>
         .switchMap((action) => {
             if( action.projectionDefs && action.projectionDefs.length > 0){
                 action.projectionDefs.forEach(projectionDef => {
-                    console.log("plui projectionDef :", projectionDef);
-                    console.log("plui projectionDef ?", Proj4js.defs(projectionDef.code));
+                    window.pluiEvolution.debug("plui projectionDef :", projectionDef);
+                    window.pluiEvolution.debug("plui projectionDef ?", Proj4js.defs(projectionDef.code));
                     if (!Proj4js.defs(projectionDef.code)) {
-                        console.log("plui add projection :", projectionDef.code);
+                        window.pluiEvolution.debug("plui add projection :", projectionDef.code);
                         Proj4js.defs(projectionDef.code, projectionDef.def);
                     }
                 });
@@ -639,16 +639,3 @@ export const ensureProjectionDefsPlui = (action$) =>
 
             return Rx.Observable.of(ensureProj4Done());
         });
-
-export function logPluiEvent(action$, store) {
-    return action$.ofType(actions.PLUI_EVOLUTION_DISPLAY_LOG)
-        .filter((action) => store.getState()?.pluievolution.activated)
-        .switchMap((action) => {
-            // On pourra par la suite ajouter une condition pour voir si les log sont autorisés
-            if (action.logMessages) {
-                console.log(...action?.logMessages);
-            }
-            return Rx.Observable.of();
-        });
-}
-
