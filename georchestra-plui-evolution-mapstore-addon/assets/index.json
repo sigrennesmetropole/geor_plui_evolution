@@ -3,7 +3,10 @@
         {
             "name": "PluiEvolutionExtension",
             "description": "PLUI Evolution Extension",
-            "dependencies": []
+            "dependencies": [],
+            "defaultConfig": {
+                "debugPluiEvolution": false
+            }
         }
     ]
 }
