@@ -280,7 +280,8 @@
           {
             "name":"PluiEvolutionExtension",
             "cfg": {
-              "backend_url": "http://localhost:8082"
+              "backend_url": "http://localhost:8082",
+              "debugPluiEvolution": true
             }
           },
           {
