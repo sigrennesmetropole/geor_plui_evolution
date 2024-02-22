@@ -33,7 +33,7 @@ import {
     startDrawing,
     stopDrawing,
     updateAttachments,
-    ensureProj4, closeViewer, consoleLog, consoleLogDone
+    ensureProj4, closeViewer
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
@@ -53,6 +53,7 @@ import {mapLayoutValuesSelector} from "../selectors/maplayout";
 
 const isEnabled = createControlEnabledSelector('pluievolution');
 
+window.pluiEvolution = { debug: (obj) => {} };
 const PluiEvolutionPanelComponentConnected = connect((state) => ({
     active: !!isOpen(state),
     loading: !!isLoadingSelector(state),
@@ -73,7 +74,6 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     dockStyle: mapLayoutValuesSelector(state, { right: true, height: true}, true),
     // debug
     state: state,
-    consoleLogWasPrinted: state.pluievolution.consoleLogWasPrinted,
     activated: !!isPluiEvolutionActivate(state)
 }), {
     initPluiEvolution: initPluiEvolution,
@@ -101,8 +101,6 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     toggleControl: closePanel,
     ensureProj4: ensureProj4,
     closeViewer: closeViewer,
-    consoleLog: consoleLog,
-    consoleLogDone: consoleLogDone
 })(PluiEvolutionPanelComponent);
 
 export default createPlugin(name, {
