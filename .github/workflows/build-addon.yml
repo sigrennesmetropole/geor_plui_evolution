@@ -45,4 +45,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Artifacts
-          path: ./georchestra-plui-evolution-mapstoe-addon/dist/PluiEvolutionExtension.zip
+          path: ./georchestra-plui-evolution-mapstore-addon/dist/PluiEvolutionExtension.zip
+          retention-days: 365
