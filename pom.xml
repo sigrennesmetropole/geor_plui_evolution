@@ -15,7 +15,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		 <version>2.7.16</version>
+		<version>2.7.16</version>
 		<relativePath />
 	</parent>
 
@@ -49,7 +49,7 @@
 		<itextpdf.version>5.5.13.1</itextpdf.version>
 		<flyingsauver.version>9.1.19</flyingsauver.version>
 		<jtidy.version>r938</jtidy.version>
-		<geotools.version>23.3</geotools.version>
+		<geotools.version>30.2</geotools.version>
 		<redmine.java.api.version>4.0.0.rc2</redmine.java.api.version>
 
 		<activiti.version>7.1.0.M5</activiti.version>
@@ -86,7 +86,7 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<repositories>
+	<!--<repositories>
 		<repository>
 			<id>osgeo</id>
 			<name>OSGeo Release Repository</name>
@@ -101,7 +101,7 @@
 			<snapshots><enabled>true</enabled></snapshots>
 			<releases><enabled>false</enabled></releases>
 		</repository>
-	</repositories>
+	</repositories>-->
 
 	<dependencyManagement>
 		<dependencies>
@@ -123,7 +123,8 @@
 				<version>${project.version}</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
+			<!--
+			https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
 			<dependency>
 				<groupId>org.apache.logging.log4j</groupId>
 				<artifactId>log4j-slf4j-impl</artifactId>
@@ -161,14 +162,16 @@
 				<version>${commons.io.version}</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
+			<!--
+			https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-collections4</artifactId>
 				<version>${commons.collections.version}</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+			<!--
+			https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
@@ -282,7 +285,13 @@
 
 			<dependency>
 				<groupId>org.geotools</groupId>
-				<artifactId>gt-referencing</artifactId>
+				<artifactId>geotools</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>geotools</artifactId>
 				<version>${geotools.version}</version>
 				<exclusions>
 					<exclusion>
@@ -297,6 +306,12 @@
 				<artifactId>gt-geometry</artifactId>
 				<version>${geotools.version}</version>
 			</dependency>
+			
+			<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-referencing</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
 
 			<dependency>
 				<groupId>org.geotools</groupId>
@@ -310,14 +325,16 @@
 				<version>${geotools.version}</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
+			<!--
+			https://mvnrepository.com/artifact/com.google.code.maven-replacer-plugin/maven-replacer-plugin -->
 			<dependency>
 				<groupId>com.google.code.maven-replacer-plugin</groupId>
 				<artifactId>maven-replacer-plugin</artifactId>
 				<version>${maven-replacer-plugin.version}</version>
 			</dependency>
 
-			<!-- https://mvnrepository.com/artifact/com.taskadapter/redmine-java-api -->
+			<!--
+			https://mvnrepository.com/artifact/com.taskadapter/redmine-java-api -->
 			<dependency>
 				<groupId>com.taskadapter</groupId>
 				<artifactId>redmine-java-api</artifactId>
