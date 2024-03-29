@@ -37,9 +37,7 @@ pluievolutionapi:build:
   except:
     refs:
       - master
-      - open/master  
-  tags: 
-   - iaas
+      - open/master
   artifacts:
     reports:
       dotenv:
@@ -56,8 +54,6 @@ pluievolutionapi:build:master:
     - echo $PROJET_VERSION
     - sh ./mvnw $MAVEN_CLI_OPTS -U package -DskipTests -Pprod 
   stage: build
-  tags: 
-   - iaas
   only:
     refs:
       - master
