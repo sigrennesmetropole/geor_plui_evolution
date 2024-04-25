@@ -3,6 +3,10 @@ package org.georchestra.pluievolution.service.mapper;
 import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.dto.Point;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
+import org.geotools.api.referencing.FactoryException;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.referencing.operation.MathTransform;
+import org.geotools.api.referencing.operation.TransformException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.geom.Coordinate;
@@ -10,10 +14,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;

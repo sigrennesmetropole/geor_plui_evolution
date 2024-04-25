@@ -46,6 +46,19 @@
     src: default.properties.j2
     dest: "{{ pluievolution_config_directory }}/default.properties"
     mode: 0777
+
+- name: Copy certificate
+  copy:
+    src: "{{ pluievolution_server_keystore_cert }}"
+    dest: "{{ pluievolution_config_directory }}/plui-evolution/{{ pluievolution_server_keystore_cert }}"
+    mode: 0770
+  when: pluievolution_server_keystore_cert | length > 0
+
+- name: Copy entrypoint shell script
+  copy:
+    src: "entrypoint.sh"
+    dest: "{{ pluievolution_image_directory }}/entrypoint.sh"
+    mode: 0770
         
 #- name: Copy tomcat lib jar
 #  copy:

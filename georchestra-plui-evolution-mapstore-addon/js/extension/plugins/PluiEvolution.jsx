@@ -47,6 +47,7 @@ import {
     pluiEvolutionMeSelector,
 } from '../selectors/plui-evolution-selector';
 import '../assets/plui-evolution.css';
+import icon from '../assets/plui_vSIGRM.svg';
 import {createPlugin} from "@mapstore/utils/PluginsUtils";
 import {mapLayoutValuesSelector} from "../selectors/maplayout";
 
@@ -116,7 +117,7 @@ export default createPlugin(name, {
             panel: true,
             tooltip: "pluievolution.name",
             text: <Message msgId="pluievolution.name" />,
-            icon: <Glyphicon glyph="exclamation-sign" />,
+            icon: <img src={icon} alt="" height="24" width="24" class="plui-icon" />,
             doNotHide: true,
             toggle: true,
             action: toggleControl.bind(null, 'pluievolution', null)
