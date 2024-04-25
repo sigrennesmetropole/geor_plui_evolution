@@ -12,6 +12,11 @@ logging.level.org.georchestra=DEBUG
 server.port={{pluievolution_server_port}}
 #spring.main.web-application-type=none
 
+server.trustcert.keystore.cert={{pluievolution_server_keystore_cert}}
+server.trustcert.keystore.alias={{pluievolution_server_keystore_alias}}
+server.trustcert.keystore.store={{pluievolution_server_keystore_store}}
+server.trustcert.keystore.password={{pluievolution_server_keystore_password}}
+
 # BDD
 spring.datasource.url=jdbc:postgresql://${pgsqlHost}:${pgsqlPort}/${pgsqlDatabase}?ApplicationName=pluievolution
 spring.datasource.username={{pluievolution_db_user}}

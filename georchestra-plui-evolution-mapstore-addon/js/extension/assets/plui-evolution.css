@@ -150,3 +150,7 @@ span .info {
 .plui-evolution-request-viewer .block-valid-form .validation-button {
 	margin-left: 15px;
 }
+
+#mapstore-sidebar-menu > button.active .plui-icon {
+	filter: brightness(0) invert(1);
+}

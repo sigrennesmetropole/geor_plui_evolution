@@ -17,6 +17,16 @@ pluievolution_server_port: 8080
 pluievolution_server_expose_port: 8084
 #pluievolution_backend_url: http://pluievolution:{{pluievolution_server_port}}/pluievolution/
 
+# filename du certificat (à déposer dans ansible/dockerize/files/)
+pluievolution_server_keystore_cert: ''
+# nom de l'alias du certificat à insérer dans le keystore
+pluievolution_server_keystore_alias: ''
+# chemin absolu du keystore dans le container docker
+pluievolution_server_keystore_store: ''
+# mot de passe du keystore
+pluievolution_server_keystore_password: ''
+
+
 pluievolution_admin_password: 4dM1nApp!
 
 pluievolution_smtp_host: 10.50.1.113
