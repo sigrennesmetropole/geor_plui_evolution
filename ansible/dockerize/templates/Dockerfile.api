@@ -9,6 +9,11 @@ RUN mkdir -p /opt/pluievolution/data/models
 ADD pluievolution.war /var/lib/jetty/webapps/pluievolution.war
 #ADD jetty-logging.properties /usr/local/jetty/resources/jetty-logging.properties
 
+ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
+
+ADD entrypoint.sh /opt/pluievolution/entrypoint.sh
+ENTRYPOINT [ "/bin/bash", "/opt/pluievolution/entrypoint.sh" ]
+
 CMD [ "sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty -Dgeorchestra.datadir=/etc/georchestra \
       ${ADD_JAVA_OPTS}                                   \
       -Xmx${XMX:-1G} -Xms${XMX:-1G}                      \
