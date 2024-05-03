@@ -86,7 +86,7 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<!--<repositories>
+	<repositories>
 		<repository>
 			<id>osgeo</id>
 			<name>OSGeo Release Repository</name>
@@ -101,7 +101,7 @@
 			<snapshots><enabled>true</enabled></snapshots>
 			<releases><enabled>false</enabled></releases>
 		</repository>
-	</repositories>-->
+	</repositories>
 
 	<dependencyManagement>
 		<dependencies>
