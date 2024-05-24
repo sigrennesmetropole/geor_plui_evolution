@@ -1,11 +1,7 @@
 FROM jetty:9.4.31-jdk11
-MAINTAINER fni18300@open-groupe.com
 ENV TZ=Europe/Paris
 
-RUN mkdir -p /opt/pluievolution/data/models
-
 ADD /var/lib/jetty/webapps/plui-evolution.war /var/lib/jetty/webapps/pluievolution.war
-#ADD etc/ /etc
 
 ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
 
