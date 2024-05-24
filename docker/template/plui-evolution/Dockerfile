@@ -3,6 +3,11 @@ FROM jetty:9.4.31-jdk11
 ADD georchestra-plui-evolution-1.0-SNAPSHOT.war /var/lib/jetty/webapps/plui-evolution.war
 #ADD etc/ /etc
 
+ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
+
+ADD entrypoint.sh /opt/pluievolution/entrypoint.sh
+ENTRYPOINT [ "/bin/bash", "/opt/pluievolution/entrypoint.sh" ]
+
 CMD ["sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty \
   ${ADD_JAVA_OPTS} \
   -Dgeorchestra.datadir=/etc/georchestra \
