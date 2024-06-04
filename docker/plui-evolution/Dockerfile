@@ -1,4 +1,5 @@
 FROM jetty:9.4.31-jdk11
+USER root
 ENV TZ=Europe/Paris
 
 ADD /var/lib/jetty/webapps/plui-evolution.war /var/lib/jetty/webapps/pluievolution.war
