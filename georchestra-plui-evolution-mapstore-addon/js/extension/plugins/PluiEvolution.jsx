@@ -33,7 +33,7 @@ import {
     startDrawing,
     stopDrawing,
     updateAttachments,
-    ensureProj4, closeViewer
+    ensureProj4, closeViewer, openPanelAuto
 } from '../actions/plui-evolution-action';
 import {
     isLoadingSelector,
@@ -91,6 +91,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     displayAllPluiRequest: displayAllPluiRequest,
     loadEtablissementConfiguration: loadEtablissementConfiguration,
     openPanel: openPanel,
+    openPanelAuto: openPanelAuto,
     savePluiRequest: savePluiRequest,
     loadingPluiCreateForm: loadingPluiCreateForm,
     requestClosing: requestClosing,

@@ -22,7 +22,7 @@ import {getMessageById} from '@mapstore/utils/LocaleUtils';
 import {getViewer, setViewer} from '@mapstore/utils/MapInfoUtils';
 import {closeIdentify} from '@mapstore/actions/mapInfo';
 import {PLUI_EVOLUTION_REQUEST_VIEWER, PluiEvolutionRequestViewer} from './PluiEvolutionRequestViewer';
-import {openPanel, status} from '../actions/plui-evolution-action';
+import {actions, openPanel, openPanelAuto, status} from '../actions/plui-evolution-action';
 import {
     GeometryType,
     MAX_NB_CHARACTERS_PLUI_OBJECT, PLUIEVOLUTION_PANEL_WIDTH, PLUIEVOLUTION_VIEWER_WIDTH,
@@ -30,6 +30,7 @@ import {
 } from '../constants/plui-evolution-constants';
 import {PluiEvolutionViewer} from "../components/PluiEvolutionViewer";
 import ResponsivePanel from "@mapstore/components/misc/panels/ResponsivePanel";
+import {toggleControl} from "@mapstore/actions/controls";
 
 export class PluiEvolutionPanelComponent extends React.Component {
     static propTypes = {
@@ -94,7 +95,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         ensureProj4: PropTypes.func,
         closeViewer: PropTypes.func,
         activated: PropTypes.bool,
-        openPanel: PropTypes.func
+        openPanel: PropTypes.func,
+        openPanelAuto: PropTypes.func,
     };
 
     static defaultProps = {
@@ -169,7 +171,8 @@ export class PluiEvolutionPanelComponent extends React.Component {
         toggleControl: () => {},
         ensureProj4: () => {},
         closeViewer: () => {},
-        openPanel: () => {}
+        openPanel: () => {},
+        openPanelAuto: () => {}
     };
 
     static contextTypes = {
@@ -193,6 +196,11 @@ export class PluiEvolutionPanelComponent extends React.Component {
 
         // chargement des projections dans localconfig si nécessaire
         this.props.ensureProj4(this.props.localConfig.projectionDefs);
+
+        // Pour ouvrir le plugin PLUi par défaut si dans la confif openAuto est à TRUE
+        if (this.props.openAuto) {
+            this.props.openPanelAuto();
+        }
 
         window.pluiEvolution.debug('pluie construct component...');
     }

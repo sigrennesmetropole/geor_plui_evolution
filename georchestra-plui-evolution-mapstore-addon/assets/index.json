@@ -5,7 +5,8 @@
             "description": "PLUI Evolution Extension",
             "dependencies": [],
             "defaultConfig": {
-                "debugPluiEvolution": false
+                "debugPluiEvolution": false,
+                "openAuto": false
             }
         }
     ]
