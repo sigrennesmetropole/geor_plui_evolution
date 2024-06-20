@@ -57,8 +57,9 @@ import Proj4js from 'proj4';
 import {
     FORCE_UPDATE_MAP_LAYOUT, forceUpdateMapLayout,
     UPDATE_MAP_LAYOUT,
-    updateDockPanelsList
+    updateDockPanelsList, updateMapLayout
 } from "@mapstore/actions/maplayout";
+import {updateMapLayoutEpic} from "@mapstore/epics/maplayout";
 
 let backendURLPrefix = "/pluievolution";
 let pluiEvolutionLayerId;
@@ -69,11 +70,21 @@ let currentLayout;
 export const openPluievelutionPanelEpic = (action$, store) =>
     action$.ofType(TOGGLE_CONTROL)
         .filter((action) => action.control === "pluievolution" && !!store.getState() && !!pluievolutionSidebarControlSelector(store.getState()))
-        .switchMap(() => {
+        .switchMap((action) => {
             let layout = store.getState().maplayout;
             layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
             currentLayout = layout;
             return Rx.Observable.from([updateDockPanelsList('pluievolution', 'add', 'right'), pluiEvolutionUpdateMapLayout(layout), openPanel(null)]);
+        });
+
+
+export const openAutoPluievelutionPanelEpic = (action$, store) =>
+    action$.ofType(actions.PLUI_EVOLUTION_AUTO_OPEN_PANEL)
+        .switchMap(() => {
+            let layout = store.getState().maplayout;
+            layout = {transform: layout.layout.transform, height: layout.layout.height, rightPanel: true, leftPanel: layout.layout.leftPanel, ...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT, boundingMapRect: {...layout.boundingMapRect, right: PLUIEVOLUTION_PANEL_WIDTH + RIGHT_SIDEBAR_MARGIN_LEFT}, boundingSidebarRect: layout.boundingSidebarRect};
+            currentLayout = layout;
+            return Rx.Observable.from([toggleControl('pluievolution'), updateDockPanelsList('pluievolution', 'add', 'right'), openPanel(null), pluiEvolutionUpdateMapLayout(layout)]);
         });
 
 export const closePluievelutionPanelEpic = (action$, store) =>
