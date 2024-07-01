@@ -59,6 +59,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         viewerWidth: PropTypes.number,
         // data
         attachmentConfiguration: PropTypes.object,
+        versionConfiguration: PropTypes.object,
         layerConfiguration: PropTypes.object,
         etablissementConfiguration: PropTypes.object,
         geographicEtablissements: PropTypes.array,
@@ -75,6 +76,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         stopDrawing: PropTypes.func,
         clearDrawn: PropTypes.func,
         loadAttachmentConfiguration: PropTypes.func,
+        loadVersionConfiguration: PropTypes.func,
         updateAttachments: PropTypes.func,
         removeAttachment: PropTypes.func,
         getAttachments: PropTypes.func,
@@ -137,6 +139,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         },
         // data
         attachmentConfiguration: null,
+        versionConfiguration: null,
         user: null,
         geographicEtablissements: null,
         etablissementConfiguration: null,
@@ -151,6 +154,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
         stopDrawing: ()=>{},
         clearDrawn: ()=>{},
         loadAttachmentConfiguration: ()=>{},
+        loadVersionConfiguration: ()=>{},
         updateAttachments: () => {},
         removeAttachment: () => {},
         getAttachments: () => {},
@@ -224,7 +228,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
     componentWillMount() {
         this.setState({initialized: false, loaded: false});
         this.props.loadAttachmentConfiguration();
-        this.props.loadLayerConfiguration();
+        this.props.loadVersionConfiguration();
         this.props.loadLayerConfiguration();
         this.props.loadEtablissementConfiguration();
     }
@@ -236,6 +240,7 @@ export class PluiEvolutionPanelComponent extends React.Component {
             && this.props.user !== null
             && this.loadGeographicEtablissement(this.props.user)
             && this.props.layerConfiguration != null
+            && this.props.versionConfiguration != null
             && this.props.etablissementConfiguration != null;
 
         if (this.props.status === status.LOAD_REQUEST) {
@@ -282,7 +287,6 @@ export class PluiEvolutionPanelComponent extends React.Component {
         window.pluiEvolution.debug('this.props render', this.props);
         window.pluiEvolution.debug('this.state render', this.state);
         if( this.props.active ){
-            
             //this.registerViewer();
             //this.connectViewer();
             // le panel est ouvert
@@ -317,6 +321,10 @@ export class PluiEvolutionPanelComponent extends React.Component {
                         </div>
                         {this.renderModelClosing()}
                     </span>
+                    {this.props.versionConfiguration && <div className="plui-evolution-version-container">
+                        <Message msgId="pluievolution.version"/>
+                        <span className="plui-evolution-version">{this.props.versionConfiguration?.version}</span>
+                    </div>}
                 </ResponsivePanel>
             );
         }

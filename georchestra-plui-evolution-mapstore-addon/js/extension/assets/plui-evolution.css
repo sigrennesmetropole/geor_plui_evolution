@@ -154,3 +154,15 @@ span .info {
 #mapstore-sidebar-menu > button.active .plui-icon {
 	filter: brightness(0) invert(1);
 }
+
+.plui-evolution-version-container {
+	gap: 5px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	display: flex;
+	justify-content: center;
+}
+
+.plui-evolution-version {
+	font-weight: bold;
+}

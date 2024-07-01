@@ -119,10 +119,14 @@
 			},
 			"name": "PLUi Evolution",
 			"loading": "En cours...",
+			"version": "Version : ",
 			"init": {
 				"loading": "En cours d'initialisation...",
 				"attachmentConfiguration":  {
 					"error": "Impossible de charger la configuration"
+				},
+				"versionConfiguration":  {
+					"error": "Impossible de charger la version"
 				},
 				"layerConfiguration": {
 					"error": "Impossible de charger la configuration du layer"

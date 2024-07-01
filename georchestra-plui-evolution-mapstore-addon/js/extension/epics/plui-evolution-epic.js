@@ -37,8 +37,13 @@ import {
     status,
     updateAttachments,
     updateLocalisation,
-    ensureProj4Done, loadPluiEvolutionViewer, openPanel, closePanel, closeViewer,
-    pluiEvolutionUpdateMapLayout
+    ensureProj4Done,
+    loadPluiEvolutionViewer,
+    openPanel,
+    closePanel,
+    closeViewer,
+    pluiEvolutionUpdateMapLayout,
+    loadedVersionConfiguration
 } from '../actions/plui-evolution-action';
 import {
     DEFAULT_PROJECTION, DEFAULT_PROJECTION_CODE,
@@ -206,6 +211,18 @@ export const loadPluiAttachmentConfigurationEpic = (action$) =>
             return Rx.Observable.defer(() => axios.get(url))
                 .switchMap((response) => Rx.Observable.of(loadedAttachmentConfiguration(response.data)))
                 .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.attachmentConfiguration.error", null, e)));
+        });
+
+export const loadPluiVersionConfigurationEpic = (action$) =>
+    action$.ofType(actions.PLUI_EVOLUTION_VERSION_CONFIGURATION_LOAD)
+        .switchMap((action) => {
+            if (action.versionConfiguration) {
+                return Rx.Observable.of(loadedVersionConfiguration(action.versionConfiguration)).delay(0);
+            }
+            const url = backendURLPrefix + "/administration/configuration";
+            return Rx.Observable.defer(() => axios.get(url))
+                .switchMap((response) => Rx.Observable.of(loadedVersionConfiguration(response.data)))
+                .catch(e => Rx.Observable.of(loadActionError("pluievolution.init.versionConfiguration.error", null, e)));
         });
 
 export const loadPluiLayerConfigurationEpic = (action$) =>
