@@ -6,6 +6,7 @@ const initialState = {
     user: null,
     attachments: null,
     attachmentConfiguration: {},
+    versionConfiguration: {},
     layerConfiguration: {},
     layers: {}
 }
@@ -19,6 +20,9 @@ export default (state = initialState, action) => {
         }
         case actions.PLUI_EVOLUTION_ATTACHMENT_CONFIGURATION_LOADED: {
             return assign({}, state, {attachmentConfiguration: action.attachmentConfiguration});
+        }
+        case actions.PLUI_EVOLUTION_VERSION_CONFIGURATION_LOADED: {
+            return assign({}, state, {versionConfiguration: action.versionConfiguration});
         }
         case actions.PLUI_EVOLUTION_ATTACHMENTS_UPDATED: {
             return assign({}, state, {error: null, attachments: action.attachments});

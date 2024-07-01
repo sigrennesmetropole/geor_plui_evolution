@@ -24,6 +24,7 @@ import {
     initPluiEvolution,
     loadActionError,
     loadAttachmentConfiguration,
+    loadVersionConfiguration,
     loadEtablissementConfiguration,
     loadingPluiCreateForm,
     loadLayerConfiguration,
@@ -45,6 +46,7 @@ import {
     pluiEvolutionFeaturesResponseSelector,
     pluiEvolutionLayerConfigurationSelector,
     pluiEvolutionMeSelector,
+    pluiEvolutionVersionConfigurationSelector,
 } from '../selectors/plui-evolution-selector';
 import '../assets/plui-evolution.css';
 import icon from '../assets/plui_vSIGRM.svg';
@@ -62,6 +64,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     viewerMode: !!isViewerModeSelector(state),
     response: pluiEvolutionFeaturesResponseSelector(state),
     attachmentConfiguration: pluiEvolutionAttachmentConfigurationSelector(state),
+    versionConfiguration: pluiEvolutionVersionConfigurationSelector(state),
     layerConfiguration: pluiEvolutionLayerConfigurationSelector(state),
     etablissementConfiguration: pluiEvolutionEtablissementConfigurationSelector(state),
     user: pluiEvolutionMeSelector(state),
@@ -82,6 +85,7 @@ const PluiEvolutionPanelComponentConnected = connect((state) => ({
     stopDrawing: stopDrawing,
     clearDrawn: clearDrawn,
     loadAttachmentConfiguration: loadAttachmentConfiguration,
+    loadVersionConfiguration: loadVersionConfiguration,
     loadLayerConfiguration: loadLayerConfiguration,
     updateAttachments: updateAttachments,
     getAttachments: getAttachments,
