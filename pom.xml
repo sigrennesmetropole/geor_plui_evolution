@@ -24,7 +24,6 @@
 		<module>georchestra-plui-evolution-api</module>
 		<module>georchestra-plui-evolution-service</module>
 		<module>georchestra-plui-evolution-core</module>
-		<module>georchestra-plui-evolution-mapstore-addon</module>
 	</modules>
 
 	<!-- Propriétés du projet -->
