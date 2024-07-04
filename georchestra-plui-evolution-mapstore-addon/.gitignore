@@ -1,9 +1,0 @@
-/target/
-/node_modules/
-/.project
-/dist/
-/.settings/
-/.tern-project
-
-/.classpath
-/.factorypath
