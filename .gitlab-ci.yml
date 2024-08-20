@@ -14,7 +14,7 @@ cache:
     - $CI_PROJECT_DIR/**/target/**/*
 
 default:
-  image: maven:3.6.3-jdk-11
+  image: maven:3.9.6-eclipse-temurin-17
   
   before_script:
     - apt update && apt install -y gettext-base build-essential
