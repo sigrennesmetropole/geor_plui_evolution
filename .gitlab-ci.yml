@@ -13,6 +13,12 @@ cache:
     - $CI_PROJECT_DIR/.m2/repository/**/*
     - $CI_PROJECT_DIR/**/target/**/*
 
+include:
+  - project: 'boost/template-ci/pipelines/common'
+    file: 'docker/docker-template.yml'
+  - project: 'bots/trivy-script'
+    file: 'trivy-template-job.yml' 
+
 default:
   image: maven:3.9.6-eclipse-temurin-17
   
@@ -24,6 +30,8 @@ default:
 stages:
   - build
   - test
+  - pre_docker
+  - docker
   - deploy
 
 # Build job with maven plugin execution policies define in parent pom
@@ -84,7 +92,6 @@ pluievolutionapi:sonar:
       -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_ID
       -Dsonar.branch.name=$CI_COMMIT_REF_NAME
-            
 
 # On master, do not use branch parameter
 pluievolutionapi:sonar:master:
@@ -103,6 +110,35 @@ pluievolutionapi:sonar:master:
       -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
       -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+
+# Copie des artifacts dans les répertoires des images dockers
+pluievolutionapi:pre_docker:
+  stage: pre_docker
+  only:
+    refs:
+      - master
+      - open/master
+      - open/develop
+      - /^release.*/
+  script:
+    - PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
+    - echo $PROJET_VERSION  
+    - ls $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war /var/lib/jetty/webapps/plui-evolution.war
+  artifacts:
+    paths:
+      - '$CI_PROJECT_DIR/docker/**/**.jar'
+
+pluievolutionapi:docker:build:
+  extends: ['.docker:build']
+  needs:
+    - pre_docker
+  dependencies:
+    - pre_docker
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/'
+  timeout: 2h
 
 .pluievolutionapi:deploy:
   stage: deploy
@@ -125,7 +161,6 @@ pluievolutionapi:sonar:master:
     - cp plui-evolution_dev_var.yml $HOME/plui-evolution_var.yml
     - ansible-playbook plui-evolution-docker.yml -v -i "${TARGET_ENV}," -u root --ssh-common-args=-oStrictHostKeyChecking=no
 
-
 pluievolutionapi:deploy:
   extends: .pluievolutionapi:deploy
   only:
@@ -141,4 +176,14 @@ pluievolutionapi:deploy:master:
       - open/master
   variables: 
     TARGET_ENV: REN1VML0095
+    
+pluievolutionapi:trivyscan:front: 
+  extends: 
+    - .trivy-scan
+  stage: docker
+  variables:
+    TRIVY_DOCKER_SCAN: glregistry.boost.open.global/rennes-metropole/plui-evolution/plui-evolution/plui-evolution:open-develop
+  only:
+    refs:
+      - open/develop      
  
