@@ -75,7 +75,11 @@
 - name: Clone yaml-merge
   shell: 
     chdir: /tmp
-    cmd: rm -rf /tmp/yaml-merge; mkdir -p  /tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml/main
+    cmd: "{{ item.cmd }}"
+  loop:
+    - cmd: "rm -rf /tmp/yaml-merge"
+    - cmd: "mkdir -p  /tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml/main"
+    - cmd: "mkdir -p  /tmp/yaml-merge/bin"
     #git clone https://github.com/OndraZizka/yaml-merge.git ; git checkout v1.0.1
     
 - name: Override yaml-merge
