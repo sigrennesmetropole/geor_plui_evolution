@@ -2,7 +2,7 @@ FROM jetty:9.4.55-jdk17-eclipse-temurin
 USER root
 ENV TZ=Europe/Paris
 
-ADD georchestra-plui-evolution-1.0-SNAPSHOT.war /var/lib/jetty/webapps/plui-evolution.war
+ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
 
 ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
 

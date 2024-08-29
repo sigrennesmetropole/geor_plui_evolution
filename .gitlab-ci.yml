@@ -53,7 +53,8 @@ pluievolutionapi:build:
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
-      
+  interruptible: true
+  
 pluievolutionapi:build:master:
   script:
     - PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
@@ -72,7 +73,8 @@ pluievolutionapi:build:master:
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
-
+  interruptible: true
+  
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
 pluievolutionapi:sonar:
   stage: test
@@ -127,10 +129,12 @@ pluievolutionapi:pre_docker:
     - ls $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/
     - mkdir -p /var/lib/jetty/webapps/
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war /var/lib/jetty/webapps/plui-evolution.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/plui-evolution/plui-evolution.war
   artifacts:
     paths:
       - '$CI_PROJECT_DIR/docker/**/**.jar'
-
+  interruptible: true
+  
 pluievolutionapi:docker:build:
   extends: ['.docker:build']
   needs:
@@ -140,7 +144,8 @@ pluievolutionapi:docker:build:
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/'
   timeout: 2h
-
+  interruptible: true
+  
 .pluievolutionapi:deploy:
   stage: deploy
   tags: 
