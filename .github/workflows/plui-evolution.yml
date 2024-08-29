@@ -18,7 +18,7 @@ jobs:
     - name: "Setting up Java"
       uses: actions/setup-java@v1
       with:
-        java-version: '11.x'
+        java-version: '17.x'
 
     - name: "Maven repository caching"
       uses: actions/cache@v1

@@ -8,7 +8,6 @@ Le projet _git_ est construit comme suit :
 - `georchestra-plui-evolution-api` : il s'agit du sous-projet maven contenant l'application et les controleurs
 - `georchestra-plui-evolution-core` : il s'agit du sous-projet maven contenant les entités et les DAO
 - `georchestra-plui-evolution-service` : il s'agit du sous-projet maven contenant les services métiers, les services techniques
-- `georchestra-plui-evolution-mapstore-addon` :  il s'agit des sources de l'addon pour mapstore
 - `resources` :  les resources avec notamment :
   - `sql` qui contient les fichiers SQL d'initialisation
   - `swagger`qui contient le fichier swagger permettant de générer l'ensemble des services REST du back-office
@@ -19,7 +18,6 @@ Le back-office est construit à partir de la commande maven
 Le résultat de cette construction est :
 * Un fichier WAR `[projet]/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1.0-SNAPSHOT.war` déployable directement dans Tomcat ou Jetty
 * Un fichier SpringBoot JAR `[projet]/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1.0-SNAPSHOT.jar`
-* Un fichier `[projet]/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-1.0-SNAPSHOT-extension.zip`contenant l'addon Mapstore
 
 ## II - Installation
 
@@ -157,10 +155,6 @@ freemarker.fontsPath=fonts
 
 ```
 
-#### II.3 - Déploiement de l'addon Mapstore
-
-*TODO*
-
 ## III - Configuration
 
 #### III.1 Configuration du certificat
@@ -168,8 +162,10 @@ freemarker.fontsPath=fonts
 Un script est lancé au déploiement de l'image docker de l'application qui ajoute un certificat donné au keystore.  
 Afin d'ajouter le bon certificat au bon keystore, il est nécessaire de remplir les informations adéquates dans le fichier `properties` de l'application :
 
-```
-# filename du certificat (à déposer dans <...>/config/pluievolution/)
+```yaml
+# dossier contenant le certificat
+server.trustcert.keystore.path=
+# filename du certificat
 server.trustcert.keystore.cert=
 # nom de l'alias du certificat à insérer dans le keystore
 server.trustcert.keystore.alias=
@@ -178,9 +174,14 @@ server.trustcert.keystore.store=
 # mot de passe du keystore
 server.trustcert.keystore.password=
 ```
+Par exemple :
+```
+server.trustcert.keystore.path=/etc/georchestra/
+server.trustcert.keystore.cert=plui-evolution.crt
+server.trustcert.keystore.alias=certificat-plui-evolution
+server.trustcert.keystore.store=/usr/local/openjdk-11/lib/security/cacerts
+server.trustcert.keystore.password=changeit
+```
 
-Il est important de noter que la variable `server.trustcert.keystore.cert` ne doit contenir que le _nom du fichier_, pas son chemin.  
 Si les variables ne sont pas remplies, le certificat n'est pas ajouté au keystore et l'application démarre normalement.
-
-Le certificat dont le nom est renseigné doit être déposé dans `<...>/config/pluievolution/` (le répertoire <...>/config/ qui est monté sur le répertoire /etc/georchestra dans le container)
 
