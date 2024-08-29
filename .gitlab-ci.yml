@@ -125,6 +125,7 @@ pluievolutionapi:pre_docker:
     - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
     - echo $PROJET_VERSION  
     - ls $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/
+    - mkdir -p /var/lib/jetty/webapps/
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war /var/lib/jetty/webapps/plui-evolution.war
   artifacts:
     paths:
