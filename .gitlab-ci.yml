@@ -113,8 +113,11 @@ pluievolutionapi:sonar:master:
     - pluievolutionapi:build
   before_script:
     - eval $(ssh-agent -s)
-    - ssh-add <(echo "$ansible_private_key" | base64 -d)        
+    - ssh-add <(echo "$ansible_private_key" | base64 -d)     
   script:
+    - PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
+    - echo $PROJET_VERSION
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cd $CI_PROJECT_DIR/ansible
