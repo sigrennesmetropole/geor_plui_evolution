@@ -94,7 +94,7 @@
       dest: "/tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml"
     - src: "ymlmerger/MergeYml.java"
       dest: "/tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml/main"
-    - src: "ymlmerger/yml-merge.sh"
+    - src: "ymlmerger/yaml-merge.sh"
       dest: "/tmp/yaml-merge/bin"
       
 - name: Build yaml-merge
