@@ -9,7 +9,8 @@ import org.cobbzilla.util.yml.YmlMerger;
 public class MergeYml {
 
     public static void main (String[] args) throws Exception {
-        System.out.println(new YmlMerger().mergeToString(args));
+    	YmlMerger merger = new YmlMerger();
+        System.out.println(merger.mergeToString(merger.stringsToPaths(args)));
     }
 
 }
