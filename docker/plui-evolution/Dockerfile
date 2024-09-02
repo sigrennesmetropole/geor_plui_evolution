@@ -4,7 +4,7 @@ ENV TZ=Europe/Paris
 
 RUN apt-get update && apt-get upgrade
 
-ADD /var/lib/jetty/webapps/plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
+ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
 
 ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
 
