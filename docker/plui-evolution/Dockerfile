@@ -2,7 +2,7 @@ FROM jetty:9.4.55-jdk17-eclipse-temurin
 USER root
 ENV TZ=Europe/Paris
 
-RUN apt-get update && apt-get upgrade
+RUN apt-get update && apt-get upgrade -y
 
 ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
 
