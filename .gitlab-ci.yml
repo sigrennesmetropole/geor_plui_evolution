@@ -142,8 +142,8 @@ pluievolutionapi:docker:build:
     - pluievolutionapi:pre_docker
   dependencies:
     - pluievolutionapi:pre_docker
-  before_script:
-    - find $CI_PROJECT_DIR -name "*.war" -print
+  #before_script:
+  #  - find $CI_PROJECT_DIR -name "*.war" -print
       
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/'
