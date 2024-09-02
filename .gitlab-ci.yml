@@ -131,10 +131,9 @@ pluievolutionapi:pre_docker:
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war /var/lib/jetty/webapps/plui-evolution.war
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/plui-evolution/plui-evolution.war
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/template/plui-evolution/plui-evolution.war
-    
   artifacts:
     paths:
-      - '$CI_PROJECT_DIR/docker/**/**.jar'
+      - '$CI_PROJECT_DIR/docker/**/**.war'
   interruptible: true
   
 pluievolutionapi:docker:build:
@@ -143,6 +142,9 @@ pluievolutionapi:docker:build:
     - pluievolutionapi:pre_docker
   dependencies:
     - pluievolutionapi:pre_docker
+  before_script:
+    - find $CI_PROJECT_DIR -name "*.war" -print
+      
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/'
   timeout: 2h
