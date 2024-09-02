@@ -134,6 +134,7 @@ pluievolutionapi:pre_docker:
   artifacts:
     paths:
       - '$CI_PROJECT_DIR/docker/**/**.war'
+      - /var/lib/jetty/webapps/plui-evolution.war
   interruptible: true
   
 pluievolutionapi:docker:build:
