@@ -188,7 +188,7 @@ pluievolutionapi:deploy:master:
   variables: 
     TARGET_ENV: REN1VML0095
     
-pluievolutionapi:trivyscan:front: 
+pluievolutionapi:trivyscan:back: 
   extends: 
     - .trivy-scan
   stage: docker
