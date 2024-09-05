@@ -257,7 +257,7 @@
 								of the image -->
 							<resources>
 								<resource>
-									<targetPath>/var/lib/jetty/webapps/</targetPath>
+									<targetPath>${project.basedir}/../docker/plui-evolution</targetPath>
 									<directory>${project.build.directory}</directory>
 									<include>${finalName}.war</include>
 								</resource>
