@@ -16,4 +16,4 @@ CMD ["sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty \
   -Dgeorchestra.datadir=/etc/georchestra \
   -Duser.language=fr -Duser.country=FR \
   -Xmx${XMX:-1G} -Xms${XMX:-1G} \
-  -jar /usr/local/jetty/start.jar"]      
+  -jar /usr/local/jetty/start.jar"]

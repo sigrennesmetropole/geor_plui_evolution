@@ -128,8 +128,7 @@ pluievolutionapi:pre_docker:
     - echo $PROJET_VERSION  
     - ls $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/
     - mkdir -p /var/lib/jetty/webapps/
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war /var/lib/jetty/webapps/plui-evolution.war
-    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/plui-evolution/plui-evolution.war
+    - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/rennes-metrople/plui-evolution.war
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/docker/template/plui-evolution/plui-evolution.war
   artifacts:
     paths:

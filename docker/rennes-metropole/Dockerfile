@@ -17,8 +17,3 @@ CMD ["sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty \
   -Duser.language=fr -Duser.country=FR \
   -Xmx${XMX:-1G} -Xms${XMX:-1G} \
   -jar /usr/local/jetty/start.jar"]
-
-
-
-
-  
