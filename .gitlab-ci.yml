@@ -78,6 +78,7 @@ pluievolutionapi:build:master:
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
 pluievolutionapi:sonar:
   stage: test
+  image: maven:3.9.9-eclipse-temurin-17
   dependencies:
     - pluievolutionapi:build
   except:
@@ -98,6 +99,7 @@ pluievolutionapi:sonar:
 # On master, do not use branch parameter
 pluievolutionapi:sonar:master:
   stage: test
+  image: maven:3.9.9-eclipse-temurin-17
   dependencies:
     - pluievolutionapi:build
   only:
