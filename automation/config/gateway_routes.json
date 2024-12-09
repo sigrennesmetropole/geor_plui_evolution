@@ -1,0 +1,7 @@
+{
+	"id": "pluievolution-TARGET_ENV",
+	"uri": "http://pluievolution-back-TARGET_ENV-rm-pluievolution-back:8080/pluievolution/",
+	"predicates": [ 
+		"Path=/pluievolution-TARGET_ENV/**"
+	]
+}

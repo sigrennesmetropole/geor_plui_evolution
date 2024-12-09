@@ -1,0 +1,14 @@
+image:
+  tag: open-develop
+  env:
+    - name: PLUIEVOLUTION_DATASOURCE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: pluievolution-secret-qua
+          key: database.pluievolution.password
+
+    - name: PLUIEVOLUTION_BDD_HOST
+      value: georchestra-bdd-qua-georchestra-service-bdd
+      
+    - name: SWAGGER_SERVER
+      value: https://search-application-qua.shom-search.karbon.open.global/
