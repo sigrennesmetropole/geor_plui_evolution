@@ -124,6 +124,7 @@ pluievolutionapi:pre_docker:
       - open/master
       - open/develop
       - /^release.*/
+      - /.*karbonification.*/
   script:
     - PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
     - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
@@ -148,10 +149,12 @@ pluievolutionapi:docker:build:
   #  - find $CI_PROJECT_DIR -name "*.war" -print
       
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/'
+    - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/ || $CI_COMMIT_BRANCH =~ /.*karbonification.*/'
   timeout: 2h
   interruptible: true
-  
+
+## #####
+# Déploiement iaas
 .pluievolutionapi:deploy:
   stage: deploy
   tags: 
@@ -188,7 +191,77 @@ pluievolutionapi:deploy:master:
       - open/master
   variables: 
     TARGET_ENV: REN1VML0095
-    
+  when: manual
+
+## #####
+# Déploiement Karbon
+.pluievolutionapi:deploy-karbon:prepare:
+  stage: pre_docker
+  script:
+    - echo "send automation to georchestra deploiement"
+  artifacts:
+    name: pluievolution-karbon-${TARGET_ENV}
+    paths:
+      - '$CI_PROJECT_DIR/automation/**'
+
+pluievolutionapi:deploy-karbon:prepare:dev:
+  extends: .pluievolutionapi:deploy-karbon:prepare
+  only:
+    refs:
+      - open/develop
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+
+.pluievolutionapi:deploy-karbon:
+  stage: deploy
+  trigger:
+    project: rennes-metropole/georchestra/georchestra-service-deployment
+    strategy: depend
+    branch: master
+  variables:
+    TRIGGERED_BY: pluievolution
+    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+
+pluievolutionapi:deploy-karbon:dev:
+  extends: .pluievolutionapi:deploy-karbon
+  needs:
+    - job: pluievolutionapi:deploy-karbon:prepare:dev
+      artifacts: true
+  only:
+    refs:
+      - open/develop
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+    FORCE_POD: "true"
+    PARENT_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PARENT_SERVICE_LOGIN: $SERVICE_LOGIN
+    PARENT_SERVICE_TOKEN: $SERVICE_TOKEN
+    PARENT_SERVICE_ACCESS_TOKEN: $SERVICE_ACCESS_TOKEN
+    PARENT_PROJECT_ID: $CI_PROJECT_ID
+    PARENT_STAGE_PREFIX: pluievolutionapi:deploy-karbon:prepare
+
+pluievolutionapi:deploy-karbon:qua:
+  extends: .pluievolutionapi:deploy-karbon
+  needs:
+    - job: pluievolutionapi:deploy-karbon:prepare:dev
+      artifacts: true
+  only:
+    refs:
+      - open/master
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+    FORCE_POD: "true"
+    PARENT_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PARENT_SERVICE_LOGIN: $SERVICE_LOGIN
+    PARENT_SERVICE_TOKEN: $SERVICE_TOKEN
+    PARENT_SERVICE_ACCESS_TOKEN: $SERVICE_ACCESS_TOKEN
+    PARENT_PROJECT_ID: $CI_PROJECT_ID
+    PARENT_STAGE_PREFIX: pluievolutionapi:deploy-karbon:prepare
+  when: manual
+
 pluievolutionapi:trivyscan:back: 
   extends: 
     - .trivy-scan

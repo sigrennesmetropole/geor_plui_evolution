@@ -1,0 +1,14 @@
+image:
+  tag: open-develop
+  env:
+    - name: PLUIEVOLUTION_DATASOURCE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: pluievolution-secret-dev
+          key: database.pluievolution.password
+
+    - name: PLUIEVOLUTION_BDD_HOST
+      value: georchestra-bdd-dev-georchestra-service-bdd
+      
+    - name: SWAGGER_SERVER
+      value: https://pluievolution-back-dev.rennes-metropole-georchestra.karbon.open.global
