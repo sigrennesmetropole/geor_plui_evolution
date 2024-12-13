@@ -251,18 +251,16 @@
 								<imageTag>latest</imageTag>
 							</imageTags>
 							<!-- chemin relatif depuis le target du présent projet -->
-							<dockerDirectory>${project.basedir}/../docker/plui-evolution</dockerDirectory>
+							<dockerDirectory>${project.basedir}/../docker/rennes-metropole</dockerDirectory>
 
 							<!-- copy the service's jar file from target into the root directory
 								of the image -->
 							<resources>
 								<resource>
-									<targetPath>/var/lib/jetty/webapps/</targetPath>
+									<targetPath>/</targetPath>
 									<directory>${project.build.directory}</directory>
 									<include>${finalName}.war</include>
 								</resource>
-								<!-- <resource> <targetPath>/etc/georchestra</targetPath> <directory>${project.build.directory}/datadir</directory>
-									<include>${project.artifactId}/**</include> </resource> -->
 							</resources>
 							<!-- This will require to set up the docker-hub credentials correctly
 								into your ~/.m2/settings.xml, see: https://github.com/spotify/docker-maven-plugin#authenticating-with-private-registries -->
