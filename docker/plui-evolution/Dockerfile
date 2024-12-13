@@ -2,9 +2,7 @@ FROM jetty:9.4.55-jdk17-eclipse-temurin
 USER root
 ENV TZ=Europe/Paris
 
-RUN apt-get update && apt-get upgrade -y
-
-ADD plui-evolution.war /var/lib/jetty/webapps/plui-evolution.war
+ADD /var/lib/jetty/webapps/plui-evolution.war /var/lib/jetty/webapps/pluievolution.war
 
 ENV PROPERTIES_PATH /etc/georchestra/plui-evolution/plui-evolution.properties
 
@@ -17,3 +15,8 @@ CMD ["sh", "-c", "exec java -Djava.io.tmpdir=/tmp/jetty \
   -Duser.language=fr -Duser.country=FR \
   -Xmx${XMX:-1G} -Xms${XMX:-1G} \
   -jar /usr/local/jetty/start.jar"]
+
+
+
+
+  
