@@ -75,32 +75,14 @@
 - name: Clone yaml-merge
   shell: 
     chdir: /tmp
-    cmd: "{{ item.cmd }}"
-  loop:
-    - cmd: "rm -rf /tmp/yaml-merge"
-    - cmd: "mkdir -p  /tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml/main"
-    - cmd: "mkdir -p  /tmp/yaml-merge/bin"
-    #git clone https://github.com/OndraZizka/yaml-merge.git ; git checkout v1.0.1
+    cmd: rm -rf /tmp/yaml-merge; git clone https://github.com/OndraZizka/yaml-merge.git 
     
 - name: Override yaml-merge
   copy: 
-    src: "{{ item.src }}" 
-    dest: "{{ item.dest }}"
-    mode: "{{ item.mode }}"
-  loop:
-    - src: "ymlmerger/pom.xml"
-      dest: "/tmp/yaml-merge"
-      mode: 0664   
-    - src: "ymlmerger/YmlMerger.java"
-      dest: "/tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml"
-      mode: 0664
-    - src: "ymlmerger/MergeYml.java"
-      dest: "/tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml/main"
-      mode: 0664
-    - src: "ymlmerger/yaml-merge.sh"
-      dest: "/tmp/yaml-merge/bin"
-      mode: 0777
-      
+    src: "YmlMerger.java"
+    dest: "/tmp/yaml-merge/src/main/java/org/cobbzilla/util/yml"
+    mode: 0664    
+    
 - name: Build yaml-merge
   shell:
     chdir: /tmp

@@ -185,6 +185,3 @@ server.trustcert.keystore.password=changeit
 
 Si les variables ne sont pas remplies, le certificat n'est pas ajouté au keystore et l'application démarre normalement.
 
-IV - Version
-
- Le numéro de version du back qui s'affiche est celui qui est configuré manuellement dans le fichier pom.xml
