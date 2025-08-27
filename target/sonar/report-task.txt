@@ -3,5 +3,5 @@ serverUrl=https://sonar.boost.open.global
 serverVersion=9.9.8.100196
 branch=v1.9.0
 dashboardUrl=https://sonar.boost.open.global/dashboard?id=rennes-metropole.plui-evolution.georchestra-plui-evolution&branch=v1.9.0
-ceTaskId=AZjsCUC_JrxbLPvSyKHS
-ceTaskUrl=https://sonar.boost.open.global/api/ce/task?id=AZjsCUC_JrxbLPvSyKHS
+ceTaskId=AZjsQrRHJrxbLPvSyKJK
+ceTaskUrl=https://sonar.boost.open.global/api/ce/task?id=AZjsQrRHJrxbLPvSyKJK
