@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.7.0</version>
+		<version>1.9.0</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -119,7 +119,7 @@
 					<!-- Les interfaces sont généres dans la target, c'est normal -->
 					<apiPackage>org.georchestra.pluievolution.api</apiPackage>
 					<modelPackage>org.georchestra.pluievolution.core.dto</modelPackage>
-					<inputSpec>resources/swagger/georchestra-plui-evolution.json</inputSpec>
+					<inputSpec>resources/openapi/georchestra-plui-evolution.json</inputSpec>
 					<library>spring-boot</library>
 					<generatorName>spring</generatorName>
 					<generateModelTests>false</generateModelTests>
@@ -134,7 +134,7 @@
 						<serializableModel>true</serializableModel>
 						<unhandledException>true</unhandledException>
 					</configOptions>
-					<templateDirectory>../resources/swagger/generation</templateDirectory>
+					<templateDirectory>../resources/openapi/generation</templateDirectory>
 				</configuration>
 				<executions>
 					<execution>
@@ -251,15 +251,15 @@
 								<imageTag>latest</imageTag>
 							</imageTags>
 							<!-- chemin relatif depuis le target du présent projet -->
-							<dockerDirectory>${project.basedir}/../docker/plui-evolution</dockerDirectory>
+							<dockerDirectory>${project.basedir}/../docker/rennes-metropole</dockerDirectory>
 
 							<!-- copy the service's jar file from target into the root directory
 								of the image -->
 							<resources>
 								<resource>
-									<targetPath>/var/lib/jetty/webapps/</targetPath>
+									<targetPath>/</targetPath>
 									<directory>${project.build.directory}</directory>
-									<include>${finalName}.war</include>
+									<include>${finalName}.jar</include>
 								</resource>
 								<!-- <resource> <targetPath>/etc/georchestra</targetPath> <directory>${project.build.directory}/datadir</directory>
 									<include>${project.artifactId}/**</include> </resource> -->

@@ -96,13 +96,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 			throws ApiServiceException {
 
 		if (!enableWmts && queryString != null && queryString.toLowerCase().contains(SERVICE_WMTS)) {
-			LOG.debug("{} {}", GEOSERVER_SERVICE_ERROR, "Erreur WMTS");
+			LOG.warn("{} {}", GEOSERVER_SERVICE_ERROR, "Erreur WMTS");
 			throw new ApiServiceException(GEOSERVER_SERVICE_ERROR, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 		try (CloseableHttpClient httpClient = createHttpClient()) {
 
 			String wmsUrl = buildURL("wms");
 			HttpGet httpGet = buildGeoserverHttpGet(wmsUrl, area, queryString, contentType, encoding);
+			LOG.info("URL Get WMS {}", httpGet.getURI());
 			final HttpResponse response = httpClient.execute(httpGet);
 
 			// Code 200 : succès
@@ -112,10 +113,12 @@ public class GeoserverServiceImpl implements GeoserverService {
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
 			} else {
+				LOG.error("getWms calque {} {} {}",response.getStatusLine(), outputContentType, httpGet.getURI());
 				throw new ApiServiceException(String.format("%s %s", GEOSERVER_CALQUE_ERROR, response),
 						ApiServiceExceptionsStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
+			LOG.error("getWms call",e);
 			throw new ApiServiceException(String.format("%s %s", GEOSERVER_REQUEST_ERROR, e.getMessage()), e, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 
@@ -147,6 +150,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			return buildGeoserverWfsResponse(response);
 		} catch (final Exception e) {
+			LOG.error("getWfs call",e);
 			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR + e.getMessage(), e);
 		}
 	}
@@ -183,6 +187,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			return buildGeoserverWfsResponse(response);
 		} catch (final Exception e) {
+			LOG.error("postWfs call",e);
 			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
 		}
 	}

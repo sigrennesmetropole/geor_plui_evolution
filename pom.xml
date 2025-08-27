@@ -6,7 +6,7 @@
 
 	<groupId>org.georchestra</groupId>
 	<artifactId>georchestra-plui-evolution</artifactId>
-	<version>1.7.0</version>
+	<version>1.9.0</version>
 	<packaging>pom</packaging>
 
 	<name>georchestra-plui-evolution</name>
@@ -81,7 +81,7 @@
 		</repository>
 		<snapshotRepository>
 			<id>open.nexus</id>
-			<url>${MVN_SNAPSHOTS}</url>
+			<url>https://nexus.boost.open.global/repository/rennes-metropole-plui-evolution-mvn-snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 

@@ -8,11 +8,13 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Classe de configuration globale de l'application.
  */
 @SpringBootApplication
+@EnableScheduling
 @ComponentScan({ "org.georchestra.pluievolution.api", "org.georchestra.pluievolution.service",
 		"org.georchestra.pluievolution.core" })
 @EntityScan(basePackages = "org.georchestra.pluievolution.core.entity")

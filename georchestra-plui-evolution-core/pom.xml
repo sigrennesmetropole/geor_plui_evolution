@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>georchestra-plui-evolution</artifactId>
 		<groupId>org.georchestra</groupId>
-		<version>1.7.0</version>
+		<version>1.9.0</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -88,7 +88,7 @@
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<configuration>
 					<modelPackage>org.georchestra.pluievolution.core.dto</modelPackage>
-					<inputSpec>resources/swagger/georchestra-plui-evolution.json</inputSpec>
+					<inputSpec>resources/openapi/georchestra-plui-evolution.json</inputSpec>
 					<library>spring-boot</library>
 					<generatorName>spring</generatorName>
 					<generateModelTests>true</generateModelTests>

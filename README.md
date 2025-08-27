@@ -185,3 +185,7 @@ server.trustcert.keystore.password=changeit
 
 Si les variables ne sont pas remplies, le certificat n'est pas ajouté au keystore et l'application démarre normalement.
 
+## IV - Montées de version
+#### IV.1 Version 1.9.0
+À l'occasion de la montée de version vers la 1.9.0 une évolution a lieu sur la couche detailed_plui_request.
+Il faut donc penser à mettre à jour la couche géoserver correspondante pour qu'elle prenne en compte les deux nouveaux champs

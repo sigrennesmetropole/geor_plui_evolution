@@ -27,4 +27,5 @@ public interface PluiRequestDao extends QueryDslDao<PluiRequestEntity, Long> {
      */
     void deleteByUuid(UUID uuid);
 
+    PluiRequestEntity findByRedmineId(Integer redmineId);
 }

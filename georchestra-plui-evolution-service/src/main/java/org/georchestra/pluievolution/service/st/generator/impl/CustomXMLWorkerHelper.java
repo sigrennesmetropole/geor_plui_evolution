@@ -109,6 +109,7 @@ public class CustomXMLWorkerHelper {
 		StyleAttrCSSResolver cssResolver = new StyleAttrCSSResolver(cssFiles);
 		HtmlPipelineContext hpc = new HtmlPipelineContext((CssAppliers) null);
 		hpc.setAcceptUnknown(true).autoBookmark(true).setTagFactory(this.getDefaultTagProcessorFactory());
+		@SuppressWarnings("rawtypes")
 		Pipeline<?> pipeline = new CssResolverPipeline(cssResolver,
 				new HtmlPipeline(hpc, new ElementHandlerPipeline(d, (Pipeline) null)));
 		XMLWorker worker = new XMLWorker(pipeline, true);
@@ -195,6 +196,7 @@ public class CustomXMLWorkerHelper {
 		StyleAttrCSSResolver cssResolver = new StyleAttrCSSResolver(cssFiles);
 		HtmlPipelineContext hpc = new HtmlPipelineContext((CssAppliers) null);
 		hpc.setAcceptUnknown(true).autoBookmark(true).setTagFactory(this.getDefaultTagProcessorFactory());
+		@SuppressWarnings("rawtypes")
 		Pipeline<?> pipeline = new CssResolverPipeline(cssResolver,
 				new HtmlPipeline(hpc, new ElementHandlerPipeline(d, (Pipeline) null)));
 		XMLWorker worker = new XMLWorker(pipeline, true);

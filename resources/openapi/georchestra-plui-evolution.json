@@ -1,0 +1,1597 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Georchestra - Plugin Plui'Evolution' API",
+        "contact": {
+            "email": "thomas.brule@open-groupe.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+	"servers": [
+		{
+			"url": "/{basePath}",
+			"description": "Georchestra - Plugin PluiEvolution API",
+			"variables": {
+				"basePath": {
+					"default": "pluievolution"
+				}
+			}
+		}
+	],    
+    "tags": [
+        {
+            "name": "administration",
+            "description": "Administration de la plateforme"
+        },
+        {
+            "name": "user",
+            "description": "Services de gestion des utilisateurs"
+        },
+        {
+            "name": "request",
+            "description": "Services de gestion des demandes"
+        },
+        {
+            "name": "geographic",
+            "description": "Service de recuperation des geographics"
+        },
+        {
+            "name": "carto",
+            "description": "Service de gestion des requetes cartographiques"
+        }
+    ],
+    "paths": {
+        "/administration/configuration": {
+            "get": {
+                "tags": [
+                    "administration"
+                ],
+                "summary": "Récupération des propriétés de configuration",
+                "description": "Ensemble des propriétés de configuration",
+                "operationId": "getConfiguration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConfigurationData"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/administration/initialize": {
+            "get": {
+                "tags": [
+                    "administration"
+                ],
+                "summary": "Initialisation applicatives",
+                "description": "Initialisation applicatives",
+                "operationId": "initialize",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/me": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Récupération des données de l'utilisateur connecté",
+                "operationId": "getMe",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/etablissement": {
+            "get": {
+                "tags": [
+                    "user"
+                ],
+                "summary": "Récupération de l'établissement auquel est asocié le user courant",
+                "operationId": "getCurrentUserEtablissement",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeographicEtablissement"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/configuration": {
+            "get": {
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Lister la configuration liées aux pièces jointes",
+                "description": "Lister la configuration liées aux pièces jointes",
+                "operationId": "getAttachmentConfiguration",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AttachmentConfiguration"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad input parameter",
+                        "content": {}
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/attachment/{idAttachment}/download": {
+            "get": {
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Téléchargement d'une pièce jointe redmimne",
+                "description": "Téléchargement d'une pièce jointe redmimne",
+                "operationId": "downLoadAttachment",
+                "parameters": [
+                    {
+                        "name": "idAttachment",
+                        "in": "path",
+                        "description": "Identifiant du fichier dans redmine",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad input parameter",
+                        "content": {}
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/request/{uuid}/upload": {
+            "post": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Téléversement d'une pièce jointe sur une demande",
+                "operationId": "uploadDocument",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Identifiant de la demande",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "description": "Pièce jointe sous la forme d'un blob",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "description": "Pièce jointe sous la forme d'un blob",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Attachment"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad input parameter",
+                        "content": {}
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/request/{uuid}/attachments": {
+            "get": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Récupération de la liste des pièces jointes d'une demande",
+                "operationId": "getAttachementsByPluiRequestUuid",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Identifiant de la demande",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Attachment"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "bad input parameter",
+                        "content": {}
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/request": {
+            "put": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Maj d'une demande",
+                "description": "Permet de mettre à jour une demande",
+                "operationId": "updatePluiRequest",
+                "requestBody": {
+                    "description": "Demande à metre à jour",
+                    "content": {
+                        "*/*": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PluiRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Demande mise à jour",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PluiRequest"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "pluiRequest"
+            },
+            "post": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Création d'une nouvelle demande",
+                "description": "Permet de créer une nouvelle demande",
+                "operationId": "createPluiRequest",
+                "requestBody": {
+                    "description": "Demande à créer",
+                    "content": {
+                        "*/*": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PluiRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Demande créée",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PluiRequest"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "pluiRequest"
+            }
+        },
+        "/request/{uuid}": {
+            "get": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Récupération d'une demande spécifique en fonction de son uuid",
+                "description": "Permet d'obtenir une demande à partir de son uuid",
+                "operationId": "getPluiRequestByUuid",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Uuid de la demande",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Demande trouvée",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PluiRequest"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "request"
+                ],
+                "summary": "Suppression d'une demande",
+                "description": "Permet de supprimer une demande à partir de son uuid",
+                "operationId": "deletePluiRequest",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "Uuid de la demande à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {}
+                    }
+                }
+            }
+        },
+        "/carto/wmsRequest": {
+            "get": {
+                "tags": [
+                    "carto"
+                ],
+                "summary": "Requete WMS",
+                "description": "Requete WMS de recuperation des request auxquelles le user courant a accès",
+                "operationId": "getWms",
+                "responses": {
+                    "200": {
+                        "description": "Reponse du geoserver",
+                        "content": {}
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "image/png": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/carto/wfsRequest": {
+            "get": {
+                "tags": [
+                    "carto"
+                ],
+                "summary": "Requete WFS get (essentiellement pour la description des features)",
+                "description": "Requete WFS de récupération des informations sur le service",
+                "operationId": "getWfs",
+                "responses": {
+                    "200": {
+                        "description": "Reponse du geoserver",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "carto"
+                ],
+                "summary": "Requete WFS post (notamment pour les features)",
+                "description": "Requete WFS de recuperation d'un claque",
+                "operationId": "postWfs",
+                "requestBody": {
+                    "description": "Contenu WFS au format XML",
+                    "content": {
+                        "*/*": {
+                            "schema": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "text/html": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/octet-stream": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "application/xml": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            },
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-codegen-request-body-name": "wfsContent"
+            }
+        },
+        "/carto/layerConfiguration": {
+            "get": {
+                "tags": [
+                    "carto"
+                ],
+                "summary": "Configurations du layer geoserver",
+                "operationId": "getLayerConfigurations",
+                "responses": {
+                    "200": {
+                        "description": "Configuration du layer",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LayerConfiguration"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geographic/etablissements": {
+            "get": {
+                "tags": [
+                    "geographic"
+                ],
+                "summary": "Liste des mairies de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+                "operationId": "searchEtablissements",
+                "responses": {
+                    "200": {
+                        "description": "Liste des mairies de communes + ville + metropole",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/GeographicEtablissement"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geographic/configuration": {
+            "get": {
+                "tags": [
+                    "geographic"
+                ],
+                "summary": "Configuration des établissements",
+                "operationId": "getEtablissementConfiguration",
+                "responses": {
+                    "200": {
+                        "description": "Configuration des établissements",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/EtablissementConfiguration"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geographic/areas": {
+            "get": {
+                "tags": [
+                    "geographic"
+                ],
+                "summary": "Liste des emprises de communes, plus ville et métropole, d'où les demandes peuvent être émises",
+                "operationId": "getAllPluiRequestAreas",
+                "responses": {
+                    "200": {
+                        "description": "Liste des emprises de communes + ville + metropole",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/GeographicArea"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geographic/areas/{codeInsee}": {
+            "get": {
+                "tags": [
+                    "geographic"
+                ],
+                "summary": "Emprises d'une communes ou ville où métropole à partir de son code Insee",
+                "operationId": "getPluiRequestAreaByCodeInsee",
+                "parameters": [
+                    {
+                        "name": "codeInsee",
+                        "in": "path",
+                        "description": "Code insee de la geographique area",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Emprises de commune | ville | metropole",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeographicArea"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/geographic/etablissements/{codeInsee}": {
+            "get": {
+                "tags": [
+                    "geographic"
+                ],
+                "summary": "Hotel de ville d'une commune (ou Rennes Metropole) par son code insee",
+                "operationId": "getPluiRequestEtablissementByCodeInsee",
+                "parameters": [
+                    {
+                        "name": "codeInsee",
+                        "in": "path",
+                        "description": "Code insee du geographique etablissement",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hotel de ville | metropole",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GeographicEtablissement"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "content": {
+                            "application/json;charset=utf-8": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ApiError": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ConfigurationData": {
+                "type": "object",
+                "properties": {
+                    "version": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Attachment": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "mimeType": {
+                        "type": "string"
+                    }
+                }
+            },
+            "AttachmentConfiguration": {
+                "type": "object",
+                "properties": {
+                    "maxSize": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "maxCount": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "mimeTypes": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "LayerConfiguration": {
+                "type": "object",
+                "properties": {
+                    "layerWorkspace": {
+                        "type": "string"
+                    },
+                    "layerName": {
+                        "type": "string"
+                    },
+                    "layerProjection": {
+                        "type": "string"
+                    }
+                }
+            },
+            "EtablissementConfiguration": {
+                "type": "object",
+                "properties": {
+                    "organisationRm": {
+                        "type": "string"
+                    },
+                    "codeInseeRm": {
+                        "type": "string"
+                    }
+                }
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "login": {
+                        "type": "string"
+                    },
+                    "firstName": {
+                        "type": "string"
+                    },
+                    "lastName": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "organization": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "GeometryType": {
+                "type": "string",
+                "description": "the geometry type",
+                "enum": [
+                    "Point",
+                    "LineString",
+                    "Polygon",
+                    "MultiPoint",
+                    "MultiLineString",
+                    "MultiPolygon"
+                ]
+            },
+            "Geometry": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/GeometryType"
+                    },
+                    "projection": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "description": "GeoJSon geometry",
+                "discriminator": {
+                    "propertyName": "type"
+                }
+            },
+            "Point2D": {
+                "maxItems": 2,
+                "minItems": 2,
+                "type": "array",
+                "items": {
+                    "type": "number"
+                }
+            },
+            "Point": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "$ref": "#/components/schemas/Point2D"
+                            }
+                        }
+                    }
+                ]
+            },
+            "LineString": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Point2D"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "Polygon": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Point2D"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "MultiPoint": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/Point2D"
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "MultiLineString": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Point2D"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "MultiPolygon": {
+                "description": "GeoJSon geometry",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "coordinates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/Point2D"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            },
+            "GeometryCollection": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "GeometryCollection"
+                        ]
+                    },
+                    "geometries": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Geometry"
+                        }
+                    }
+                },
+                "description": "GeoJSon geometry collection"
+            },
+            "Style": {
+                "type": "object",
+                "properties": {
+                    "color": {
+                        "type": "string"
+                    },
+                    "fillColor": {
+                        "type": "string"
+                    },
+                    "fillOpacity": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "opacity": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "iconColor": {
+                        "type": "string"
+                    },
+                    "iconGlyph": {
+                        "type": "string"
+                    },
+                    "iconShape": {
+                        "type": "string"
+                    },
+                    "weight": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "geometry": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "iconAnchor": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    "dashArray": {
+                        "type": "array",
+                        "items": {
+                            "type": "number",
+                            "format": "double"
+                        }
+                    },
+                    "filtering": {
+                        "type": "boolean"
+                    }
+                },
+                "description": "GeoJSon feature style"
+            },
+            "Feature": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "Feature"
+                        ]
+                    },
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "geometry": {
+                        "$ref": "#/components/schemas/Geometry"
+                    },
+                    "style": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Style"
+                        }
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {}
+                    }
+                },
+                "description": "GeoJSon feature"
+            },
+            "FeatureCollection": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "FeatureCollection"
+                        ]
+                    },
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Feature"
+                        }
+                    },
+                    "style": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Style"
+                        }
+                    }
+                },
+                "description": "GeoJSon feature collection"
+            },
+            "FeatureProperty": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "maxOccurs": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "minOccurs": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "nillable": {
+                        "type": "boolean"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "localType": {
+                        "type": "string"
+                    }
+                },
+                "description": "GeoJSon feature property description"
+            },
+            "FeatureType": {
+                "type": "object",
+                "properties": {
+                    "typeName": {
+                        "type": "string"
+                    },
+                    "properties": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FeatureProperty"
+                        }
+                    }
+                },
+                "description": "GeoJSon feature type"
+            },
+            "FeatureTypeDescription": {
+                "type": "object",
+                "properties": {
+                    "elementFormDefault": {
+                        "type": "string"
+                    },
+                    "targetNamespace": {
+                        "type": "string"
+                    },
+                    "targetPrefix": {
+                        "type": "string"
+                    },
+                    "featureTypes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FeatureType"
+                        }
+                    }
+                },
+                "description": "GeoJSon feature type description"
+            },
+            "PluiRequest": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "subject": {
+                        "type": "string"
+                    },
+                    "object": {
+                        "type": "string"
+                    },
+                    "comment": {
+                        "type": "string"
+                    },
+                    "pluiProcedure": {
+                        "type": "string"
+                    },
+                    "concertation": {
+                        "type": "string"
+                    },
+                    "approbation": {
+                        "type": "string"
+                    },
+                    "initiator": {
+                        "type": "string"
+                    },
+                    "creationDate": {
+                        "type": "string",
+                        "format": "date"
+                    },
+                    "localisation": {
+                        "$ref": "#/components/schemas/Point"
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/PluiRequestStatus"
+                    },
+                    "type": {
+                        "$ref": "#/components/schemas/PluiRequestType"
+                    },
+                    "codeInsee": {
+                        "type": "string"
+                    },
+                    "redmineId": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "description": "Il s'agit de la representation d'une demande"
+            },
+            "Geographic": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "nom": {
+                        "type": "string"
+                    },
+                    "codeInsee": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GeographicEtablissement": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geographic"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "localisation": {
+                                "$ref": "#/components/schemas/Point"
+                            }
+                        }
+                    }
+                ]
+            },
+            "GeographicArea": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Geographic"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "localisation": {
+                                "$ref": "#/components/schemas/Polygon"
+                            },
+                            "identifiantRedmine": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            },
+            "PluiRequestStatus": {
+                "type": "string",
+                "enum": [
+                    "STATUT_NOUVEAU",
+                    "STATUT_ANALYSE_EN_COURS",
+                    "STATUT_PRODUCTION_EN_COURS",
+                    "STATUT_EN_ATTENTE_VALIDATION_COMMUNE",
+                    "STATUT_VALIDE_COMMUNE",
+                    "STATUT_DEMANDE_NON_RECEVABLE",
+                    "STATUT_DEMANDE_REFORMULEE"
+                ]
+            },
+            "PluiRequestType": {
+                "type": "string",
+                "enum": [
+                    "TYPE_COMMUNE",
+                    "TYPE_INTERCOMMUNE",
+                    "TYPE_METROPOLITAIN"
+                ]
+            }
+        }
+    }
+}

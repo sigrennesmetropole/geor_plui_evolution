@@ -1,5 +1,7 @@
 package org.georchestra.pluievolution.service.acl.impl;
 
+import java.util.List;
+
 import org.georchestra.pluievolution.core.dao.acl.GeographicAreaDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
@@ -9,23 +11,19 @@ import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatu
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicAreaMapper;
 import org.locationtech.jts.geom.Geometry;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GeographicAreaServiceImpl implements GeographicAreaService {
 
-	@Autowired
-	GeographicAreaDao geographicAreaDao;
+	private final GeographicAreaDao geographicAreaDao;
 
-	@Autowired
-	GeographicAreaMapper geographicAreaMapper;
+	private final GeographicAreaMapper geographicAreaMapper;
 
-	@Autowired
-	AuthentificationHelper authentificationHelper;
+	private final AuthentificationHelper authentificationHelper;
 
 	@Override
 	public GeographicArea getGeographicAreaByCodeInsee(String codeInsee) {

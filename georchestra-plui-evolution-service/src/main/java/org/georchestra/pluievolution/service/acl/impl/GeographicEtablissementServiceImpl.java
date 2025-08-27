@@ -1,5 +1,7 @@
 package org.georchestra.pluievolution.service.acl.impl;
 
+import java.util.List;
+
 import org.georchestra.pluievolution.core.dao.acl.GeographicEtablissementDao;
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.GeographicEtablissement;
@@ -10,26 +12,21 @@ import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.ApiServiceExceptionsStatus;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.mapper.GeographicEtablissementMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class GeographicEtablissementServiceImpl implements GeographicEtablissementService {
 
-	@Autowired
-	GeographicEtablissementDao geographicEtablissementDao;
+	private final GeographicEtablissementDao geographicEtablissementDao;
 
-	@Autowired
-	GeographicEtablissementMapper geographicEtablissementMapper;
+	private final GeographicEtablissementMapper geographicEtablissementMapper;
 
-	@Autowired
-	GeographicAreaService geographicAreaService;
+	private final GeographicAreaService geographicAreaService;
 
-	@Autowired
-	AuthentificationHelper authentificationHelper;
+	private final AuthentificationHelper authentificationHelper;
 
 	@Override
 	public GeographicEtablissement getGeographicEtablissementByCodeInsee(String codeInsee) {

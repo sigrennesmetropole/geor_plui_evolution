@@ -55,6 +55,12 @@ public class PluiRequestEntity implements LongId {
 	@Column(name = "plui_procedure", length = 50, nullable = true)
 	private String pluiProcedure;
 
+	@Column(name = "concertation")
+	private String concertation;
+
+	@Column(name = "approbation")
+	private String approbation;
+
 	@Column(name = "comment", length = 1024)
 	private String comment;
 
@@ -82,15 +88,12 @@ public class PluiRequestEntity implements LongId {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof PluiRequestEntity)) return false;
+		if (!(o instanceof PluiRequestEntity that)) return false;
 
-		PluiRequestEntity that = (PluiRequestEntity) o;
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 
-		if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-		if (!getUuid().equals(that.getUuid())) return false;
-
-		return true;
-	}
+        return getUuid().equals(that.getUuid());
+    }
 
 	@Override
 	public int hashCode() {

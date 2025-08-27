@@ -27,3 +27,6 @@ CMD [ "sh", "-c", "exec java --add-opens java.base/java.util=ALL-UNNAMED \
   ${ADD_JAVA_OPTS}                                   \
   -Xmx${XMX:-1G} -Xms${XMX:-1G}                      \
   -jar /opt/pluievolution/service.jar" ]    
+
+
+  

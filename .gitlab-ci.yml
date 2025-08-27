@@ -4,7 +4,8 @@ variables:
   MAVEN_CLI_OPTS_VERSION: "help:evaluate -Dexpression=project.version -q -DforceStdout"
   GIT_SUBMODULE_STRATEGY: recursive
   NODE_OPTIONS: "--max-old-space-size=8192"
-  
+  DOCKER_DISABLE: "true"
+  OSS_NPM_DISABLE: "true"
 
 # Cache policy - Share target folders between jobs - Note that key is related to a commit and is purged automatically after pipeline execution
 cache:
@@ -13,9 +14,16 @@ cache:
     - $CI_PROJECT_DIR/.m2/repository/**/*
     - $CI_PROJECT_DIR/**/target/**/*
 
+include:
+  - project: 'boost/template-ci/pipelines/common'
+    file: 'docker/docker-template.yml'
+  - project: 'boost/template-ci/pipelines/common'
+    file: 'securite/oss-index/oss-index-template.yml'	
+  - project: 'bots/trivy-script'
+    file: 'trivy-template-job.yml' 
+
 default:
   image: maven:3.9.6-eclipse-temurin-17
-  
   before_script:
     - apt update && apt install -y gettext-base build-essential
     - envsubst '${MVN_GROUP} ${MVN_RELEASE} ${MVN_SNAPSHOTS}' < pom.xml > pom.subst && mv -f pom.subst pom.xml
@@ -24,7 +32,11 @@ default:
 stages:
   - build
   - test
+  - pre_docker
+  - docker
   - deploy
+  - delivering
+  - sast
 
 # Build job with maven plugin execution policies define in parent pom
 pluievolutionapi:build:
@@ -45,7 +57,8 @@ pluievolutionapi:build:
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
-      
+  interruptible: true
+  
 pluievolutionapi:build:master:
   script:
     - PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
@@ -64,7 +77,8 @@ pluievolutionapi:build:master:
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
-
+  interruptible: true
+  
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
 pluievolutionapi:sonar:
   stage: test
@@ -84,7 +98,6 @@ pluievolutionapi:sonar:
       -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_ID
       -Dsonar.branch.name=$CI_COMMIT_REF_NAME
-            
 
 # On master, do not use branch parameter
 pluievolutionapi:sonar:master:
@@ -104,24 +117,74 @@ pluievolutionapi:sonar:master:
       -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_ID
 
+# Copie des artifacts dans les répertoires des images dockers
+pluievolutionapi:pre_docker:
+  stage: pre_docker
+  only:
+    refs:
+      - master
+      - open/master
+      - open/develop
+      - /^release.*/
+  script:
+    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
+    - echo $PROJET_VERSION  
+    - ls $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/
+    - mkdir -p /var/lib/jetty/webapps/
+    - cp -f "$CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar" $CI_PROJECT_DIR/docker/rennes-metropole/plui-evolution.jar
+    - cp -f "$CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar" $CI_PROJECT_DIR/docker/template/plui-evolution/plui-evolution.jar
+  artifacts:
+    paths:
+      - '$CI_PROJECT_DIR/docker/**/**.jar'
+      - '$CI_PROJECT_DIR/docker/**/**.war'
+  interruptible: true
+  
+pluievolutionapi:docker:build:
+  extends: .docker:build
+  needs:
+    - pluievolutionapi:pre_docker
+  dependencies:
+    - pluievolutionapi:pre_docker
+  #before_script:
+  #  - find $CI_PROJECT_DIR -name "*.war" -print
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /.*develop/ || $CI_COMMIT_BRANCH =~ /.*master/ || $CI_COMMIT_BRANCH =~ /^release.*/ || $CI_COMMIT_BRANCH =~ /.*karbonification.*/'
+  timeout: 2h
+  interruptible: true
+  artifacts:
+    paths:
+      - '$CI_PROJECT_DIR/georchestra-plui-evolution-api/target/**.war'
+      - '$CI_PROJECT_DIR/georchestra-plui-evolution-api/target/**.jar'
+      - '$CI_PROJECT_DIR/georchestra-plui-evolution-api/target/*.zip'   
+      - '$CI_PROJECT_DIR/docker/**/**.war'
+      - '$CI_PROJECT_DIR/docker/**/**.zip'
+      - '$CI_PROJECT_DIR/docker/**/**.jar'   
+
+## #####
+# Déploiement iaas
 .pluievolutionapi:deploy:
   stage: deploy
   tags: 
    - iaas
-  image: glregistry.boost.open.global/boost/docker/mvn-node-jdk11-ansible:latest
   dependencies:
     - pluievolutionapi:build
+  when: manual
   before_script:
+    - cat /etc/os-release
+    - apt update && apt install -y openssh-client ansible
     - eval $(ssh-agent -s)
-    - ssh-add <(echo "$ansible_private_key" | base64 -d)        
+    - ssh-add <(echo "$ansible_private_key" | base64 -d)
   script:
+    - export PROJET_VERSION=$(sh ./mvnw $MAVEN_CLI_OPTS_VERSION)
+    - echo "PROJET_VERSION=$PROJET_VERSION" >> build.env
+    - echo $PROJET_VERSION
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.war $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.war
     - cp -f $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-$PROJET_VERSION.jar $CI_PROJECT_DIR/ansible/dockerize/files/georchestra-plui-evolution-api.jar
     - cd $CI_PROJECT_DIR/ansible
     #- chmod og-rw key/id_rsa
     - cp plui-evolution_dev_var.yml $HOME/plui-evolution_var.yml
     - ansible-playbook plui-evolution-docker.yml -v -i "${TARGET_ENV}," -u root --ssh-common-args=-oStrictHostKeyChecking=no
-
 
 pluievolutionapi:deploy:
   extends: .pluievolutionapi:deploy
@@ -138,4 +201,102 @@ pluievolutionapi:deploy:master:
       - open/master
   variables: 
     TARGET_ENV: REN1VML0095
- 
+
+## #####
+# Déploiement Karbon
+.pluievolutionapi:deploy-karbon:prepare:
+  stage: pre_docker
+  script:
+    - echo "send automation to georchestra deploiement"
+  artifacts:
+    name: pluievolution-karbon-${TARGET_ENV}
+    paths:
+      - '$CI_PROJECT_DIR/automation/**'
+
+pluievolutionapi:deploy-karbon:prepare:dev:
+  extends: .pluievolutionapi:deploy-karbon:prepare
+  only:
+    refs:
+      - open/develop
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+
+.pluievolutionapi:deploy-karbon:
+  stage: deploy
+  trigger:
+    project: rennes-metropole/georchestra/georchestra-service-deployment
+    strategy: depend
+    branch: master
+  variables:
+    TRIGGERED_BY: pluievolution
+    PARENT_PIPELINE_ID: $CI_PIPELINE_ID
+
+pluievolutionapi:deploy-karbon:dev:
+  extends: .pluievolutionapi:deploy-karbon
+  needs:
+    - job: pluievolutionapi:deploy-karbon:prepare:dev
+      artifacts: true
+  only:
+    refs:
+      - open/develop
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+    FORCE_POD: "true"
+    PARENT_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PARENT_SERVICE_LOGIN: $SERVICE_LOGIN
+    PARENT_SERVICE_TOKEN: $SERVICE_TOKEN
+    PARENT_SERVICE_ACCESS_TOKEN: $SERVICE_ACCESS_TOKEN
+    PARENT_PROJECT_ID: $CI_PROJECT_ID
+    PARENT_STAGE_PREFIX: pluievolutionapi:deploy-karbon:prepare
+
+pluievolutionapi:deploy-karbon:qua:
+  extends: .pluievolutionapi:deploy-karbon
+  needs:
+    - job: pluievolutionapi:deploy-karbon:prepare:dev
+      artifacts: true
+  only:
+    refs:
+      - open/master
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: dev
+    FORCE_POD: "true"
+    PARENT_COMMIT_BRANCH: $CI_COMMIT_BRANCH
+    PARENT_SERVICE_LOGIN: $SERVICE_LOGIN
+    PARENT_SERVICE_TOKEN: $SERVICE_TOKEN
+    PARENT_SERVICE_ACCESS_TOKEN: $SERVICE_ACCESS_TOKEN
+    PARENT_PROJECT_ID: $CI_PROJECT_ID
+    PARENT_STAGE_PREFIX: pluievolutionapi:deploy-karbon:prepare
+  when: manual
+    
+pluievolutionapi:trivyscan:back: 
+  extends: 
+    - .trivy-scan
+  stage: docker
+  variables:
+    TRIVY_DOCKER_SCAN: glregistry.boost.open.global/rennes-metropole/plui-evolution/plui-evolution/plui-evolution:open-develop
+  only:
+    refs:
+      - open/develop      
+
+
+## Livraison Github
+push-to-github:
+  stage: delivering
+  dependencies:
+    - pluievolutionapi:build
+  rules:
+    - if: '$CI_COMMIT_TAG'
+      when: manual
+  script:
+    - cd ci
+    - apt install -y rsync
+    - chmod +x push-to-github.sh
+    - ./push-to-github.sh
+  variables:
+    SOURCE_REPOSITORY: $CI_PROJECT_DIR
+    # Les variables GITHUB_RM_ACCOUNT, GITHUB_RM_LOGIN et GIT_TOKEN sont à définir manuellement avant de lancer le job
+    GIT_REMOTE: "https://$GITHUB_RM_ACCOUNT:$GIT_TOKEN@github.com/sigrennesmetropole/geor_plui_evolution.git"
+    COMMIT_MESSAGE: $GITHUB_COMMIT_MESSAGE

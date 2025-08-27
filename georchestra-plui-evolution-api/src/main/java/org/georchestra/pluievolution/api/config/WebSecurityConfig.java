@@ -34,7 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				// On autorise certains WS utilisés pour l'authent
 				.antMatchers("/plui-evolution/**").permitAll()
 				// -- swagger ui
-				.antMatchers("/csrf", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/v2/api-docs/**",
+				.antMatchers("/csrf", "/plui-evolution/swagger-resources/**", "/plui-evolution/swagger-ui.html", "/webjars/**", "/v2/api-docs/**",
 						"/configuration/ui", "/configuration/security")
 				.permitAll().antMatchers("/administration/**").fullyAuthenticated().and().httpBasic().and()
 				.addFilterAfter(createPreAuthenticationFilter(), BasicAuthenticationFilter.class).sessionManagement()
