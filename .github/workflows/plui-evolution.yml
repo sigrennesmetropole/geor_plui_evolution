@@ -21,7 +21,7 @@ jobs:
         java-version: '17.x'
 
     - name: "Maven repository caching"
-      uses: actions/cache@v1
+      uses: actions/cache@v3
       with:
         path: ~/.m2/repository
         key: plui-evolution-${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
