@@ -2,7 +2,7 @@
 
 ## I - Construction de l'application
 
-Le projet _git_ est construit comme suit :
+Le projet **git** est construit comme suit :
 
 - `docker` : ce répertoire contient des propositions de fichiers Dockerfile pour la construction/modification des images dockers ainsi  qu'une proposition pour le fichier _docker-compose.yml_
 - `georchestra-plui-evolution-api` : il s'agit du sous-projet maven contenant l'application et les controleurs
@@ -62,9 +62,10 @@ Ce script réalise les opérations suivantes :
 * Création des extensions geospatiales nécessaires dans le schéma _pluievolution_
 * Création des tables, index, séquences dans le schéma
 
-#### II.2 - Déploiement de l'application _back-office_
+#### II.2 - Déploiement de l'application **back-office**
 
 Le back-office peut être démarrer :
+
 * Soit dans un container Tomcat 9.
 
 Il suffit alors de déposer le fichier WAR produit dans le répertoire webapps de Tomcat.
@@ -86,8 +87,6 @@ java -Djava.io.tmpdir=/tmp/jetty \
 ```
 java -jar plui-evolution.jar
 ```
-
-**Remarque**: attention comme indiqué plus haut, l'application utilise la librairie "activity" qui créé ses propres tables au démarrage de l'application. Faut d'une configuration adéquate, ces tables peuvent atterrir dans le mauvais schéma. Il est donc important de dérouler le chapitre **II.1** avant toute chose.
 
 La configuration du back-office de trouve dans le fichier `plui-evolution.properties`. Les principales propriétés sont :
 
@@ -159,7 +158,10 @@ freemarker.fontsPath=fonts
 
 #### III.1 Configuration du certificat
 
-Un script est lancé au déploiement de l'image docker de l'application qui ajoute un certificat donné au keystore.  
+Un script est lancé au déploiement de l'image docker de l'application afin de permettre d'ajouter un ou des certificats dans un ou des keystores.  
+
+**Pour ajouter un seul certificat**
+
 Afin d'ajouter le bon certificat au bon keystore, il est nécessaire de remplir les informations adéquates dans le fichier `properties` de l'application :
 
 ```yaml
@@ -174,7 +176,9 @@ server.trustcert.keystore.store=
 # mot de passe du keystore
 server.trustcert.keystore.password=
 ```
+
 Par exemple :
+
 ```
 server.trustcert.keystore.path=/etc/georchestra/
 server.trustcert.keystore.cert=plui-evolution.crt
@@ -184,6 +188,46 @@ server.trustcert.keystore.password=changeit
 ```
 
 Si les variables ne sont pas remplies, le certificat n'est pas ajouté au keystore et l'application démarre normalement.
+
+**Pour ajouter plusieurs certificats**
+
+Afin d'ajouter le bon certificat au bon keystore, il est nécessaire de remplir les informations adéquates dans le fichier `properties` de l'application :
+
+```yaml
+# propriété indiquant la liste des certificats à installer
+server.trustcert.keystore.items=<item>,<item i>,<item n>
+# pour chaque items lister ci-dessus le groupe des propriétés suivantes :
+# dossier contenant le certificat pour l'item <item i>
+server.trustcert.keystore.<item i>.path=
+# filename du certificat pour l'item <item i>
+server.trustcert.keystore.<item i>.cert=
+# nom de l'alias du certificat à insérer dans le keystore pour l'item <item i>
+server.trustcert.keystore.<item i>.alias=
+# chemin absolu du keystore dans le container docker pour l'item <item i>
+server.trustcert.keystore.<item i>.store=
+# mot de passe du keystore pour l'item <item i>
+server.trustcert.keystore.<item i>.password=
+```
+
+Par exemple :
+
+```
+server.trustcert.keystore.items=k8s,geo
+
+server.trustcert.keystore.k8s.path=/etc/georchestra/
+server.trustcert.keystore.k8s.cert=plui-evolution.crt
+server.trustcert.keystore.k8s.alias=certificat-plui-evolution-k8s
+server.trustcert.keystore.k8s.store=/usr/local/openjdk-11/lib/security/cacerts
+server.trustcert.keystore.k8s.password=changeit
+
+server.trustcert.keystore.geo.path=/etc/georchestra/
+server.trustcert.keystore.geo.cert=plui-evolution2.crt
+server.trustcert.keystore.geo.alias=certificat-plui-evolution-geo
+server.trustcert.keystore.geo.store=/usr/local/openjdk-11/lib/security/cacerts
+server.trustcert.keystore.geo.password=changeit
+```
+
+Si pour un groupe (exemple : <item i>) de propriétés, il manque une propriété, le groupe est ignoré.
 
 ## IV - Montées de version
 #### IV.1 Version 1.9.0

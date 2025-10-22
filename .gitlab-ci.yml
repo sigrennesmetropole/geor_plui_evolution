@@ -222,6 +222,15 @@ pluievolutionapi:deploy-karbon:prepare:dev:
   variables:
     TARGET_ENV: dev
 
+pluievolutionapi:deploy-karbon:prepare:qua:
+  extends: .pluievolutionapi:deploy-karbon:prepare
+  only:
+    refs:
+      - open/master
+      - /.*karbonification.*/
+  variables:
+    TARGET_ENV: qua	
+
 .pluievolutionapi:deploy-karbon:
   stage: deploy
   trigger:
@@ -254,14 +263,14 @@ pluievolutionapi:deploy-karbon:dev:
 pluievolutionapi:deploy-karbon:qua:
   extends: .pluievolutionapi:deploy-karbon
   needs:
-    - job: pluievolutionapi:deploy-karbon:prepare:dev
+    - job: pluievolutionapi:deploy-karbon:prepare:qua
       artifacts: true
   only:
     refs:
       - open/master
       - /.*karbonification.*/
   variables:
-    TARGET_ENV: dev
+    TARGET_ENV: qua
     FORCE_POD: "true"
     PARENT_COMMIT_BRANCH: $CI_COMMIT_BRANCH
     PARENT_SERVICE_LOGIN: $SERVICE_LOGIN
