@@ -24,8 +24,8 @@ public class CoreAspect {
 		long start = System.currentTimeMillis();
 		Object output = proceedingJoinPoint.proceed();
 		long elapsedTime = System.currentTimeMillis() - start;
-		LOGGER.info(elapsedTime + " - " + proceedingJoinPoint.getSignature().getDeclaringTypeName() + " "
-				+ proceedingJoinPoint.getSignature().getName());
+		LOGGER.info("{} - {} {}", elapsedTime, proceedingJoinPoint.getSignature().getDeclaringTypeName(),
+				proceedingJoinPoint.getSignature().getName());
 		return output;
 	}
 

@@ -13,13 +13,8 @@
     },
 	"servers": [
 		{
-			"url": "/{basePath}",
-			"description": "Georchestra - Plugin PluiEvolution API",
-			"variables": {
-				"basePath": {
-					"default": "pluievolution"
-				}
-			}
+			"url": "/pluievolution",
+			"description": "Georchestra - Plugin PluiEvolution API"
 		}
 	],    
     "tags": [
@@ -1575,21 +1570,21 @@
             "PluiRequestStatus": {
                 "type": "string",
                 "enum": [
-                    "STATUT_NOUVEAU",
-                    "STATUT_ANALYSE_EN_COURS",
-                    "STATUT_PRODUCTION_EN_COURS",
-                    "STATUT_EN_ATTENTE_VALIDATION_COMMUNE",
-                    "STATUT_VALIDE_COMMUNE",
-                    "STATUT_DEMANDE_NON_RECEVABLE",
-                    "STATUT_DEMANDE_REFORMULEE"
+                    "NOUVEAU",
+                    "ANALYSE_EN_COURS",
+                    "PRODUCTION_EN_COURS",
+                    "EN_ATTENTE_VALIDATION_COMMUNE",
+                    "VALIDE_COMMUNE",
+                    "DEMANDE_NON_RECEVABLE",
+                    "DEMANDE_REFORMULEE"
                 ]
             },
             "PluiRequestType": {
                 "type": "string",
                 "enum": [
-                    "TYPE_COMMUNE",
-                    "TYPE_INTERCOMMUNE",
-                    "TYPE_METROPOLITAIN"
+                    "COMMUNE",
+                    "INTERCOMMUNE",
+                    "METROPOLITAIN"
                 ]
             }
         }

@@ -1,5 +1,10 @@
 package org.georchestra.pluievolution.service.mapper;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.GeometryType;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
@@ -7,12 +12,6 @@ import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GeographicAreaMapper extends AbstractMapper<GeographicAreaEntity, GeographicArea> {
@@ -31,7 +30,7 @@ public interface GeographicAreaMapper extends AbstractMapper<GeographicAreaEntit
             pt.add(BigDecimal.valueOf(coordinate.x));
             pt.add(BigDecimal.valueOf(coordinate.y));
             return pt;
-        }).collect(Collectors.toList()));
+        }).toList());
         polygonDto.setType(GeometryType.POLYGON);
         dto.setLocalisation(polygonDto);
     }

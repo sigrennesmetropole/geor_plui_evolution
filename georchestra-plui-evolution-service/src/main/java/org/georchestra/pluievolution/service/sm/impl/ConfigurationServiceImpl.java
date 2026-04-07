@@ -1,16 +1,18 @@
 package org.georchestra.pluievolution.service.sm.impl;
 
+import org.georchestra.pluievolution.core.dto.ConfigurationData;
 import org.georchestra.pluievolution.core.dto.EtablissementConfiguration;
 import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 import org.georchestra.pluievolution.service.bean.Configuration;
-import org.georchestra.pluievolution.core.dto.ConfigurationData;
 import org.georchestra.pluievolution.service.mapper.ConfigurationMapper;
 import org.georchestra.pluievolution.service.sm.ConfigurationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ConfigurationServiceImpl implements ConfigurationService {
 
     @Value("${application.version}")
@@ -31,8 +33,7 @@ public class ConfigurationServiceImpl implements ConfigurationService {
     @Value("${etablissement.rm.codeinsee}")
     private String codeInseeRm;
 
-    @Autowired
-    ConfigurationMapper configMapper;
+    private final ConfigurationMapper configMapper;
 
     @Override
     public ConfigurationData getApplicationVersion() {

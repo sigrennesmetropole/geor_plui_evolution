@@ -1,7 +1,6 @@
 projectKey=rennes-metropole.plui-evolution.georchestra-plui-evolution
 serverUrl=https://sonar.boost.open.global
-serverVersion=9.9.8.100196
-branch=v1.10.0
-dashboardUrl=https://sonar.boost.open.global/dashboard?id=rennes-metropole.plui-evolution.georchestra-plui-evolution&branch=v1.10.0
-ceTaskId=AZoMLPHpiu-cfDAh0LCn
-ceTaskUrl=https://sonar.boost.open.global/api/ce/task?id=AZoMLPHpiu-cfDAh0LCn
+serverVersion=25.9.0.112764
+dashboardUrl=https://sonar.boost.open.global/dashboard?id=rennes-metropole.plui-evolution.georchestra-plui-evolution&branch=v2.0.0
+ceTaskId=34417014-22af-46b4-844a-41a3a19c16e0
+ceTaskUrl=https://sonar.boost.open.global/api/ce/task?id=34417014-22af-46b4-844a-41a3a19c16e0

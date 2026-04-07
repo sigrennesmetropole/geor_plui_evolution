@@ -8,23 +8,23 @@ import org.georchestra.pluievolution.core.dto.GeographicEtablissement;
 import org.georchestra.pluievolution.core.dto.User;
 import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
 import org.georchestra.pluievolution.service.sm.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
  *
  */
 @RestController
+@RequiredArgsConstructor
 public class UserController implements UserApi {
 
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
 
-	@Autowired
-	private GeographicEtablissementService geographicEtablissementService;
+	private final GeographicEtablissementService geographicEtablissementService;
 
 	@Override
 	public ResponseEntity<GeographicEtablissement> getCurrentUserEtablissement() throws Exception {

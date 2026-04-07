@@ -26,6 +26,7 @@ public interface PluiRequestService {
 
 	/**
 	 * Crée une nouvelle demande
+	 * 
 	 * @param pluiRequest
 	 * @return
 	 */
@@ -34,16 +35,20 @@ public interface PluiRequestService {
 	void deletePluiRequestByUuid(UUID uuid) throws ApiServiceException;
 
 	/**
-	 * Permet d'envoyer une pièce jointe à la demande de uuid @pluiRequestUuid directement sur Redmine
+	 * Permet d'envoyer une pièce jointe à la demande de uuid @pluiRequestUuid
+	 * directement sur Redmine
+	 * 
 	 * @param pluiRequestUuid
 	 * @param documentContent
 	 * @return
 	 * @throws ApiServiceException
 	 */
-	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException, IOException, RedmineException;
+	Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent)
+			throws ApiServiceException, IOException, RedmineException;
 
 	/**
 	 * Permet de mettre à jour une pluiRequest
+	 * 
 	 * @param pluiRequest
 	 * @return
 	 * @throws ApiServiceException
@@ -52,9 +57,21 @@ public interface PluiRequestService {
 
 	/**
 	 * Récupération des pièces jointes d'une demande plui
+	 * 
 	 * @param uuid identifiant de la demande
 	 * @return liste des pièces jointes
-	 * @throws ApiServiceException erreur lors de la récupérationd des pièces jointes
+	 * @throws ApiServiceException erreur lors de la récupérationd des pièces
+	 *                             jointes
 	 */
-    List<Attachment> getAttachments(UUID uuid) throws ApiServiceException;
+	List<Attachment> getAttachments(UUID uuid) throws ApiServiceException;
+
+	/**
+	 * Récupération d'une demande plui à partir de son uuid
+	 * 
+	 * @param uuid identifiant de la demande
+	 * @return la demande plui
+	 * @throws ApiServiceException erreur lors de la récupération de la demande
+	 * 
+	 */
+	PluiRequest getPluiRequestByUuid(UUID uuid) throws ApiServiceException;
 }

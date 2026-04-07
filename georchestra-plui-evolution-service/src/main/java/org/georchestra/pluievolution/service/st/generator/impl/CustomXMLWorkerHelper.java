@@ -49,7 +49,7 @@ public class CustomXMLWorkerHelper {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CustomXMLWorkerHelper.class);
 
 	private static final String DEFAULT_CSS = "/default.css";
-	private static CustomXMLWorkerHelper myself = new CustomXMLWorkerHelper();
+	private static final CustomXMLWorkerHelper myself = new CustomXMLWorkerHelper();
 	private TagProcessorFactory tagProcessorFactory;
 	private CssFile defaultCssFile;
 
@@ -57,7 +57,7 @@ public class CustomXMLWorkerHelper {
 		this.tagProcessorFactory = tagProcessorFactory;
 	}
 
-	public static synchronized CustomXMLWorkerHelper getInstance() {
+	public static CustomXMLWorkerHelper getInstance() {
 		return myself;
 	}
 
@@ -68,9 +68,8 @@ public class CustomXMLWorkerHelper {
 		CssFile cssFile = null;
 		if (null != in) {
 			CssFileProcessor cssFileProcessor = new CssFileProcessor();
-			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-			try {
+			try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 				char[] buffer = new char[8192];
 
 				int length;

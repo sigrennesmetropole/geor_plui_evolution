@@ -4,13 +4,18 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import freemarker.ext.beans.HashAdapter;
 import freemarker.template.SimpleHash;
 import freemarker.template.TemplateHashModel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * Classe utilitaire pour la gestion des données du modèle
@@ -40,8 +45,8 @@ public final class DataModelUtils {
 	 */
 	public static String encodeOdt(String chaine) {
 		String result = chaine;
-		result = StringUtils.replace(result, "&", "&amp;");
-		result = StringUtils.replace(result, "<", "&lt;");
+		result = Strings.CS.replace(result, "&", "&amp;");
+		result = Strings.CS.replace(result, "<", "&lt;");
 
 		return result;
 	}
@@ -54,24 +59,24 @@ public final class DataModelUtils {
 	 */
 	public static String encodeHtmlAccent(String chaine) {
 		String result = chaine;
-		result = StringUtils.replace(result, "&", "&amp;");
-		result = StringUtils.replace(result, "â", "&acirc;");
-		result = StringUtils.replace(result, "à", "&agrave;");
-		result = StringUtils.replace(result, "ä", "&auml;");
-		result = StringUtils.replace(result, "é", "&eacute;");
-		result = StringUtils.replace(result, "ê", "&ecirc;");
-		result = StringUtils.replace(result, "è", "&egrave;");
-		result = StringUtils.replace(result, "ë", "&euml;");
-		result = StringUtils.replace(result, "î", "&icirc;");
-		result = StringUtils.replace(result, "ï", "&iuml;");
-		result = StringUtils.replace(result, "ô", "&ocirc;");
-		result = StringUtils.replace(result, "ö", "&ouml;");
-		result = StringUtils.replace(result, "œ", "&oelig;");
-		result = StringUtils.replace(result, "û", "&ucirc;");
-		result = StringUtils.replace(result, "ù", "&ugrave;");
-		result = StringUtils.replace(result, "ü", "&uuml;");
-		result = StringUtils.replace(result, "ç", "&ccedil;");
-		result = StringUtils.replace(result, "£", "&pound;");
+		result = Strings.CS.replace(result, "&", "&amp;");
+		result = Strings.CS.replace(result, "â", "&acirc;");
+		result = Strings.CS.replace(result, "à", "&agrave;");
+		result = Strings.CS.replace(result, "ä", "&auml;");
+		result = Strings.CS.replace(result, "é", "&eacute;");
+		result = Strings.CS.replace(result, "ê", "&ecirc;");
+		result = Strings.CS.replace(result, "è", "&egrave;");
+		result = Strings.CS.replace(result, "ë", "&euml;");
+		result = Strings.CS.replace(result, "î", "&icirc;");
+		result = Strings.CS.replace(result, "ï", "&iuml;");
+		result = Strings.CS.replace(result, "ô", "&ocirc;");
+		result = Strings.CS.replace(result, "ö", "&ouml;");
+		result = Strings.CS.replace(result, "œ", "&oelig;");
+		result = Strings.CS.replace(result, "û", "&ucirc;");
+		result = Strings.CS.replace(result, "ù", "&ugrave;");
+		result = Strings.CS.replace(result, "ü", "&uuml;");
+		result = Strings.CS.replace(result, "ç", "&ccedil;");
+		result = Strings.CS.replace(result, "£", "&pound;");
 
 		return result;
 	}
@@ -84,10 +89,10 @@ public final class DataModelUtils {
 	 */
 	public static String encodeHtmlWhiteSpace(String chaine) {
 		String result = chaine;
-		result = StringUtils.replace(result, "\n\r", BR);
-		result = StringUtils.replace(result, "\r", BR);
-		result = StringUtils.replace(result, NEW_LINE, BR);
-		result = StringUtils.replace(result, "\t", "&nbsp;&nbsp;");
+		result = Strings.CS.replace(result, "\n\r", BR);
+		result = Strings.CS.replace(result, "\r", BR);
+		result = Strings.CS.replace(result, NEW_LINE, BR);
+		result = Strings.CS.replace(result, "\t", "&nbsp;&nbsp;");
 
 		return result;
 	}
@@ -100,7 +105,7 @@ public final class DataModelUtils {
 	 */
 	public static String encodeHtml(String chaine) {
 		String result = encodeHtmlAccent(chaine);
-		result = StringUtils.replace(result, "<", "&lt;");
+		result = Strings.CS.replace(result, "<", "&lt;");
 
 		return result;
 	}
@@ -137,8 +142,8 @@ public final class DataModelUtils {
 			try {
 				if (map instanceof HashAdapter) {
 					TemplateHashModel templateModel = (TemplateHashModel) ((HashAdapter) map).getTemplateModel();
-					if (templateModel instanceof SimpleHash) {
-						Map<?, ?> innerMap = ((SimpleHash) templateModel).toMap();
+					if (templateModel instanceof SimpleHash simpleHash) {
+						Map<?, ?> innerMap = simpleHash.toMap();
 						result = innerMap.get(key);
 					}
 				}
@@ -230,40 +235,55 @@ public final class DataModelUtils {
 		int countLines = 0;
 		if (input != null) {
 			int c = countLines(input, lineLength);
-			result = new StringBuilder();
+			result = new StringBuilder(input.length());
 			String[] lines = input.split(NEW_LINE);
 			for (int i = 0; i < lines.length; i++) {
-				countLines = handleTruncateLine(result, lines[i], suspens, maxLines, lineLength, c, countLines, i);
+				countLines = handleTruncateLine(result, lines[i], suspens, ContextTruncate.builder().maxLines(maxLines)
+						.lineLength(lineLength).totalLine(c).countLines(countLines).index(i).build());
 			}
 		}
 		return result != null ? result.toString() : null;
 	}
 
-	private static int handleTruncateLine(StringBuilder result, String line, String suspens, int maxLines,
-			int lineLength, int totalLine, int countLines, int index) {
-		int currentCountLines = (int) Math.ceil(((double) line.length()) / ((double) lineLength));
-		if (countLines + currentCountLines > maxLines - 1) {
-			int trailingLines = maxLines - countLines;
-			if (countLines + trailingLines == totalLine) {
+	private static int handleTruncateLine(StringBuilder result, String line, String suspens,
+			ContextTruncate contextTruncate) {
+		int currentCountLines = (int) Math.ceil(((double) line.length()) / ((double) contextTruncate.lineLength));
+		if (contextTruncate.countLines + currentCountLines > contextTruncate.maxLines - 1) {
+			int trailingLines = contextTruncate.maxLines - contextTruncate.countLines;
+			if (contextTruncate.countLines + trailingLines == contextTruncate.totalLine) {
 				suspens = null;
 			}
-			int currentMaxLength = trailingLines * lineLength - (suspens != null ? suspens.length() : 0);
-			if (result.length() > 0) {
+			int currentMaxLength = trailingLines * contextTruncate.lineLength
+					- (suspens != null ? suspens.length() : 0);
+			if (!result.isEmpty()) {
 				result.append(NEW_LINE);
 			}
 			result.append(line.substring(0, Math.min(currentMaxLength, line.length())));
 			if (suspens != null) {
 				result.append(suspens);
 			}
-			countLines += trailingLines;
+			contextTruncate.countLines += trailingLines;
 		} else {
-			countLines += currentCountLines;
-			if (index > 0) {
+			contextTruncate.countLines += currentCountLines;
+			if (contextTruncate.index > 0) {
 				result.append(NEW_LINE);
 			}
 			result.append(line);
 		}
-		return countLines;
+		return contextTruncate.countLines;
+	}
+
+	@Getter
+	@Setter
+	@Builder
+	@NoArgsConstructor
+	@AllArgsConstructor
+	private static class ContextTruncate {
+		int maxLines;
+		int lineLength;
+		int totalLine;
+		int countLines;
+		int index;
 	}
 
 }

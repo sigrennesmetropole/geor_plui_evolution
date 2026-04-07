@@ -8,24 +8,24 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.service.exception.EMailException;
 import org.georchestra.pluievolution.service.st.mail.EMailConfiguration;
 import org.georchestra.pluievolution.service.st.mail.MailDescription;
 import org.georchestra.pluievolution.service.st.mail.MailService;
-import org.h2.util.IOUtils;
 import org.jsoup.Jsoup;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300

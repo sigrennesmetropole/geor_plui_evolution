@@ -1,23 +1,15 @@
 /**
- * 
+ *
  */
 package org.georchestra.pluievolution.api.security;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.georchestra.pluievolution.core.dto.User;
@@ -25,27 +17,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import jakarta.servlet.Filter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * This filter is inspired from georchestra geowebcache project
- * 
+ *
  * @author FNI18300
  *
  */
-public class PreAuthenticationFilter implements Filter {
+public class PreAuthenticationFilter extends OncePerRequestFilter implements Filter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PreAuthenticationFilter.class);
 
@@ -59,38 +44,46 @@ public class PreAuthenticationFilter implements Filter {
 	public static final String SEC_LASTNAME = "sec-lastname";
 	public static final String SEC_FIRSTNAME = "sec-firstname";
 
-	public PreAuthenticationFilter() {
+	// Controle des patterns des URL
+	private AntPathMatcher pathMatcher;
+
+	// Liste des URL à exclure
+	private Collection<String> excludeUrlPatterns;
+
+	/**
+	 *
+	 * @param excludeUrlPatterns
+	 */
+	public PreAuthenticationFilter(final String[] excludeUrlPatterns) {
 		super();
+		this.excludeUrlPatterns = Arrays.asList(excludeUrlPatterns);
+		pathMatcher = new AntPathMatcher();
 	}
 
 	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws IOException, ServletException {
-		if (request instanceof HttpServletRequest) {
-			HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-			if (LOGGER.isInfoEnabled()) {
-				Enumeration<String> names = httpServletRequest.getHeaderNames();
-				while (names.hasMoreElements()) {
-					String headerName = names.nextElement();
-					LOGGER.info("header:{} : {}", headerName, httpServletRequest.getHeader(headerName));
-				}
-			}
-			final String username = httpServletRequest.getHeader(SEC_USERNAME);
-			if (username != null) {
-				SecurityContextHolder.getContext().setAuthentication(createAuthentication(httpServletRequest));
+	public void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+			jakarta.servlet.FilterChain filterChain) throws ServletException, IOException {
 
-				if (LOGGER.isInfoEnabled()) {
-					LOGGER.info("Populated SecurityContextHolder with pre-auth token: '{}'",
-							SecurityContextHolder.getContext().getAuthentication());
-				}
-			} else {
-				if (LOGGER.isInfoEnabled()) {
-					LOGGER.info("SecurityContextHolder not populated with pre-auth token");
-				}
+		if (LOGGER.isInfoEnabled()) {
+			Enumeration<String> names = request.getHeaderNames();
+			while (names.hasMoreElements()) {
+				LOGGER.info("header:{}", names.nextElement());
 			}
 		}
+		final String username = request.getHeader(SEC_USERNAME);
+		if (username != null) {
+			SecurityContextHolder.getContext().setAuthentication(createAuthentication(request));
 
-		chain.doFilter(request, response);
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("Populated SecurityContextHolder with pre-auth token: '{}'",
+						SecurityContextHolder.getContext().getAuthentication());
+			}
+		} else {
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("SecurityContextHolder not populated with pre-auth token");
+			}
+		}
+		filterChain.doFilter(request, response);
 	}
 
 	/**
@@ -147,4 +140,10 @@ public class PreAuthenticationFilter implements Filter {
 		return update;
 	}
 
+	@Override
+	protected boolean shouldNotFilter(final HttpServletRequest request) throws ServletException {
+		// Contrôle si l'URL n'est pas dans le liste d'exclusion. Si c'est le cas, elle
+		// ne passera pas dans ce filtre
+		return excludeUrlPatterns.stream().anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
+	}
 }

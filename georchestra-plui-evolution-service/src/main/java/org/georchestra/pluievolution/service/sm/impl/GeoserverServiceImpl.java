@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -57,6 +58,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import jakarta.xml.bind.DatatypeConverter;
 
 @Service
 public class GeoserverServiceImpl implements GeoserverService {
@@ -108,7 +111,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// Code 200 : succès
 			String outputContentType = extractContentType(response, contentType);
-			if (response.getStatusLine().getStatusCode() == 200 && !StringUtils.contains(outputContentType, "text/xml")) {
+			if (response.getStatusLine().getStatusCode() == 200 && !Strings.CS.contains(outputContentType, "text/xml")) {
 				return GeoserverStream.builder().status(response.getStatusLine().getStatusCode())
 						.stream(IOUtils.toBufferedInputStream(response.getEntity().getContent()))
 						.mimeType(outputContentType).build();
@@ -118,8 +121,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 						ApiServiceExceptionsStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			LOG.error("getWms call",e);
-			throw new ApiServiceException(String.format("%s %s", GEOSERVER_REQUEST_ERROR, e.getMessage()), e, ApiServiceExceptionsStatus.BAD_REQUEST);
+			throw new ApiServiceException(String.format("%s %s %s", GEOSERVER_REQUEST_ERROR, "(getWms)", e.getMessage()), e, ApiServiceExceptionsStatus.BAD_REQUEST);
 		}
 
 	}
@@ -149,9 +151,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 			final HttpResponse response = httpClient.execute(httpGet);
 
 			return buildGeoserverWfsResponse(response);
-		} catch (final Exception e) {
-			LOG.error("getWfs call",e);
-			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR + e.getMessage(), e);
+		} catch (Exception e) {
+			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR +"(getWfs)" + e.getMessage(), e);
 		}
 	}
 
@@ -166,14 +167,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 			String wfsUrl = buildURL("wfs?" + buildQuery(queryString, encoding));
 
 			// Filtre si l'utilisateur n'est pas un agent RM
-			if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
+			if (area != null && area.getCodeInsee()!= null && !CODE_INSEE_RM.equals(area.getCodeInsee())) {
 				// filtre sur le code insee
 				wfsContent = addFilterToWFSContent(wfsContent, area.getCodeInsee());
 			}
 
 			// paramètres d'authentification
 			final String userpass = geoserverUsername + ":" + geoserverPassword;
-			final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+			final String basicAuth = BASIC + DatatypeConverter.printBase64Binary(userpass.getBytes());
 
 			final HttpPost httpPost = new HttpPost(wfsUrl);
 			httpPost.setHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -186,9 +187,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 			final HttpResponse response = httpClient.execute(httpPost);
 
 			return buildGeoserverWfsResponse(response);
-		} catch (final Exception e) {
-			LOG.error("postWfs call",e);
-			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR, e);
+		} catch (Exception e) {
+			throw new ApiServiceException(GEOSERVER_REQUEST_ERROR + "(postWfs)", e);
 		}
 	}
 
@@ -210,14 +210,14 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// requete original
 			String urlGet = baseUrl + "?" + queryString;
-			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(urlGet);
+			UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(urlGet);
 			Pair<String, String> cql = getQueryParam(CQL_FILTER_PARAM_NAME, queryString);
 			String filter = cql != null ? cql.getSecond() : "";
 			// Filtre sur le code insee si l'utilisateur n'est pas un agent RM
 			// Ce nouveau ne doit pas se substituer aux filtres deja present...
 			// Si un filtre est deja present, le nouveau filtre s'y ajoute avec la condition AND
 			// Si l'utilisateur est un agent RM, le filtre si existant dans l'URL reste tel quel
-			if (area != null && !area.getCodeInsee().equals(CODE_INSEE_RM)) {
+			if (area != null &&  area.getCodeInsee() != null && !CODE_INSEE_RM.equals(area.getCodeInsee())) {
 				if (StringUtils.isNotEmpty(filter)) {
 					filter = String.format("(%s) AND ", filter);
 				}
@@ -232,7 +232,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 
 			// paramètres d'authentification
 			final String userpass = geoserverUsername + ":" + geoserverPassword;
-			final String basicAuth = BASIC + javax.xml.bind.DatatypeConverter.printBase64Binary(userpass.getBytes());
+			final String basicAuth = BASIC + DatatypeConverter.printBase64Binary(userpass.getBytes());
 
 			// On met à jour l'URL
 			urlGet = uriBuilder.build().encode().toUriString();
@@ -342,7 +342,8 @@ public class GeoserverServiceImpl implements GeoserverService {
 					// On applique un operateur AND entre les filtre existants et le nouveau
 					NodeList filterChilds = filterNode.getChildNodes();
 					Node andOperator = buildAndFilterOperatorElement(document);
-					for (int i = 0; i < filterChilds.getLength(); i++) {
+					int length = filterChilds.getLength();
+					for (int i = 0; i < length; i++) {
 						andOperator.appendChild(filterChilds.item(i));
 					}
 					andOperator.appendChild(buildPropertyToEqualElement(document, codeInsee));
@@ -439,7 +440,7 @@ public class GeoserverServiceImpl implements GeoserverService {
 	}
 
 	private String buildURL(String service) {
-		StringBuilder urlBuilder = new StringBuilder();
+		StringBuilder urlBuilder = new StringBuilder(128);
 		urlBuilder.append(geoserverUrl).append('/').append(geoserverWorkspace);
 		if (!service.startsWith("/")) {
 			urlBuilder.append('/');

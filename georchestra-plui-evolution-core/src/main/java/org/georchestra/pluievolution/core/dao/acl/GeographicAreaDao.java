@@ -25,12 +25,14 @@ public interface GeographicAreaDao extends QueryDslDao<GeographicAreaEntity, Lon
     GeographicAreaEntity findByNom(String nom);
 
     @Query(
-            value = "SELECT * FROM geographic_area ga WHERE ga.codeinsee <> '243500139' AND ST_Intersects(ga.geometry, :point)",
-            nativeQuery = true
+            value = "SELECT ga FROM GeographicAreaEntity ga WHERE ga.codeInsee <> :codeInseeRM AND intersects(ga.geometry, :point) = true"
     )
-    GeographicAreaEntity getByCoords(@Param("point") Geometry point);
+    GeographicAreaEntity getByCoords(@Param("point") Geometry point, @Param("codeInseeRM") String codeInseeRM);
 
-
-
+    @Query(
+            value = "SELECT COUNT(ga) FROM GeographicAreaEntity ga WHERE ga.id = :areaId AND contains(ga.geometry, :point) = true"
+    )
+    long isPointInGeographicArea(@Param("areaId") Long areaId, @Param("point") Geometry point);
 
 }
+

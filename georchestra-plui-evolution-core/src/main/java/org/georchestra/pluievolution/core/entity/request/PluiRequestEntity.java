@@ -1,27 +1,28 @@
 package org.georchestra.pluievolution.core.entity.request;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import java.util.Date;
+import java.util.UUID;
+
 import org.georchestra.pluievolution.core.common.LongId;
 import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
 import org.georchestra.pluievolution.core.entity.acl.GeographicAreaEntity;
 import org.locationtech.jts.geom.Geometry;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import java.util.Date;
-import java.util.UUID;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 
 /**
@@ -87,11 +88,16 @@ public class PluiRequestEntity implements LongId {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof PluiRequestEntity that)) return false;
-
-        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
-
+		if (this == o) {
+			return true;
+		}
+		if (!(o instanceof PluiRequestEntity that)) {
+			return false;
+		}
+		if( getId() != null && getId().equals(that.getId())) {
+			return true;
+		}
+		
         return getUuid().equals(that.getUuid());
     }
 

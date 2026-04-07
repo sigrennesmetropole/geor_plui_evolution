@@ -9,25 +9,27 @@ import org.georchestra.pluievolution.service.sm.ConfigurationService;
 import org.georchestra.pluievolution.service.sm.InitializationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Controlleur pour la configuration.
  */
 @RestController
+@RequiredArgsConstructor
 public class AdministrationController implements AdministrationApi {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AdministrationController.class);
 
-	@Autowired
-	private ConfigurationService configurationService;
+	private final ConfigurationService configurationService;
 
-	@Autowired
-	private InitializationService initializationService;
+	private final InitializationService initializationService;
 
 	@Override
 	public ResponseEntity<ConfigurationData> getConfiguration() throws Exception {
@@ -41,10 +43,10 @@ public class AdministrationController implements AdministrationApi {
 			return ResponseEntity.ok(true);
 		} catch (Exception e) {
 			LOGGER.warn("Failed to initialize...", e);
-			return ResponseEntity.ok(false);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
 	}
-	
+
 	/**
 	 * point d'entrée utilisé uniquement en mode développement
 	 * 

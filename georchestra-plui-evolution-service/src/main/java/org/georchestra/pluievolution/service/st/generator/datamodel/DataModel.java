@@ -20,7 +20,7 @@ public abstract class DataModel {
 	/**
 	 * Constructeur pour DataModel
 	 */
-	public DataModel() {
+	protected DataModel() {
 		super();
 	}
 
@@ -29,11 +29,11 @@ public abstract class DataModel {
 	 * 
 	 * @param format
 	 */
-	public DataModel(GenerationFormat format) {
+	protected DataModel(GenerationFormat format) {
 		this(format, null);
 	}
 
-	public DataModel(GenerationFormat format, String modelFileName) {
+	protected DataModel(GenerationFormat format, String modelFileName) {
 		super();
 		this.format = format;
 		this.modelFileName = modelFileName;

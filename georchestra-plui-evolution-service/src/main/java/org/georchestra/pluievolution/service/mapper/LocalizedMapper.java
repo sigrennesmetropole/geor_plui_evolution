@@ -35,7 +35,8 @@ public abstract class LocalizedMapper {
         org.locationtech.jts.geom.Geometry pointGeom = null;
         try {
             // Si la geomeytrie a une projection definie et qui n'est pas en 3948 alors on la transforme vers 3948
-            if (point.getProjection() != null && layerSRID != point.getProjection()) {
+        	Integer srid = point.getProjection();
+            if (srid != null && layerSRID != srid) {
                 CoordinateReferenceSystem sourceProjection = CRS.decode("EPSG:" + point.getProjection());
 
                 CoordinateReferenceSystem targetProjection = CRS.decode("EPSG:" + layerSRID);

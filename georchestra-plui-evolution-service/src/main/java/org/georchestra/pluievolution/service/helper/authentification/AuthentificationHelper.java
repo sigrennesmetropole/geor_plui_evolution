@@ -4,10 +4,10 @@
 package org.georchestra.pluievolution.service.helper.authentification;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.georchestra.pluievolution.core.dto.User;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -60,8 +60,8 @@ public class AuthentificationHelper {
 		List<String> result = null;
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication != null) {
-			result = authentication.getAuthorities().stream().map(authority -> authority.getAuthority())
-					.collect(Collectors.toList());
+			result = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+					.toList();
 		}
 		return result;
 	}
@@ -82,7 +82,9 @@ public class AuthentificationHelper {
 	}
 	public String getOrganisation() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		User details  = (User) authentication.getDetails();
-		return details.getOrganization();
+		if (authentication != null && authentication.getDetails() instanceof User user) {
+			return user.getOrganization();
+		}
+		return null;
 	}
 }

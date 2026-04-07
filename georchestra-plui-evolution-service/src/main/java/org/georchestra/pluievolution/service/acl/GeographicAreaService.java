@@ -47,4 +47,13 @@ public interface GeographicAreaService {
      * @return
      */
     public GeographicAreaEntity getGeographicAreaEntityByCodeInsee(String codeInsee);
+
+    /**
+     * Vérifie que le point se trouve dans l'emprise géographique de l'organisation de l'utilisateur courant.
+     * Pour un agent Rennes Métropole, valide que le point est dans une commune de la métropole.
+     * Pour un agent communal, valide que le point est dans sa commune.
+     * @param point le point à tester
+     * @return true si le point est dans l'emprise, false sinon
+     */
+    boolean isPointInUserArea(Geometry point) throws ApiServiceException;
 }

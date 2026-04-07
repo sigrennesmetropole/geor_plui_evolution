@@ -233,3 +233,9 @@ Si pour un groupe (exemple : <item i>) de propriétés, il manque une propriét�
 #### IV.1 Version 1.9.0
 À l'occasion de la montée de version vers la 1.9.0 une évolution a lieu sur la couche detailed_plui_request.
 Il faut donc penser à mettre à jour la couche géoserver correspondante pour qu'elle prenne en compte les deux nouveaux champs
+
+#### IV.2 Version 2.0.0
+A l'occasion de la version 2.0.0, l'ensemble de la stack technique backend a été mise à jour (passage spring-boot 3.7 et montée de version diverses sur la partie swagger notamment).
+
+Cette montée de version fait que les énumérés PluiRequestStatus et PluiRequestType ne sont plus générés comme précédemment et les valeurs à passer au backend ont été modifiées (suppression du prefixe sur les valeurs).
+Il n'y a pas d'impact sur la bdd.

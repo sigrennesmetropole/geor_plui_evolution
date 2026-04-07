@@ -7,11 +7,9 @@ import java.net.URLDecoder;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.georchestra.pluievolution.api.CartoApi;
 import org.georchestra.pluievolution.core.dto.LayerConfiguration;
 import org.georchestra.pluievolution.service.acl.GeographicAreaService;
@@ -19,7 +17,6 @@ import org.georchestra.pluievolution.service.bean.GeoserverStream;
 import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.sm.ConfigurationService;
 import org.georchestra.pluievolution.service.sm.GeoserverService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,24 +24,27 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 /**
  * @author NCA20245
  *
  */
 @RestController
+@RequiredArgsConstructor
 public class CartoController implements CartoApi {
-
-	@Autowired
-	GeographicAreaService geographicAreaService;
-
-	@Autowired
-	GeoserverService geoserverService;
-
-	@Autowired
-	ConfigurationService configurationService;
 
 	private static final String GET_MAP_REQUEST_PARAM_VALUE = "GetMap";
 	private static final String REQUEST_PARAM = "REQUEST";
+	
+	private final GeographicAreaService geographicAreaService;
+
+	private final GeoserverService geoserverService;
+
+	private final ConfigurationService configurationService;
+
 
 	@Override
 	public ResponseEntity<Void> getWms() throws Exception {
@@ -150,7 +150,7 @@ public class CartoController implements CartoApi {
 		Iterator<String> it = request.getParameterNames().asIterator();
 		while (it.hasNext()) {
 			String someParam = it.next();
-			if (StringUtils.equalsIgnoreCase(someParam, paramName)) {
+			if (Strings.CI.equals(someParam, paramName)) {
 				return request.getParameter(someParam);
 			}
 		}

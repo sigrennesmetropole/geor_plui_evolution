@@ -19,8 +19,11 @@ include:
     file: 'docker/docker-template.yml'
   - project: 'boost/template-ci/pipelines/common'
     file: 'securite/oss-index/oss-index-template.yml'	
-  - project: 'bots/trivy-script'
-    file: 'trivy-template-job.yml' 
+  - component: $CI_SERVER_FQDN/boost/ci-component/security/dependency-track@2.0.0
+  - component: $CI_SERVER_FQDN/boost/ci-component/security/cdxgen-sbom@2.0.1
+  - component: $CI_SERVER_FQDN/boost/ci-component/security/syft-docker-sbom@2.0.0
+    inputs:
+      image_docker: 'glregistry.boost.open.global/rennes-metropole/plui-evolution/plui-evolution/plui-evolution:open-develop'
 
 default:
   image: maven:3.9.6-eclipse-temurin-17
@@ -37,6 +40,7 @@ stages:
   - deploy
   - delivering
   - sast
+  - post_sast
 
 # Build job with maven plugin execution policies define in parent pom
 pluievolutionapi:build:
@@ -50,13 +54,17 @@ pluievolutionapi:build:
     refs:
       - master
       - open/master
-  artifacts:
-    reports:
-      dotenv:
-        - build.env
+  artifacts:     
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
+      - '**/target'
+      - '**/target/jacoco.exec'
+      - '**/target/site/jacoco/**'
+    reports:
+      junit:
+        - '**/target/surefire-reports/TEST-*.xml'
+        - '**/target/surefire-reports/*.txt'
   interruptible: true
   
 pluievolutionapi:build:master:
@@ -72,8 +80,6 @@ pluievolutionapi:build:master:
       - open/master   
   artifacts:
     reports:
-      dotenv:
-        - build.env
     paths:
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.jar
       - $CI_PROJECT_DIR/georchestra-plui-evolution-api/target/georchestra-plui-evolution-api-*.war
@@ -82,6 +88,8 @@ pluievolutionapi:build:master:
 # Sonar code quality analysis - note a full test coverage report through a jacoco.exec merged file in base project folder
 pluievolutionapi:sonar:
   stage: test
+  needs:
+    - pluievolutionapi:build
   dependencies:
     - pluievolutionapi:build
   except:
@@ -91,19 +99,25 @@ pluievolutionapi:sonar:
   allow_failure: true
   script:
     - >
-      sh ./mvnw $MAVEN_CLI_OPTS -U compile sonar:sonar
+      mvn -U compile sonar:sonar
+      $MAVEN_CLI_OPTS
+      -Dmaven.source.skip=true
+      -Dmaven.main.skip
       -Dsonar.host.url=$SONAR_URL
       -Dsonar.login=$SONAR_TOKEN
       -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
       -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
       -Dsonar.gitlab.project_id=$CI_PROJECT_ID
-      -Dsonar.branch.name=$CI_COMMIT_REF_NAME
+      ${BRANCH}
+  interruptible: true  
 
 # On master, do not use branch parameter
 pluievolutionapi:sonar:master:
   stage: test
   dependencies:
     - pluievolutionapi:build
+  needs:
+    - pluievolutionapi:build    
   only:
     refs:
       - open/master
@@ -279,17 +293,6 @@ pluievolutionapi:deploy-karbon:qua:
     PARENT_PROJECT_ID: $CI_PROJECT_ID
     PARENT_STAGE_PREFIX: pluievolutionapi:deploy-karbon:prepare
   when: manual
-    
-pluievolutionapi:trivyscan:back: 
-  extends: 
-    - .trivy-scan
-  stage: docker
-  variables:
-    TRIVY_DOCKER_SCAN: glregistry.boost.open.global/rennes-metropole/plui-evolution/plui-evolution/plui-evolution:open-develop
-  only:
-    refs:
-      - open/develop      
-
 
 ## Livraison Github
 push-to-github:

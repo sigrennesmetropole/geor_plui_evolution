@@ -7,28 +7,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.georchestra.pluievolution.core.dao.acl.UserDao;
 import org.georchestra.pluievolution.core.dto.User;
 import org.georchestra.pluievolution.service.helper.authentification.AuthentificationHelper;
 import org.georchestra.pluievolution.service.st.ldap.LdapService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
 import org.springframework.ldap.query.SearchScope;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+
 /**
  * @author FNI18300
  *
  */
 @Service
+@RequiredArgsConstructor
 public class LdapServiceImpl implements LdapService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(LdapServiceImpl.class);
@@ -54,14 +54,9 @@ public class LdapServiceImpl implements LdapService {
 	@Value("${ldap.user.searchBase}")
 	private String userSearchBase;
 
-	@Autowired
-	private AuthentificationHelper authentificationHelper;
+	private final AuthentificationHelper authentificationHelper;
 
-	@Autowired
-	private LdapTemplate ldapTemplate;
-
-	@Autowired
-	private UserDao userDao;
+	private final LdapTemplate ldapTemplate;
 
 	private String[] attributes;
 

@@ -127,8 +127,8 @@ public class GenerationConnectorImpl implements GenerationConnector {
 
 		String nomFichierModele = dataModel.getModelFileName();
 		Template template = initModeleFreeMarker(nomFichierModele);
-		try {
-			template.process(dataModel.getDataModel(), new FileWriter(generateFile));
+		try (FileWriter fileWriter = new FileWriter(generateFile)) {
+			template.process(dataModel.getDataModel(), fileWriter);
 
 			result = new DocumentContent(dataModel.getOutputFileName(), dataModel.getFormat().getTypeMime(),
 					generateFile);
@@ -216,31 +216,22 @@ public class GenerationConnectorImpl implements GenerationConnector {
 
 		File convertedFile = null;
 		Document document = null;
-		InputStream cssFileInputStream = null;
-		FileOutputStream fop = null;
-		try {
-			convertedFile = File.createTempFile("tmp", ".cnv", new File(temporaryDirectory));
+		try (FileOutputStream fop = new FileOutputStream(convertedFile = File.createTempFile("tmp", ".cnv", new File(temporaryDirectory)));
+				InputStream cssFileInputStream = StringUtils.isNotEmpty(freemarkerCssFile)
+						? Thread.currentThread().getContextClassLoader().getResourceAsStream(freemarkerCssFile)
+						: null) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Temporary convert itext file:{}", convertedFile);
 			}
-
-			fop = new FileOutputStream(convertedFile);
 
 			document = new Document();
 			PdfWriter writer = PdfWriter.getInstance(document, fop);
 			document.open();
 
 			URL rootUrl = Thread.currentThread().getContextClassLoader().getResource(freemarkerBaseDirectory);
-			if (StringUtils.isNotEmpty(freemarkerCssFile)) {
-				cssFileInputStream = Thread.currentThread().getContextClassLoader()
-						.getResourceAsStream(freemarkerCssFile);
-			}
-			XMLWorkerFontProvider xmlWorkerFontProvider = null;
-			if (StringUtils.isNotEmpty(freemarkerFontsPath)) {
-				xmlWorkerFontProvider = new XMLWorkerFontProvider(freemarkerFontsPath);
-			} else {
-				xmlWorkerFontProvider = new XMLWorkerFontProvider();
-			}
+			XMLWorkerFontProvider xmlWorkerFontProvider = StringUtils.isNotEmpty(freemarkerFontsPath)
+					? new XMLWorkerFontProvider(freemarkerFontsPath)
+					: new XMLWorkerFontProvider();
 
 			final TagProcessorFactory tagProcessorFactory = Tags.getHtmlTagProcessorFactory();
 			tagProcessorFactory.removeProcessor(HTML.Tag.IMG);
@@ -259,21 +250,6 @@ public class GenerationConnectorImpl implements GenerationConnector {
 				document.close();
 			}
 			inputDocument.closeStream();
-			if (cssFileInputStream != null) {
-				try {
-					cssFileInputStream.close();
-				} catch (IOException e) {
-					LOGGER.warn("Failed to close cssStream", e);
-				}
-			}
-			if (fop != null) {
-				try {
-					fop.close();
-				} catch (IOException e) {
-					LOGGER.warn("Failed to close file stream", e);
-				}
-			}
-
 		}
 
 		return new DocumentContent(
@@ -295,9 +271,7 @@ public class GenerationConnectorImpl implements GenerationConnector {
 		ensureTargetDirectoryFile();
 
 		File convertedFile = null;
-		FileOutputStream fop = null;
-		try {
-			convertedFile = File.createTempFile("tmp", ".cnv", new File(temporaryDirectory));
+		try (FileOutputStream fop = new FileOutputStream(convertedFile = File.createTempFile("tmp", ".cnv", new File(temporaryDirectory)))) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Temporary flyingsaucer convert file:{}", convertedFile);
 			}
@@ -310,20 +284,10 @@ public class GenerationConnectorImpl implements GenerationConnector {
 			renderer.layout();
 
 			// Création du fichier PDF
-			fop = new FileOutputStream(convertedFile);
 			renderer.createPDF(fop);
-			fop.close();
 
 		} catch (Exception e) {
 			throw new DocumentGenerationException("Failed to flysauve html", e);
-		} finally {
-			if (fop != null) {
-				try {
-					fop.close();
-				} catch (IOException e) {
-					LOGGER.warn("Failed to close file", e);
-				}
-			}
 		}
 		return new DocumentContent(
 				FilenameUtils.getBaseName(inputDocument.getFileName()) + "." + GenerationFormat.PDF.getExtension(),

@@ -14,6 +14,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,9 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 	private final GeographicAreaMapper geographicAreaMapper;
 
 	private final AuthentificationHelper authentificationHelper;
+
+	@Value("${etablissement.rm.codeinsee}")
+	private String codeInseeRM;
 
 	@Override
 	public GeographicArea getGeographicAreaByCodeInsee(String codeInsee) {
@@ -54,7 +58,7 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 
 	@Override
 	public GeographicAreaEntity getGeographicAreaByPoint(Geometry point) throws ApiServiceException {
-		GeographicAreaEntity entity = geographicAreaDao.getByCoords(point);
+		GeographicAreaEntity entity = geographicAreaDao.getByCoords(point, codeInseeRM);
 		if (entity == null) {
 			throw new ApiServiceException("Ce point n'est dans aucune commune connue");
 		}
@@ -64,5 +68,22 @@ public class GeographicAreaServiceImpl implements GeographicAreaService {
 	@Override
 	public GeographicAreaEntity getGeographicAreaEntityByCodeInsee(String codeInsee) {
 		return geographicAreaDao.findByCodeInsee(codeInsee);
+	}
+
+	@Override
+	public boolean isPointInUserArea(Geometry point) throws ApiServiceException {
+		GeographicArea userArea = getCurrentUserArea();
+		if (userArea == null) {
+			return false;
+		}
+		if (codeInseeRM.equals(userArea.getCodeInsee())) {
+			// Agent RM : valide si le point est dans n'importe quelle commune de la
+			// métropole
+			return geographicAreaDao.getByCoords(point, codeInseeRM) != null;
+		} else {
+			// Agent commune : valide si le point est dans sa commune
+			GeographicAreaEntity userAreaEntity = geographicAreaDao.findByCodeInsee(userArea.getCodeInsee());
+			return geographicAreaDao.isPointInGeographicArea(userAreaEntity.getId(), point) > 0;
+		}
 	}
 }

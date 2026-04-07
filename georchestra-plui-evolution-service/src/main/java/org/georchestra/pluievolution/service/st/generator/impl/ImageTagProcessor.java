@@ -34,7 +34,7 @@ public class ImageTagProcessor extends com.itextpdf.tool.xml.html.Image {
 		final Map<String, String> attributes = tag.getAttributes();
 		String src = attributes.get(HTML.Attribute.SRC);
 		List<Element> elements = new ArrayList<>(1);
-		if (null != src && src.length() > 0) {
+		if (null != src && !src.isEmpty()) {
 			Image img = null;
 			img = handleDataImage(ctx, tag, src, elements, img);
 

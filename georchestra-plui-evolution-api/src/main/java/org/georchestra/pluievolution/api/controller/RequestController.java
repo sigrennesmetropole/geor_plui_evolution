@@ -10,31 +10,25 @@ import java.util.UUID;
 import org.apache.commons.io.FileUtils;
 import org.georchestra.pluievolution.api.RequestApi;
 import org.georchestra.pluievolution.core.common.DocumentContent;
-import org.georchestra.pluievolution.core.dto.*;
-import org.georchestra.pluievolution.service.acl.GeographicAreaService;
-import org.georchestra.pluievolution.service.acl.GeographicEtablissementService;
+import org.georchestra.pluievolution.core.dto.Attachment;
+import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
  *
  */
 @RestController
+@RequiredArgsConstructor
 public class RequestController implements RequestApi {
 
-	@Autowired
-	PluiRequestService pluiRequestService;
-
-	@Autowired
-    GeographicEtablissementService geographicEtablissementService;
-
-	@Autowired
-	GeographicAreaService geographicAreaService;
+	private final PluiRequestService pluiRequestService;
 
 	@Override
 	public ResponseEntity<PluiRequest> createPluiRequest(PluiRequest pluiRequest) throws Exception {
@@ -69,8 +63,7 @@ public class RequestController implements RequestApi {
 
 	@Override
 	public ResponseEntity<PluiRequest> getPluiRequestByUuid(UUID uuid) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return ResponseEntity.ok(pluiRequestService.getPluiRequestByUuid(uuid));
 	}
 
 }

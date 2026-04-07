@@ -1,14 +1,14 @@
 package org.georchestra.pluievolution.core.dao.request;
 
+import java.util.UUID;
+
 import org.georchestra.pluievolution.core.dao.QueryDslDao;
 import org.georchestra.pluievolution.core.entity.request.PluiRequestEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
-
-@SuppressWarnings("squid:S100")
+//@SuppressWarnings("squid:S100")
 @Repository
 public interface PluiRequestDao extends QueryDslDao<PluiRequestEntity, Long> {
 

@@ -4,6 +4,7 @@
 package org.georchestra.pluievolution.service.st.repository.impl;
 
 import java.io.ByteArrayInputStream;
+import java.util.Collections;
 import java.util.List;
 
 import org.georchestra.pluievolution.core.common.DocumentContent;
@@ -12,9 +13,10 @@ import org.georchestra.pluievolution.service.exception.ApiServiceException;
 import org.georchestra.pluievolution.service.exception.DocumentRepositoryException;
 import org.georchestra.pluievolution.service.helper.request.RedmineHelper;
 import org.georchestra.pluievolution.service.st.repository.DocumentRepositoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
@@ -22,10 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class DocumentRepositoryServiceImpl implements DocumentRepositoryService {
 
-	@Autowired
-	RedmineHelper redmineHelper;
+	private final RedmineHelper redmineHelper;
 
 	@Override
 	@Transactional(readOnly = false)
@@ -55,41 +57,36 @@ public class DocumentRepositoryServiceImpl implements DocumentRepositoryService 
 
 	@Override
 	public List<DocumentContent> getDocumentContents(String attachmentId) throws DocumentRepositoryException {
-		List<DocumentContent> result = null;
-
-		return result;
+		// Not implemented
+		return List.of();
 	}
 
 	@Override
 	public Attachment getDocument(Long id) {
-		Attachment result = null;
-
-		return result;
+		// Not implemented
+		return null;
 	}
 
 	@Override
 	public List<Attachment> getDocuments(String attachmentId) {
-		List<Attachment> result = null;
-
-		return result;
+		// Not implemented
+		return Collections.emptyList();
 	}
 
 	@Override
 	public List<Long> getDocumentIds(String attachmentId) throws DocumentRepositoryException {
-		List<Long> result = null;
-
-		return result;
+		return Collections.emptyList();
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteDocument(Long id) throws DocumentRepositoryException {
-
+		// Not implemented
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	public void deleteDocuments(String attachmentId) throws DocumentRepositoryException {
-
+		// Not implemented
 	}
 }

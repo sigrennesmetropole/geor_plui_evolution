@@ -12,27 +12,26 @@ import org.georchestra.pluievolution.service.mapper.UserMapper;
 import org.georchestra.pluievolution.service.sm.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
  *
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-	@Autowired
-	private AuthentificationHelper authentificationHelper;
+	private final AuthentificationHelper authentificationHelper;
 
-	@Autowired
-	private UserDao userDao;
+	private final UserDao userDao;
 
-	@Autowired
-	private UserMapper userMapper;
+	private final UserMapper userMapper;
 
 	@Override
 	@Transactional(readOnly = true)

@@ -3,12 +3,16 @@
  */
 package org.georchestra.pluievolution.service.sm.impl;
 
-import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.bean.Issue;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
 import org.georchestra.pluievolution.core.common.DocumentContent;
 import org.georchestra.pluievolution.core.dao.request.PluiRequestDao;
 import org.georchestra.pluievolution.core.dto.Attachment;
 import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
+import org.georchestra.pluievolution.core.dto.GeographicArea;
 import org.georchestra.pluievolution.core.dto.PluiRequest;
 import org.georchestra.pluievolution.core.dto.PluiRequestStatus;
 import org.georchestra.pluievolution.core.dto.PluiRequestType;
@@ -29,18 +33,14 @@ import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.locationtech.jts.geom.Geometry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.bean.Issue;
 
-
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
@@ -48,54 +48,47 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class PluiRequestServiceImpl implements PluiRequestService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(PluiRequestServiceImpl.class);
-
-	@Autowired
-	private AttachmentHelper attachmentHelper;
-
-	@Autowired
-	PluiRequestMapper pluiRequestMapper;
-
-	@Autowired
-	PluiRequestDao pluiRequestDao;
-
-	@Autowired
-	GeographicAreaService geographicAreaService;
-
-	@Autowired
-	GeographicEtablissementService geographicEtablissementService;
-
-	@Autowired
-	GeographicAreaMapper geographicAreaMapper;
-
-	@Autowired
-	GeographicEtablissementMapper geographicEtablissementMapper;
-
-	@Autowired
-	AuthentificationHelper authentificationHelper;
 
 	private static final String CODE_INSEE_RM = "243500139";
 	private static final String COMMUNAL_REQUEST_LOCALISATION_NOT_FOUND = "La localisation de la demande communale ne peut etre vide";
 	private static final String REQUEST_TYPE_NOT_FOUND = "Le type de demande doit etre fourni";
 
-	@Autowired
-	RedmineHelper redmineHelper;
+	private final AttachmentHelper attachmentHelper;
+
+	private final PluiRequestMapper pluiRequestMapper;
+
+	private final PluiRequestDao pluiRequestDao;
+
+	private final GeographicAreaService geographicAreaService;
+
+	private final GeographicEtablissementService geographicEtablissementService;
+
+	private final GeographicAreaMapper geographicAreaMapper;
+
+	private final GeographicEtablissementMapper geographicEtablissementMapper;
+
+	private final AuthentificationHelper authentificationHelper;
+	private final RedmineHelper redmineHelper;
 
 	@Override
 	@Transactional(readOnly = true)
-	public Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent) throws ApiServiceException, IOException, RedmineException {
+	public Attachment sendAttachment(UUID pluiRequestUuid, DocumentContent documentContent)
+			throws ApiServiceException, IOException, RedmineException {
 		PluiRequestEntity pluiRequestEntity = pluiRequestDao.findByUuid(pluiRequestUuid);
 		if (pluiRequestEntity == null) {
 			throw new ApiServiceException("Cette demande n'a pas encore été renseignée");
 		}
 		// Verification de la piece jointe
-			// Verification du mimetype
+		// Verification du mimetype
 		if (!getAttachmentConfiguration().getMimeTypes().contains(documentContent.getContentType())) {
-			throw new ApiServiceException(String.format("Les fichiers de types %s ne sont pas autorisés", documentContent.getContentType()));
+			throw new ApiServiceException(
+					String.format("Les fichiers de types %s ne sont pas autorisés", documentContent.getContentType()));
 		}
-			// Verification de la taille du fichier
+		// Verification de la taille du fichier
 		if (getAttachmentConfiguration().getMaxSize() < documentContent.getFileSize()) {
 			throw new ApiServiceException("Taille du fichier superieure à la taille maximale");
 		}
@@ -136,7 +129,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(REQUEST_TYPE_NOT_FOUND);
 		}
 
-		// On defini le statut de  la demande si non defini ou different de nouveau
+		// On defini le statut de la demande si non defini ou different de nouveau
 		if (pluiRequest.getStatus() == null || pluiRequest.getStatus() != PluiRequestStatus.NOUVEAU) {
 			pluiRequest.setStatus(PluiRequestStatus.NOUVEAU);
 		}
@@ -153,13 +146,10 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On ajoute un UUID à la demande
 		entityInDb.setUuid(UUID.randomUUID());
 
-		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
+		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id
+		// retourné de léa précédente opération
 		try {
-			pluiRequest = this.pluiRequestMapper.entityToDto(
-					this.pluiRequestDao.save(
-							entityInDb
-					)
-			);
+			pluiRequest = this.pluiRequestMapper.entityToDto(this.pluiRequestDao.save(entityInDb));
 			redmineHelper.updatePluiRequestIssue(entityInDb);
 			return pluiRequest;
 		} catch (DataAccessException e) {
@@ -179,34 +169,48 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		}
 		Issue redmineIssue = redmineHelper.getIssueByRedmineId(pluiRequestEntity.getRedmineId(), true);
 		if (redmineIssue == null) {
-			throw new ApiServiceException("La demande plui id = " + pluiRequestEntity.getId() + " n'existe pas dans Redmine.");
+			throw new ApiServiceException(
+					"La demande plui id = " + pluiRequestEntity.getId() + " n'existe pas dans Redmine.");
 		}
-		return redmineIssue.getAttachments().stream()
-				.map(redmineAttachment -> {
-					Attachment attachment = new Attachment();
-					attachment.setId(redmineAttachment.getId().longValue());
-					attachment.setName(redmineAttachment.getFileName());
-					attachment.setMimeType(redmineAttachment.getContentType());
-					return attachment;
-				})
-				.collect(Collectors.toList());
+		return redmineIssue.getAttachments().stream().map(redmineAttachment -> {
+			Attachment attachment = new Attachment();
+			attachment.setId(redmineAttachment.getId().longValue());
+			attachment.setName(redmineAttachment.getFileName());
+			attachment.setMimeType(redmineAttachment.getContentType());
+			return attachment;
+		}).toList();
 	}
 
 	/**
-	 * Permet de mettre à jour la geometry de localisation de la PluiRequest (localisation précise ou commune)
+	 * Permet de mettre à jour la geometry de localisation de la PluiRequest
+	 * (localisation précise ou commune)
+	 * 
 	 * @param pluiRequest
-	 * @param codeInsee, @Nullable codeInsee de la commune demandeuse. Il est précisé quand il s'agit d'un utilisateur de Rennes Métropole
+	 * @param codeInsee,  @Nullable codeInsee de la commune demandeuse. Il est
+	 *                    précisé quand il s'agit d'un utilisateur de Rennes
+	 *                    Métropole
 	 * @throws ApiServiceException
 	 */
 	private void updatePositionAndArea(PluiRequestEntity pluiRequest, String codeInsee) throws ApiServiceException {
 		// Si type communale alors position de la demande ajoutée depuis le front
-		if (pluiRequest.getType() == PluiRequestType.COMMUNE && pluiRequest.getGeometry() == null) {
-			throw new ApiServiceException(COMMUNAL_REQUEST_LOCALISATION_NOT_FOUND);
+		if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
+			if (pluiRequest.getGeometry() == null) {
+				throw new ApiServiceException(COMMUNAL_REQUEST_LOCALISATION_NOT_FOUND);
+			}
+			if (!geographicAreaService.isPointInUserArea(pluiRequest.getGeometry())) {
+				throw new ApiServiceException(
+						"Le point dessiné se situe en dehors de l'emprise géographique de votre organisation",
+						ApiServiceExceptionsStatus.BAD_REQUEST);
+			}
 		}
-		// Si type intercommunal, position de la demande a fixer a partir de la position de l'etablissement de l'organisation a laquelle appartient le user
-		// Si type metropolitain, position de la demande a fixer à partir de la position de l'hotel rennes metropole
-		// cas special des agents RM, code insee fourni pour demande metropolitaine et intercommunale, commune detecte si demande communale
-		if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE || pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
+		// Si type intercommunal, position de la demande a fixer a partir de la position
+		// de l'etablissement de l'organisation a laquelle appartient le user
+		// Si type metropolitain, position de la demande a fixer à partir de la position
+		// de l'hotel rennes metropole
+		// cas special des agents RM, code insee fourni pour demande metropolitaine et
+		// intercommunale, commune detecte si demande communale
+		if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE
+				|| pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
 			pluiRequest.setGeometry(getGeographicPosition(pluiRequest, codeInsee));
 		}
 
@@ -216,6 +220,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	/**
 	 * Il s'agit positionner la demande sur le bon emplacement
+	 * 
 	 * @param pluiRequest
 	 * @param codeInsee
 	 * @return
@@ -225,22 +230,23 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		GeographicEtablissementEntity geographic = null;
 		if (pluiRequest.getType() == PluiRequestType.INTERCOMMUNE) {
 			// Si l'utilisateur est un agent Rennes Metropole
-			if (geographicAreaService.getCurrentUserArea().getCodeInsee().equals(CODE_INSEE_RM)) {
-				geographic = geographicEtablissementMapper.dtoToEntity(
-						geographicEtablissementService.getGeographicEtablissementByCodeInsee(codeInsee)
-				);
+			GeographicArea currentGeographicArea = geographicAreaService.getCurrentUserArea();
+			if (currentGeographicArea != null && CODE_INSEE_RM.equals(currentGeographicArea.getCodeInsee())) {
+				geographic = geographicEtablissementMapper
+						.dtoToEntity(geographicEtablissementService.getGeographicEtablissementByCodeInsee(codeInsee));
 				if (geographic == null) {
 					throw new ApiServiceException("Le code insee fourni n'a pas de geographic area correspondante");
 				}
 			} else {
-				// on place la demande sur l'etablissement de l'organisation a laquelle appartient l'utilisateur
-				geographic = geographicEtablissementMapper.dtoToEntity(
-						geographicEtablissementService.getCurrentUserEtablissement());
+				// on place la demande sur l'etablissement de l'organisation a laquelle
+				// appartient l'utilisateur
+				geographic = geographicEtablissementMapper
+						.dtoToEntity(geographicEtablissementService.getCurrentUserEtablissement());
 			}
 		} else if (pluiRequest.getType() == PluiRequestType.METROPOLITAIN) {
 			// On place la demande sur hotel rennes metropole
-			geographic = geographicEtablissementMapper.dtoToEntity(
-					geographicEtablissementService.getGeographicEtablissementByCodeInsee(CODE_INSEE_RM));
+			geographic = geographicEtablissementMapper
+					.dtoToEntity(geographicEtablissementService.getGeographicEtablissementByCodeInsee(CODE_INSEE_RM));
 
 		}
 
@@ -253,19 +259,24 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 
 	/**
 	 * Permet de recuperer la geographic area a associer à une demande
+	 * 
 	 * @param pluiRequest
 	 * @return
 	 */
-	private GeographicAreaEntity getGeographicArea(PluiRequestEntity pluiRequest, String codeInsee) throws ApiServiceException {
+	private GeographicAreaEntity getGeographicArea(PluiRequestEntity pluiRequest, String codeInsee)
+			throws ApiServiceException {
 		// On associe a la demande la geographicArea de l'utilisateur courant
 		GeographicAreaEntity area = null;
-		if (geographicAreaService.getCurrentUserArea().getCodeInsee().equals(CODE_INSEE_RM)) {
+		GeographicArea currentGeographicArea = geographicAreaService.getCurrentUserArea();
+		if (currentGeographicArea != null && CODE_INSEE_RM.equals(currentGeographicArea.getCodeInsee())) {
 			// Si utilisateur est un agent rennes metropole
 			if (pluiRequest.getType() == PluiRequestType.COMMUNE) {
-				// Si demande de type communale, alors on localise la commune a laquelle appartient le point
+				// Si demande de type communale, alors on localise la commune a laquelle
+				// appartient le point
 				area = geographicAreaService.getGeographicAreaByPoint(pluiRequest.getGeometry());
 			} else {
-				// on lui attribue la geographic area associée au code insee fourni pour le type metropolitain et intercommune
+				// on lui attribue la geographic area associée au code insee fourni pour le type
+				// metropolitain et intercommune
 				area = geographicAreaMapper.dtoToEntity(geographicAreaService.getGeographicAreaByCodeInsee(codeInsee));
 			}
 		} else {
@@ -292,7 +303,7 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			throw new ApiServiceException(REQUEST_TYPE_NOT_FOUND);
 		}
 
-		// On defini le statut de  la demande si non defini ou different de nouveau
+		// On defini le statut de la demande si non defini ou different de nouveau
 		if (pluiRequest.getStatus() == null || pluiRequest.getStatus() != PluiRequestStatus.NOUVEAU) {
 			pluiRequest.setStatus(PluiRequestStatus.NOUVEAU);
 		}
@@ -303,7 +314,8 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		// On defini la date de creation de la demande
 		pluiRequestEntity.setCreationDate(new Date());
 
-		// On trouve la geograohic area associée à la demande et on l'ajoute à la demande
+		// On trouve la geograohic area associée à la demande et on l'ajoute à la
+		// demande
 		String initiator = authentificationHelper.getUsername();
 
 		// On ajoute l'initiateur de la demande
@@ -315,19 +327,18 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 		pluiRequestEntity.setUuid(UUID.randomUUID());
 
 		// on envoie la pluirequest au redminehelper et on la recupere
-		// Si le processus d'envoi réussi alors on recoit la pluirequest avec le redmineId renseigné
+		// Si le processus d'envoi réussi alors on recoit la pluirequest avec le
+		// redmineId renseigné
 		// Sinon une exception est levée
 		pluiRequestEntity = redmineHelper.createPluiRequestIssue(pluiRequestEntity);
 
-		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id retourné de léa précédente opération
+		// On enregistre la demande dans la bdd après lui avoir ajouté le redmine id
+		// retourné de léa précédente opération
 		try {
-			return this.pluiRequestMapper.entityToDto(
-					this.pluiRequestDao.save(
-							pluiRequestEntity
-					)
-			);
+			return this.pluiRequestMapper.entityToDto(this.pluiRequestDao.save(pluiRequestEntity));
 		} catch (DataAccessException e) {
-			// On supprime le ticket dans redmine si la demande n'a pu etre enregistrée ici dans la base de donnée
+			// On supprime le ticket dans redmine si la demande n'a pu etre enregistrée ici
+			// dans la base de donnée
 			redmineHelper.deleteIssueById(pluiRequestEntity.getRedmineId());
 			LOGGER.error("Erreur lors de l'enregistrement de la demande dans la BDD");
 			throw new ApiServiceException(e.getMessage(), e);
@@ -343,6 +354,18 @@ public class PluiRequestServiceImpl implements PluiRequestService {
 			LOGGER.error("Erreur lors de la suppression de la demande dans la BDD");
 			throw new ApiServiceException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public PluiRequest getPluiRequestByUuid(UUID uuid) throws ApiServiceException {
+		if (uuid == null) {
+			throw new ApiServiceException("UUID non fourni");
+		}
+		PluiRequestEntity pluiRequestEntity = pluiRequestDao.findByUuid(uuid);
+		if (pluiRequestEntity == null) {
+			throw new ApiServiceException("Entité non trouvée en base");
+		}
+		return pluiRequestMapper.entityToDto(pluiRequestEntity);
 	}
 
 }

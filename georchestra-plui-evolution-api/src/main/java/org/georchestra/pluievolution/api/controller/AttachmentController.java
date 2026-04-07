@@ -8,23 +8,25 @@ import org.georchestra.pluievolution.api.controller.common.AbstractExportDocumen
 import org.georchestra.pluievolution.core.dto.AttachmentConfiguration;
 import org.georchestra.pluievolution.service.sm.PluiRequestService;
 import org.georchestra.pluievolution.service.st.repository.DocumentRepositoryService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * @author FNI18300
  *
  */
 @RestController
+@RequiredArgsConstructor
 public class AttachmentController extends AbstractExportDocumentApi implements AttachmentApi {
 	
-	@Autowired
-	private PluiRequestService pluiRequestService;
+	
+	private final PluiRequestService pluiRequestService;
 
-	@Autowired
-	private DocumentRepositoryService documentRepositoryService;
+	
+	private final DocumentRepositoryService documentRepositoryService;
 
 	@Override
 	public ResponseEntity<AttachmentConfiguration> getAttachmentConfiguration() throws Exception {
